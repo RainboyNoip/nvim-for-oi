@@ -23,10 +23,15 @@ vim.g.maplocalleader = "\\"
 
 -- 设置 lazy.nvim
 require("lazy").setup({
-  -- 自动检查插件更新
-  checker = { enabled = true },
+  -- 不自动检查插件更新
+  checker = { enabled = false },
   -- 在这里添加你的插件配置
-  spec = {},
+  spec = {
+    -- same as: require("lazy").setup("plugins")
+    -- 从 lua/plugins 目录加载插件配置
+    { import = "plugins" },
+  },
+
   git = {
     log = { "-8" }, -- 显示最近8次提交
     timeout = 120,  -- 终止超过2分钟的进程
