@@ -33,3 +33,8 @@ vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>', opts)
     -- 这样一来，你就可以连续多次按 > 来增加缩进，而不需要每次都重新手动选择代码块。
 vim.keymap.set('v', '<', '<gv', opts)
 vim.keymap.set('v', '>', '>gv', opts)
+
+
+-- 保存快捷键
+vim.keymap.set('n', '<C-s>', ':w<CR>', opts)
+vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>a', opts)
