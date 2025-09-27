@@ -35,10 +35,10 @@ function M.setup()
 
   -- 设定缓冲区局部的快捷键
   local opts = { buffer = true, silent = true }
-  vim.keymap.set('n', '<F5>', ':w <bar> !g++ -std=c++17 % -o %< && ./%< <CR>', {
-    buffer = true,
-    desc = "Compile & Run C++ file"
-  })
+  -- vim.keymap.set('n', '<F5>', ':w <bar> !g++ -std=c++17 % -o %< && ./%< <CR>', {
+  --   buffer = true,
+  --   desc = "Compile & Run C++ file"
+  -- })
 
   -- ... 你未来可以添加更多快捷键和设置在这里 ...
 
