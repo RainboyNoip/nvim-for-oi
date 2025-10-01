@@ -30,8 +30,8 @@ local function insert_code_snippet(snip_path)
 
 	-- 添加 //-- filename {{{ 和 }}} 到文件的开头和结尾
 	local filename = vim.fn.fnamemodify(snip_path, ":t")
-	table.insert(lines, 1, "//-- " .. filename .. " {{{")
-	table.insert(lines, "//-- }}}")
+	table.insert(lines, 1, "//oisnip_begin " .. filename)
+	table.insert(lines, "//oisnip_end")
 
 	local bufnr = vim.api.nvim_get_current_buf()
 	local winid = vim.api.nvim_get_current_win()

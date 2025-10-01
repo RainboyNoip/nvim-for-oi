@@ -23,3 +23,14 @@ vim.opt.incsearch = true -- search as characters are entered
 vim.opt.hlsearch = false -- do not highlight matches
 vim.opt.ignorecase = true -- ignore case in searches by default
 vim.opt.smartcase = true -- but make it case sensitive if an uppercase is entered
+
+
+
+-- enable fold
+vim.opt.foldenable = true
+vim.opt.foldmethod = "marker" -- use marker to fold code
+vim.opt.foldmarker = { "//oisnip_begin", "//oisnip_end" }
+vim.opt.foldlevel = 99
+-- open all folds by default
+-- opt.foldopen:append("all")
+-- opt.foldopen:append("hor") -- open folds when opening a horizontal split
