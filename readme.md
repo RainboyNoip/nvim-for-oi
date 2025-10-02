@@ -86,6 +86,14 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 - 重命名符号
 - 代码诊断
 
+
+使用`clangd`,在项目的根目录下创建`.clangd`文件，内容如下:
+
+```
+CompileFlags:
+  Add: [-std=c++17]
+```
+
 ### 调试
 
 使用 nvim-dap 进行调试，支持:

@@ -1,6 +1,6 @@
 -- from :https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#clangd
 return {
-    cmd = { 'clangd' },
+    cmd = { 'clangd'},
     -- Filetypes to automatically attach to.
     filetypes = { 'cpp' },
     -- Sets the "workspace" to the directory where any of these files is found.
