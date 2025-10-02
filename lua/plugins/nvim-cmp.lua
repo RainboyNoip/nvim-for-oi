@@ -7,6 +7,7 @@ return {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
     "onsails/lspkind.nvim" , -- 用于显示图标
+    "saadparwaiz1/cmp_luasnip", -- 
   },
   -- Not all LSP servers add brackets when completing a function.
   -- To better deal with this, LazyVim adds a custom option to cmp,
@@ -83,6 +84,7 @@ return {
           end, { "i", "s" }),
       }),
       sources = cmp.config.sources({
+        { name = 'luasnip' },
         { name = "lazydev" },
         { name = "nvim_lsp" },
         { name = "path" },
