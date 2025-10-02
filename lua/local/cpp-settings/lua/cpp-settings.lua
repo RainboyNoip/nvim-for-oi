@@ -25,7 +25,7 @@ local M = {}
 
 -- 创建一个 setup 函数，这是模块的入口点
 function M.setup()
-  print("Custom C++ settings from an external LOCAL module file loaded!")
+  -- print("Custom C++ settings from an external LOCAL module file loaded!")
 
   -- 设定缓冲区局部的选项
   vim.bo.tabstop = 4
