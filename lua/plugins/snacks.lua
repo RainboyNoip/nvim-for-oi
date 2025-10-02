@@ -1,6 +1,8 @@
 return {
     "folke/snacks.nvim",
     ---@type snacks.Config
+    lazy = false,
+    priority = 1001,
     opts = {
         dashboard = require("plugins.snacks.dashboard"),
         terminal = {
