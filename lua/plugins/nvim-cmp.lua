@@ -6,6 +6,7 @@ return {
     "hrsh7th/cmp-nvim-lsp",
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
+    "onsails/lspkind.nvim" , -- 用于显示图标
   },
   -- Not all LSP servers add brackets when completing a function.
   -- To better deal with this, LazyVim adds a custom option to cmp,
@@ -22,6 +23,7 @@ return {
 
     vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
     local cmp = require("cmp")
+    local lspkind = require("lspkind")
     local defaults = require("cmp.config.default")()
     local auto_select = true
     return {
@@ -92,7 +94,13 @@ return {
       formatting = {
         format = lspkind.cmp_format({
           mode = "symbol_text",   -- 显示 图标 和 文本
-          maxwidth = 50,
+          maxwidth = {
+            -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+            -- can also be a function to dynamically calculate max width such as
+            -- menu = function() return math.floor(0.45 * vim.o.columns) end,
+            menu = 50, -- leading text (labelDetails)
+            abbr = 50, -- actual suggestion item
+          },
           ellipsis_char = "...",
           -- 展示来源，对于调试很有用
           source_mapping = {
@@ -133,5 +141,5 @@ return {
       sorting = defaults.sorting,
     }
   end,
-  main = "lazyvim.util.cmp",
+  -- main = "lazyvim.util.cmp",
 }
