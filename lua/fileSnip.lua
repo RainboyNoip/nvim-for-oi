@@ -45,7 +45,7 @@ function InsertSnippet()
 	local winid = vim.api.nvim_get_current_win()
 	
 	-- 使用 Snacks picker
-	print(M.snippetPath)
+	-- print(M.snippetPath)
 	Snacks.picker.pick("files",{
 		dirs = {M.snippetPath},
 		hidden = true,
@@ -78,29 +78,22 @@ function M.setup(opts)
 	opts = opts or {}
 
 	-- 设置 snippet 路径
-	if opts.snippetPath then
-		M.snippetPath = opts.snippetPath
-	end
-	print("Snippet path: %s", M.snippetPath)
-	-- 设置默认的 snippet 路径
-	if not M.snippetPath or M.snippetPath == "" then
-		M.snippetPath = "$HOME/.config/nvim/snippets/"
-	end
+	M.snippetPath = opts.snippetPath or M.snippetPath
+	-- print("Snippet path: %s", M.snippetPath)
 	-- 确保路径存在
-	M.snippetPath = vim.fn.expand(M.snippetPath)
 	if not vim.fn.isdirectory(M.snippetPath) then
 		vim.fn.mkdir(M.snippetPath, "p")
 	end
 	-- 创建命令 Choose
 
-	vim.api.nvim_create_user_command("Choose", function()
+	vim.api.nvim_create_user_command("OISnipChoose", function()
 		InsertSnippet()
 	end, {})
 
 	-- 绑定快捷键 F1 所有模式
 	-- vim.api.nvim_set_keymap("n", "<leader>oi", ":Choose<CR>", { noremap = true, silent = true })
 
-	vim.keymap.set('n', '<leader>oi', ":Choose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
+	vim.keymap.set('n', '<leader>oi', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
 	-- -- 绑定快捷键 F1 insert 模式
 	-- vim.api.nvim_set_keymap("i", "<F1>", "<C-o>:Choose<CR>", { noremap = true, silent = true })
 	-- -- 绑定快捷键 F1 所有模式
