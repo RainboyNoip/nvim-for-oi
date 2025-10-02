@@ -8,6 +8,7 @@ return {
         local ls = require("luasnip")
         -- Load VSCode snippets
         require("luasnip.loaders.from_vscode").lazy_load({ paths = { vim.fn.stdpath("config") .. "/vscode-snippets" } })
+        require("luasnip.loaders.from_lua").load({ paths =  vim.fn.stdpath("config") .. "/lua-snippets"  })
         
         -- Set up keymaps
         vim.keymap.set({ "i" }, "<C-K>", function() ls.expand() end, { silent = true })

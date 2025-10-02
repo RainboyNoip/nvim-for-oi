@@ -1,0 +1,61 @@
+local ls = require('luasnip')
+local s = ls.snippet
+local t = ls.text_node
+local i = ls.insert_node
+local d = ls.dynamic_node
+local sn = ls.snippet_node
+local f = ls.function_node
+local c = ls.choice_node
+local r = ls.restore_node
+local fmt = require('luasnip.extras.fmt').fmt
+local rep = require('luasnip.extras').rep
+
+-- Nui components
+local Input = require('nui.input')
+
+
+local popup_options = {
+  relative = "cursor",
+  position = {
+    row = 1,
+    col = 0,
+  },
+  size = 20,
+  border = {
+    style = "rounded",
+    text = {
+      top = "[Input]",
+      top_align = "left",
+    },
+  },
+  win_options = {
+    winhighlight = "Normal:Normal",
+  },
+}
+
+local input = Input(popup_options, {
+  prompt = "> ",
+  default_value = "44",
+  on_close = function()
+    print("Input closed!")
+  end,
+  on_submit = function(value)
+    local number = tonumber(value) + 1100
+    print("Value submitted: ", number)
+  end,
+  on_change = function(value)
+    print("Value changed: ", value)
+  end,
+})
+
+vim.api.nvim_create_user_command("Myin", function()
+  input:mount()
+end, {})
+
+return s("myfor", {
+  t("function_node: "),
+  f(function(args)
+    -- return "args: ".. vim.inspect(args)
+    
+  end, {})
+})
