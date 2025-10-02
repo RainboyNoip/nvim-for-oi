@@ -8,6 +8,7 @@ return {
     "hrsh7th/cmp-path",
     "onsails/lspkind.nvim" , -- 用于显示图标
     "saadparwaiz1/cmp_luasnip", -- 
+    "uga-rosa/cmp-dictionary", -- 字典补全
   },
   -- Not all LSP servers add brackets when completing a function.
   -- To better deal with this, LazyVim adds a custom option to cmp,
@@ -27,6 +28,14 @@ return {
     local lspkind = require("lspkind")
     local defaults = require("cmp.config.default")()
     local auto_select = true
+
+    -- dictionary
+    require("cmp_dictionary").setup({
+      paths = { vim.fn.stdpath("config") .. '/dictionary/google-10000-english-no-swears.txt' },
+      exact_length = 2,
+    })
+
+
     return {
       auto_brackets = {}, -- configure any filetype to auto add brackets
       completion = {
@@ -88,6 +97,7 @@ return {
         { name = "lazydev" },
         { name = "nvim_lsp" },
         { name = "path" },
+        { name = "dictionary", keyword_length = 2 }, -- 字典补全
       }, {
         { name = "buffer" ,keyword_length = 2},-- 缓冲区源的最小关键字长度
       }),
@@ -110,6 +120,14 @@ return {
             nvim_lsp = "[LSP]",
             luasnip = "[Snippet]",
             path = "[Path]",
+            dictionary = "[Dict]",
+          },
+          menu = {
+            buffer = "[Buffer]",
+            nvim_lsp = "[LSP]",
+            luasnip = "[Snippet]",
+            path = "[Path]",
+            dictionary = "[Dict]",
           }
         }),
       },
