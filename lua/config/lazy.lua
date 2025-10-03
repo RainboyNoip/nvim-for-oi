@@ -20,6 +20,8 @@ vim.opt.rtp:prepend(lazypath)
 -- 这里也是设置其他选项 (vim.opt) 的好地方
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+vim.o.timeout = true -- 启用 leader 键的延迟
+vim.o.timeoutlen = 0 -- 设置 leader 键的延迟时间为 300 毫秒
 
 -- 设置 lazy.nvim
 require("lazy").setup({

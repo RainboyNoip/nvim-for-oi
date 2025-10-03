@@ -1,6 +1,6 @@
 -- dap 快捷键
 return {
-    { "<leader>d",  group = "dap",                                                                        desc = "debug:nvim-dap short keys" },
+    -- { "<leader>d",  group = "dap",                                                                        desc = "debug:nvim-dap short keys" },
     { "<leader>dR", function() require("dap").run_to_cursor() end,                                        desc = "Run to Cursor" },
     { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
     { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "Toggle Breakpoint" },
