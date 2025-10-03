@@ -27,16 +27,49 @@ end
 -- 插入代码片段
 local function insert_code_snippet(snip_path)
 	local lines = read_snippet_content(snip_path)
-
-	-- 添加 //-- filename {{{ 和 }}} 到文件的开头和结尾
 	local filename = vim.fn.fnamemodify(snip_path, ":t")
-	table.insert(lines, 1, "//oisnip_begin " .. filename)
-	table.insert(lines, "//oisnip_end")
 
+	local function add_fold_markers()
+		table.insert(lines, 1, "//oisnip_begin" .. filename)
+		table.insert(lines, "/oisnip_begin")
+	end
+	if filename == "simaple_template.cpp" then
+		-- 替换日期
+		local date = os.date("%Y-%m-%d %H:%M:%S")
+		for i, line in ipairs(lines) do
+			lines[i] = line:gsub("2025%-10%-02 10:34:43", date)
+		end
+	else
+		-- 添加 //oisnip_begin filename 和 //oisnip_end 到文件的开头和结尾
+		add_fold_markers()
+	end
+
+
+	-- 获取当前缓冲区和窗口
 	local bufnr = vim.api.nvim_get_current_buf()
 	local winid = vim.api.nvim_get_current_win()
 	local cur_pos = vim.api.nvim_win_get_cursor(0)
+	-- 加入到当前行
 	vim.api.nvim_buf_set_lines(bufnr, cur_pos[1] - 1, cur_pos[1], false, lines)
+
+	-- after insert, move cursor to the end of the snippet
+	-- vim.api.nvim_win_set_cursor(0, {cur_pos[1] + #lines, 0})
+
+	if filename == "simaple_template.cpp" then
+		-- fold the snippet
+		vim.cmd("normal! zM")
+		-- move cur_pos to function main 
+		for i, line in ipairs(lines) do
+			if line:find("void init") then
+				vim.api.nvim_win_set_cursor(0, {i+1, 4})
+				vim.cmd("normal! zz")
+				-- run <c-y>
+				vim.api.nvim_input("<c-y>")
+				vim.api.nvim_input("<c-y>")
+				break
+			end
+		end
+	end
 	
 end
 

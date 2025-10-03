@@ -1,11 +1,7 @@
-
 //Author by [Rainboy](https://github.com/rainboylvx)
 //date: 2025-10-02 10:34:43
 
-// 根据编译器选择不同的头文件
-#ifdef __GNUC__
-#include <bits/stdc++.h>
-#else
+//oisnip_begin 头文件
 #include <algorithm>
 #include <bitset>
 #include <complex>
@@ -38,11 +34,13 @@
 #include <utility>
 #include <valarray>
 #include <vector>
-#endif
-
+//oisnip_end 
 using namespace std;
+
 typedef long long ll;
-#ifndef DEBUG
+
+// #define NO_DEBUG // switch debug
+#if defined(onlinejudge) || defined(ONLINE_JUDGE) || defined(NO_DEBUG)
 #define log(...)
 #else
 #define log(args...) { cout << "LINE:" << __LINE__ << " : ";string _s = #args; replace(_s.begin(), _s.end(), ',', ' '); stringstream _ss(_s); istream_iterator<string> _it(_ss); err(_it, args); }
@@ -62,6 +60,10 @@ err(++it, args...);
 const int maxn = 1e6+5;
 int n,m;
 int a[maxn];
+
+void init() {
+
+}
 
 int main () {
     std::ios::sync_with_stdio(false); cin.tie(0); cout.tie(0); // 关闭io同步
