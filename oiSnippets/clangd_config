@@ -1,0 +1,3 @@
+// rename file to .clangd and delete this line
+CompileFlags:
+  Add: [-std=c++17]
