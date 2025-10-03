@@ -46,6 +46,10 @@
    - clangd (用于 C++ LSP 支持)
    - nodejs (某些插件可能需要)
 
+4. 安装调试器(for nvim-dap)
+   5. `vscode-cpptools` 扩展(linux): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
+   6. `CodeLLDB` 扩展 (macos): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(via--codelldb)
+
 ## 使用
 
 ### 代码片段
