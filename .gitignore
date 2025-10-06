@@ -1,0 +1,39 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Vim/Neovim swap, backup, and undo files
+*.sw[op]
+*.swn
+*~
+*.un~
+undo/
+
+# Session files
+Session.vim
+session.vim
+
+# Plugin manager files
+packer_compiled.lua
+
+# Dependency directories
+/node_modules/
+/vendor/
+/venv/
+__pycache__/
+
+# Tooling and data directories (e.g., for Mason, nvim-dap)
+/mason/
+/data/
+
+# Log files
+*.log
+log/
+
+# Local/private configuration (optional, but good practice)
+local.lua
+local_*.lua
+local.vim
+local_*.vim
+
+__pycache__
