@@ -59,6 +59,21 @@ function M.setup()
   vim.keymap.set('i', '<leader>;', conditional_add_semicolon_insert, { buffer = true, silent = true, desc = "在行尾添加分号" })
   -- vim.keymap.set('n', '<leader>;', 'A;<Esc>', { buffer = true, silent = true, desc = "在行尾添加分号" })
   -- vim.keymap.set('i', '<leader>;', '<C-o>A;', { buffer = true, silent = true, desc = "在行尾添加分号" })
+
+
+  -- 在打开 cpp 文件后自动折叠
+  -- 设置折叠方法为语法折叠
+  -- 创建autocmd，在打开cpp文件后自动执行zM折叠所有代码
+  vim.api.nvim_create_autocmd("BufEnter", {
+    pattern = "*.cpp,*.hpp,*.h,*.cc,*.cxx",
+    callback = function()
+      -- 延迟执行以确保文件完全加载
+      vim.defer_fn(function()
+        vim.cmd("normal! zM")
+      end, 10)
+    end,
+    desc = "打开C++文件后自动折叠所有代码"
+  })
 end
 
 -- 返回这个模块，这样其他文件才能 require 它
