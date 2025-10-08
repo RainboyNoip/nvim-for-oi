@@ -34,3 +34,9 @@ vim.opt.foldlevel = 99
 -- open all folds by default
 -- opt.foldopen:append("all")
 -- opt.foldopen:append("hor") -- open folds when opening a horizontal split
+
+
+-- undofile
+vim.opt.undofile = true -- save undo history
+-- vim.opt.undodir = vim.fn.stdpath('config') .. '/undodir'
+vim.opt.swapfile = false -- don't use swapfile
