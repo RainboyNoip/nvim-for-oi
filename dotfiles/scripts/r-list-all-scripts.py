@@ -15,6 +15,7 @@ def main():
         "one-duipai.py": "展示输入文件内容并对比两个程序的运行结果",
         "test-data.py": "测试目录下的所有输入文件并对比两个程序的运行结果",
         "transfer.sh": "上传代码文件到transfer.sh服务器,需要设置环境变量TRANSFER_URL",
+        "luogu.py": "下载数据, luogu.py 1000",
         "input2dot.py": "将输入文件转换为dot图形格式",
         "dot2png.py": "将dot图形文件转换为png图片",
         "randint.py": "生成一定数量的随机整数",
