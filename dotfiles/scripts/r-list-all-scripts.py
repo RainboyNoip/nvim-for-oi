@@ -18,6 +18,7 @@ def main():
         "input2dot.py": "将输入文件转换为dot图形格式",
         "dot2png.py": "将dot图形文件转换为png图片",
         "randint.py": "生成一定数量的随机整数",
+        "nvimsizer.sh": "[nvimsizer.sh 1.cpp in ] - 使用nvim打开文件并调整窗口大小",
         "r-list-all-scripts.py": "列出所有工具脚本及其功能说明"
     }
     
