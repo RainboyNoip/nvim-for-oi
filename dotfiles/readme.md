@@ -1,6 +1,6 @@
 ## 安装依赖
 ```bash
-sudo apt install -y python3 fzf graphviz clangd
+sudo apt install -y python3 fzf graphviz clangd curl
 ```
 
 # 配置
