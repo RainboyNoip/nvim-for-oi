@@ -52,7 +52,7 @@ echo -e "正在上传: ${YELLOW}$FILENAME${NC} 到 ${BASE_URL}..."
 echo ""
 
 # 执行上传命令并捕获返回的分享链接
-SHARE_URL=$(curl --progress-bar --upload-file "$FILE_PATH" "${BASE_URL}/${FILENAME}")
+SHARE_URL=$(curl --progress-bar --upload-file "$FILE_PATH" "${BASE_URL}/${FILENAME}.txt")
 
 # 检查上传是否成功
 if [[ $? -ne 0 || -z "$SHARE_URL" || ! "$SHARE_URL" == http* ]]; then
