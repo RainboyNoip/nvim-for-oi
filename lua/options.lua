@@ -38,5 +38,15 @@ vim.opt.undofile = true -- save undo history
 -- vim.opt.undodir = vim.fn.stdpath('config') .. '/undodir'
 vim.opt.swapfile = false -- don't use swapfile
 
--- don't auto-comment new lines
+
 vim.opt.formatoptions:remove({ 'r', 'o' })
+
+-- 不知道那个插件设置了这个，导致在cpp文件中，按o会自动插入注释
+local group = vim.api.nvim_create_augroup('MyFormatOptions', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'c,cpp',
+    group = group,
+    callback = function()
+        vim.opt_local.formatoptions:remove({ 'r', 'o' })
+    end,
+})

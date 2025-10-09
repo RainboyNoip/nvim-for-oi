@@ -56,7 +56,10 @@ function M.setup()
   -- 在行尾添加分号 (如果需要)
 
   vim.keymap.set('n', '<leader>;', conditional_add_semicolon_normal, { buffer = true, silent = true, desc = "在行尾添加分号" })
-  vim.keymap.set('i', '<leader>;', conditional_add_semicolon_insert, { buffer = true, silent = true, desc = "在行尾添加分号" })
+
+  -- 如果启用这个快捷键 <leader> 在插入模式下，就会有lag
+  -- vim.keymap.set('i', '<leader>;', conditional_add_semicolon_insert, { buffer = true, silent = true, desc = "在行尾添加分号" })
+
   -- vim.keymap.set('n', '<leader>;', 'A;<Esc>', { buffer = true, silent = true, desc = "在行尾添加分号" })
   -- vim.keymap.set('i', '<leader>;', '<C-o>A;', { buffer = true, silent = true, desc = "在行尾添加分号" })
 
