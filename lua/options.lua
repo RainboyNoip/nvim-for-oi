@@ -50,3 +50,38 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.opt_local.formatoptions:remove({ 'r', 'o' })
     end,
 })
+
+-- 设置 sign column 固定宽度，避免文字推动
+vim.opt.signcolumn = "auto:2-3"  -- 自动调整，但最少2-3个字符宽度
+
+-- LSP 诊断配置
+vim.diagnostic.config({
+    virtual_text = true,           -- 在代码行末尾显示诊断信息
+    underline = true,              -- 在错误下方显示下划线
+    update_in_insert = false,      -- 在插入模式下不更新诊断
+    severity_sort = true,          -- 按严重程度排序诊断信息
+    float = {
+        source = "always",         -- 在悬浮窗口中显示诊断来源
+        border = "rounded",        -- 悬浮窗口边框样式
+    },
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.INFO] = "",
+            [vim.diagnostic.severity.HINT] = "",
+        },
+        texthl = {
+            [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+            [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+            [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+            [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+        },
+        numhl = {
+            [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
+            [vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
+            [vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
+            [vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
+        },
+    },
+})

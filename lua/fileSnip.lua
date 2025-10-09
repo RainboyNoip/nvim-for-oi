@@ -33,13 +33,16 @@ local function insert_code_snippet(snip_path)
 		table.insert(lines, 1, "//oisnip_begin" .. filename)
 		table.insert(lines, "/oisnip_begin")
 	end
+
+
 	if filename == "simaple_template.cpp" then
 		-- 替换日期
 		local date = os.date("%Y-%m-%d %H:%M:%S")
 		for i, line in ipairs(lines) do
 			lines[i] = line:gsub("2025%-10%-02 10:34:43", date)
 		end
-	else
+	-- snip_path include "template"
+	elseif not string.find(snip_path,"template") then
 		-- 添加 //oisnip_begin filename 和 //oisnip_end 到文件的开头和结尾
 		add_fold_markers()
 	end
@@ -126,7 +129,7 @@ function M.setup(opts)
 	-- 绑定快捷键 F1 所有模式
 	-- vim.api.nvim_set_keymap("n", "<leader>oi", ":Choose<CR>", { noremap = true, silent = true })
 
-	vim.keymap.set('n', '<leader>oi', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
+	vim.keymap.set('n', '<leader>os', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
 	-- -- 绑定快捷键 F1 insert 模式
 	-- vim.api.nvim_set_keymap("i", "<F1>", "<C-o>:Choose<CR>", { noremap = true, silent = true })
 	-- -- 绑定快捷键 F1 所有模式
