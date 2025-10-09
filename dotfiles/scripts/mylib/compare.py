@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-手动比较结果
-将JavaScript版本的compare.js转换为Python版本
+比较结果
 """
 
 import os
