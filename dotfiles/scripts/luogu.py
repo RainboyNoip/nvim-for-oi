@@ -207,7 +207,6 @@ class Luogu:
     def download_samples(self, id_str):
         """下载样例数据并保存到文件"""
         data = self.http(id_str)
-        print('data ',data)
         
         if not data:
             print("无法获取题目数据")
