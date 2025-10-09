@@ -1,5 +1,5 @@
 require("config.lazy")
-require("options")
-require("keymaps")
 require("lsp")
 require("fileSnip").setup()
+require("keymaps")
+require("options")
