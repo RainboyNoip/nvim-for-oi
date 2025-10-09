@@ -11,7 +11,14 @@ import subprocess
 import argparse
 import shutil
 
-import mylib.fzf as fzf
+# 添加 gum 模块路径
+sys.path.append(os.path.join(os.path.dirname(__file__), 'mylib'))
+try:
+    from gum import choose as gum_choose, filter as gum_filter, input as gum_input
+    GUM_AVAILABLE = True
+except ImportError:
+    print("警告: 无法导入 gum 模块，将使用普通输入方式")
+    GUM_AVAILABLE = False
 
 # 默认配置
 TOTAL_COUNT = None
@@ -76,10 +83,42 @@ def scan_cpp_files():
     import glob
     return glob.glob("*.cpp")
 
-# 移除了旧的select_file函数，使用fzf.py替代
+def select_file_with_gum(files, prompt):
+    """使用 gum 选择文件"""
+    if GUM_AVAILABLE:
+        try:
+            return gum_choose(files, header=prompt)
+        except Exception:
+            # 如果 gum 失败，回退到普通选择
+            pass
+    
+    # 回退到普通选择方式
+    print(f"\n{prompt}")
+    for i, file in enumerate(files, 1):
+        print(f"{i}. {file}")
+    
+    while True:
+        try:
+            choice = input("请选择文件编号: ").strip()
+            if choice.isdigit() and 1 <= int(choice) <= len(files):
+                return files[int(choice) - 1]
+            else:
+                print("无效选择，请重新输入")
+        except (ValueError, KeyboardInterrupt):
+            print("\n选择取消")
+            return None
 
 def get_user_input(prompt, default_value):
     """获取用户输入，提供默认值"""
+    if GUM_AVAILABLE:
+        try:
+            user_input = gum_input(placeholder=f"默认: {default_value}", prompt=f"{prompt}: ")
+            return user_input if user_input else default_value
+        except Exception:
+            # 如果 gum 失败，回退到普通输入
+            pass
+    
+    # 普通输入方式
     user_input = input(f"{prompt} (默认: {default_value}): ").strip()
     return user_input if user_input else default_value
 
@@ -135,8 +174,7 @@ def main():
     if args.data:
         DATA_CODE = args.data
     else:
-        print("请选择数据生成程序源码:")
-        DATA_CODE = fzf.select_with_fzf(cpp_files)
+        DATA_CODE = select_file_with_gum(cpp_files, "请选择数据生成程序源码")
         if DATA_CODE is None:
             print("未选择数据生成程序源码")
             sys.exit(1)
@@ -144,8 +182,7 @@ def main():
     if args.user:
         USR_CODE = args.user
     else:
-        print("请选择用户程序源码:")
-        USR_CODE = fzf.select_with_fzf(cpp_files)
+        USR_CODE = select_file_with_gum(cpp_files, "请选择用户程序源码")
         if USR_CODE is None:
             print("未选择用户程序源码")
             sys.exit(1)
@@ -153,8 +190,7 @@ def main():
     if args.std:
         STD_CODE = args.std
     else:
-        print("请选择标准程序源码:")
-        STD_CODE = fzf.select_with_fzf(cpp_files)
+        STD_CODE = select_file_with_gum(cpp_files, "请选择标准程序源码")
         if STD_CODE is None:
             print("未选择标准程序源码")
             sys.exit(1)
