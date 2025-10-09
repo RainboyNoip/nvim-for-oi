@@ -3,6 +3,7 @@
 
 //oisnip_begin 头文件
 #include <algorithm>
+#include <cstring>
 #include <bitset>
 #include <complex>
 #include <deque>
