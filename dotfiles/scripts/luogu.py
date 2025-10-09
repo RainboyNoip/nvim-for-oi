@@ -15,6 +15,14 @@ import os
 import gzip
 import subprocess
 
+# 添加 gum 模块路径
+sys.path.append(os.path.join(os.path.dirname(__file__), 'mylib'))
+try:
+    from gum import input as gum_input
+except ImportError:
+    print("警告: 无法导入 gum 模块，将使用普通 input()")
+    gum_input = None
+
 class Luogu:
     def __init__(self):
         self.base_url = "https://www.luogu.com.cn/problem"
@@ -95,6 +103,10 @@ class Luogu:
                 # 处理可能的HTML转义字符
                 json_content = json_content.replace('\\', '\\\\')  # 先处理反斜杠
                 json_content = json_content.replace('\\"', '"')    # 处理转义的双引号
+                
+                # 在JSON解析之前解码Unicode转义字符
+                json_content = json_content.encode().decode('unicode-escape')
+                
                 parsed_data = json.loads(json_content)
                 return parsed_data.get('data', {})
             else:
@@ -153,6 +165,10 @@ class Luogu:
                     # 处理可能的HTML转义字符
                     json_content = json_content.replace('\\', '\\\\')  # 先处理反斜杠
                     json_content = json_content.replace('\\"', '"')    # 处理转义的双引号
+                    
+                    # 在JSON解析之前解码Unicode转义字符
+                    json_content = json_content.encode().decode('unicode-escape')
+                    
                     parsed_data = json.loads(json_content)
                     return parsed_data.get('data', {})
                 else:
@@ -191,6 +207,7 @@ class Luogu:
     def download_samples(self, id_str):
         """下载样例数据并保存到文件"""
         data = self.http(id_str)
+        print('data ',data)
         
         if not data:
             print("无法获取题目数据")
@@ -322,13 +339,23 @@ class Luogu:
         return text
 
 def main():
+    # 检查是否提供了题目ID参数
     if len(sys.argv) < 2:
-        print("使用方法: python luogu.py <题目ID>")
-        print("例如: python luogu.py 1001  # P1001")
-        print("例如: python luogu.py B3634")
-        sys.exit(1)
-    
-    problem_id = sys.argv[1]
+        # 如果没有提供参数，使用 gum.input 或普通 input 获取题目ID
+        if gum_input:
+            problem_id = gum_input(
+                placeholder="请输入题目ID (例如: 1001 或 B3634)",
+                prompt="题目ID: "
+            )
+        else:
+            problem_id = input("请输入题目ID (例如: 1001 或 B3634): ")
+        
+        # 如果用户没有输入任何内容，则退出
+        if not problem_id.strip():
+            print("未输入题目ID，程序退出。")
+            sys.exit(1)
+    else:
+        problem_id = sys.argv[1]
     
     # 创建洛谷对象并下载样例数据
     luogu = Luogu()
