@@ -54,6 +54,24 @@ vim.api.nvim_create_autocmd('FileType', {
 -- 设置 sign column 固定宽度，避免文字推动
 vim.opt.signcolumn = "auto:2-3"  -- 自动调整，但最少2-3个字符宽度
 
+-- 自动保存配置
+vim.opt.autowrite = true        -- 在执行某些命令时自动保存
+vim.opt.autowriteall = true     -- 在更多情况下自动保存
+vim.opt.autoread = true         -- 文件被外部修改时自动重新加载
+
+-- 配置自动保存的自动命令组
+local autosave_group = vim.api.nvim_create_augroup('AutoSave', { clear = true })
+vim.api.nvim_create_autocmd({ 'InsertLeave', 'FocusLost', 'BufLeave' }, {
+    group = autosave_group,
+    pattern = '*',
+    callback = function()
+        -- 只对有文件名的缓冲区进行自动保存
+        if vim.fn.expand('%') ~= '' then
+            vim.cmd('silent! write')
+        end
+    end,
+})
+
 -- LSP 诊断配置
 vim.diagnostic.config({
     virtual_text = true,           -- 在代码行末尾显示诊断信息
@@ -66,10 +84,10 @@ vim.diagnostic.config({
     },
     signs = {
         text = {
-            [vim.diagnostic.severity.ERROR] = " ",
-            [vim.diagnostic.severity.WARN] = " ",
-            [vim.diagnostic.severity.INFO] = " ",
-            [vim.diagnostic.severity.HINT] = " ",
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.INFO] = "",
+            [vim.diagnostic.severity.HINT] = "",
         },
         texthl = {
             [vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
