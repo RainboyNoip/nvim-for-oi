@@ -38,3 +38,17 @@ vim.keymap.set('v', '>', '>gv', opts)
 -- 保存快捷键
 vim.keymap.set('n', '<C-s>', ':w<CR>', opts)
 vim.keymap.set('i', '<C-s>', '<Esc>:w<CR>a', opts)
+
+
+
+-- ctrl-l 跳转到当前行的最后一个字符后面,处于插入模式
+vim.keymap.set('i', '<C-l>', '<C-o>$',  { noremap = true, silent = true, desc = 'Move to end of line' })
+-- ctrl-h 跳转到当前行的第一个字符前面,处于插入模式
+vim.keymap.set('i', '<C-h>', '<C-o>^', { noremap = true, silent = true, desc = 'Move to beginning of line' })
+
+-- alt + down 向下移动一行
+vim.keymap.set('n', '<A-Down>', ':m .+1<CR>==', opts)
+vim.keymap.set('i', '<A-Down>', '<Esc>:m .+1<CR>==gi', opts)
+-- alt + up 向上移动一行
+vim.keymap.set('n', '<A-Up>', ':m .-2<CR>==', opts)
+vim.keymap.set('i', '<A-Up>', '<Esc>:m .-2<CR>==gi', opts)
