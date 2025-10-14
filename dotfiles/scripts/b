@@ -142,14 +142,30 @@ def run_program(target_file, input_file, output_file):
     run_args = [f"./{target_file}"]
 
     try:
-        with open(input_file, 'r') if input_file and os.path.exists(input_file) else subprocess.PIPE as input_f:
-            with open(output_file, 'w') if output_file else subprocess.PIPE as output_f:
-                if input_file and os.path.exists(input_file):
-                    print(f"执行代码: [ ./{target_file} < {input_file} ]")
-                    subprocess.run([f"./{target_file}"], stdin=input_f, stdout=output_f if output_file else None)
-                else:
-                    print(f"执行代码: [ ./{target_file} ]")
-                    subprocess.run([f"./{target_file}"], stdout=output_f if output_file else None)
+        # 处理输入文件
+        stdin_handle = None
+        if input_file and os.path.exists(input_file):
+            stdin_handle = open(input_file, 'r')
+        
+        # 处理输出文件
+        stdout_handle = None
+        if output_file:
+            stdout_handle = open(output_file, 'w')
+        
+        try:
+            if input_file and os.path.exists(input_file):
+                print(f"执行代码: [ ./{target_file} < {input_file} ]")
+                subprocess.run([f"./{target_file}"], stdin=stdin_handle, stdout=stdout_handle)
+            else:
+                print(f"执行代码: [ ./{target_file} ]")
+                subprocess.run([f"./{target_file}"], stdout=stdout_handle)
+        finally:
+            # 确保文件句柄被正确关闭
+            if stdin_handle:
+                stdin_handle.close()
+            if stdout_handle:
+                stdout_handle.close()
+                
     except Exception as e:
         print(f"运行程序时出错: {e}")
 
