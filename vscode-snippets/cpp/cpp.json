@@ -1,4 +1,18 @@
 {
+    "linklist-for":{
+        "prefix":"linklist-for",
+        "body":[
+            "",
+            "for(int i = e.h[u]; i != -1; i = e[i].next){",
+            "\tint v = e[i].v;",
+            "\tint w = e[i].w;",
+            "\t//if( v== fa) continue;",
+            "\t$0",
+            "}"
+        ],
+        "description":"linklist-for"
+
+    },
     "do": {
         "prefix": "do",
         "body": ["do {", "\t$0", "} while($1);"],
