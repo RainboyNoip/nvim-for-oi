@@ -27,6 +27,11 @@ return {
                     end,
                     cwd = '${workspaceFolder}',
                     stopOnEntry = false, -- 必需是false,不然有汇编代码
+                    -- from here:  https://github.com/vadimcn/codelldb/blob/master/MANUAL.md#stdio-redirection
+                    stdio = function() 
+                        local input_file = vim.fn.input("Path to read: ", vim.fn.getcwd() .. '/' )
+                        return { input_file , 'log.txt', 'tty' }
+                    end,
                 },
             }
         end,
