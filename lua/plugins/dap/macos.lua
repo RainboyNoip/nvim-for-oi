@@ -26,6 +26,11 @@ return {
                     program = function()
                         return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
                     end,
+                    initCommands = function()
+                        return {
+                            "command source " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldbinit"
+                        }
+                    end,
                     cwd = '${workspaceFolder}',
                     -- console = "internalConsole",
                     stopOnEntry = false, -- 必需是false,不然有汇编代码

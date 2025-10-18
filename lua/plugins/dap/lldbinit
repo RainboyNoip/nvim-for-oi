@@ -1,0 +1,12 @@
+settings set stop-line-count-before 10
+settings set stop-line-count-after 10
+
+# settings set thread-stop-format ""
+breakpoint set --name main
+
+# 创建一个别名 'rwi' (Run With Input)
+# %1 代表你跟在 rwi 后面的第一个参数
+command alias rwi process launch -i %1
+
+command alias l list
+
