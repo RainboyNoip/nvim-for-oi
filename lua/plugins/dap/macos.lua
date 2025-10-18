@@ -3,9 +3,11 @@ return {
         "mfussenegger/nvim-dap",
         dependencies = {
             -- "nvim-neotest/nvim-nio", -- 如果你的 Neovim 版本 < 1.10.0
+
             "theHamsta/nvim-dap-virtual-text",
         },
         config = function()
+            require("nvim-dap-virtual-text").setup()
             local dap = require('dap')
             local config_path = vim.fs.dirname(vim.fn.stdpath('config'))
             dap.defaults.fallback.terminal_win_cmd = "3split new" -- 这里把终端窗口设置的尽可能的小一点,我依然没有找到怎么隐藏这个 termina
