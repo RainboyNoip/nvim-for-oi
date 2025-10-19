@@ -3,6 +3,7 @@
 
 //oisnip_begin 头文件
 #include <algorithm>
+#include <climits>
 #include <cstring>
 #include <bitset>
 #include <complex>
@@ -43,8 +44,10 @@ typedef long long ll;
 // #define NO_DEBUG // switch debug
 #if defined(onlinejudge) || defined(ONLINE_JUDGE) || defined(NO_DEBUG)
 #define log(...)
+#define fenc
 #else
 #define log(args...) { cout << "LINE:" << __LINE__ << " : ";string _s = #args; replace(_s.begin(), _s.end(), ',', ' '); stringstream _ss(_s); istream_iterator<string> _it(_ss); err(_it, args); }
+#define fenc cout<<"================================";
 void err(istream_iterator<string> it) {}
 
 template<typename T>
