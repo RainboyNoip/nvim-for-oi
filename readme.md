@@ -34,6 +34,10 @@
    alias voi="NVIM_APPNAME=nvim-for-oi nvim"
    ```
 
+安装依赖的项目
+```bash
+brew install gum find fd
+```
 
 2. 启动 Neovim，lazy.nvim 会自动安装所有插件:
    ```bash

@@ -5,6 +5,8 @@ return {
     priority = 1001,
     opts = {
         dashboard = require("plugins.snacks.dashboard"),
+        -- 默认配置 的 explorer
+        explorer = {}, 
         terminal = {
             win = {
                 position = "float", -- 默认浮动
@@ -21,6 +23,14 @@ return {
         }
     },
     keys = {
+        -- toggle explorer
+        {
+            "<leader>e",
+            function()
+                require("snacks").explorer()
+            end,
+            desc = "Toggle Snacks Explorer",
+        },
         {
             "<leader>t",
             group = "Terminal",
