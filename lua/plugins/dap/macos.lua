@@ -8,6 +8,7 @@ return {
         },
         config = function()
             require("nvim-dap-virtual-text").setup()
+            local Snacks = require("snacks")
             local dap = require('dap')
             dap.set_log_level('TRACE')
 
@@ -39,7 +40,29 @@ return {
                     type = "lldb",
                     request = "launch",
                     program = function()
-                        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+                        -- return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/' .. vim. , 'file')
+                        -- 1. 获取当前文件的完整路径 (例如: /home/user/src/1.cpp)
+                        -- '%:p' 代表文件的绝对路径 (Full Path)
+                        local full_path = vim.fn.expand('%:p')
+
+                        -- 2. 获取文件的目录路径 (Head)
+                        -- ':h' 是文件名修饰符，代表 "Head" (路径部分，不包含文件名)
+                        local file_dir = vim.fn.fnamemodify(full_path, ':h')
+
+                        -- 3. 获取文件的根名称 (Root)
+                        -- ':t:r' 是修饰符，代表 "Tail" (文件名) 和 "Root" (去除扩展名)
+                        local file_root = vim.fn.expand('%:t:r')
+
+                        -- 4. 构造默认值：文件目录 + 分隔符 + 文件根名称 + ".out"
+                        -- 注意：在 Unix-like 系统上，目录和文件名之间需要一个 '/'
+                        local default_value = file_dir .. '/' .. file_root .. '.out'
+
+                        -- 5. 使用 vim.fn.input() 进行同步输入
+                        local val = vim.fn.input('Path to executable: ', default_value, 'file')
+
+                        print(val)
+
+                        return val
                     end,
                     cwd = '${workspaceFolder}',
                     stopOnEntry = false,
@@ -52,7 +75,7 @@ return {
                         }
                     end,
                     stdio = function()
-                        local input_file = vim.fn.input("Path to read: ", vim.fn.getcwd() .. '/')
+                        local input_file = vim.fn.input("Path to read: ", vim.fn.getcwd() .. '/in')
                         return { input_file, 'log.txt', 'stderr.log' }
                     end
                 },

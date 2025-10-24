@@ -14,10 +14,22 @@ return {
     { "<leader>do", function() require("dap").step_out() end,                                             desc = "Step Out" },
     { "<leader>dO", function() require("dap").step_over() end,                                            desc = "Step Over" },
     { "<leader>dp", function() require("dap").pause() end,                                                desc = "Pause" },
-    { "<leader>dr", function() require("dap").repl.toggle() end,                                          desc = "Toggle REPL" },
+    { "<leader>dr", function() require("dap").repl.toggle({},'botright vsplit') end,                                          desc = "Toggle REPL" },
     { "<leader>ds", function() require("dap").session() end,                                              desc = "Session" },
     { "<leader>dt", function() require("dap").terminate() end,                                            desc = "Terminate" },
     { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "Widgets" },
+    -- 重启
+    { "<leader>dn",
+        function() 
+            local dap  = require("dap")
+            if dap.session() then
+                dap.restart({terminateDebugee=false})
+            else
+                dap.continue()
+            end
+        end,
+        desc = "restart"
+    },
     -- 结束
     {
         "<F4>",

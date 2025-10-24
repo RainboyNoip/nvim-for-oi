@@ -52,3 +52,13 @@ vim.keymap.set('i', '<A-Down>', '<Esc>:m .+1<CR>==gi', opts)
 -- alt + up 向上移动一行
 vim.keymap.set('n', '<A-Up>', ':m .-2<CR>==', opts)
 vim.keymap.set('i', '<A-Up>', '<Esc>:m .-2<CR>==gi', opts)
+
+
+-- 下面的快捷键 不一定 有用, 因为终端的问题
+-- ctrl-enter 在当前行下方插入新行
+-- vim.keymap.set('n', '<C-CR>', 'o<Esc>', opts)
+-- vim.keymap.set('i', '<C-CR>', '<Esc>o', opts)
+
+-- ctrl-shift-enter 在当前行上方插入新行
+-- vim.keymap.set('n', '<C-S-CR>', 'O<Esc>', opts)
+-- vim.keymap.set('i', '<C-S-CR>', '<Esc>O', opts)

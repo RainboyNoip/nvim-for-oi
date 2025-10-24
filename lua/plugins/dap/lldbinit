@@ -10,3 +10,5 @@ command alias rwi process launch -i %1
 
 command alias l list
 
+command alias restart process launch --stdio $1
+
