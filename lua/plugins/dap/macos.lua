@@ -11,6 +11,7 @@ return {
             local Snacks = require("snacks")
             local dap = require('dap')
             dap.set_log_level('TRACE')
+            -- require("dap").set_log_level("DEBUG")
 
             dap.listeners.after.event_initialized['dapui_config'] = function()
                 vim.bo.readonly = true
@@ -32,13 +33,14 @@ return {
             dap.adapters.lldb = {
                 type = "executable",
                 command = "/opt/homebrew/opt/llvm/bin/lldb-dap", -- or if not in $PATH: "/absolute/path/to/codelldb"
-                name = "lldb",
+                name = "lldb-dap",
             }
             dap.configurations.cpp = {
                 {
-                    name = "Launch",
+                    name = "Launch file",
                     type = "lldb",
                     request = "launch",
+                    targetArchitecture = "arm64",
                     program = function()
                         -- return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/' .. vim. , 'file')
                         -- 1. 获取当前文件的完整路径 (例如: /home/user/src/1.cpp)
@@ -60,24 +62,31 @@ return {
                         -- 5. 使用 vim.fn.input() 进行同步输入
                         local val = vim.fn.input('Path to executable: ', default_value, 'file')
 
-                        print(val)
+                        -- print(val)
 
                         return val
                     end,
-                    cwd = '${workspaceFolder}',
+                    runInTerminal = false,
+                    cwd = function ()
+                        return vim.fn.getcwd()
+                    end,
                     stopOnEntry = false,
+                    console = "internalConsole", -- 告诉适配器不要启动外部终端
                     args = {},
                     initCommands = function()
                         return {
-                            "command source " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldbinit",
-                            "command script import " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldb_scripts/tu.py",
-                            "command script import " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldb_scripts/arr.py"
+                            -- "command source " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldbinit",
+                            -- "command script import " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldb_scripts/tu.py",
+                            -- "command script import " .. vim.fn.stdpath("config") .. "/lua/plugins/dap/lldb_scripts/arr.py"
                         }
                     end,
-                    stdio = function()
-                        local input_file = vim.fn.input("Path to read: ", vim.fn.getcwd() .. '/in')
-                        return { input_file, 'log.txt', 'stderr.log' }
-                    end
+                    -- lldb-dap 22 才支持
+                    -- stdio = function()
+                    --     local input_file = vim.fn.input("Path to read: ", vim.fn.getcwd() .. '/in','file')
+                    --     -- print(input_file)
+                    --     return { input_file, 'out.txt'}
+                    --     -- return input_file
+                    -- end
                 },
             }
         end,

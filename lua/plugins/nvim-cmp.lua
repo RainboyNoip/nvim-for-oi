@@ -28,6 +28,7 @@ return {
     local lspkind = require("lspkind")
     local defaults = require("cmp.config.default")()
     local auto_select = true
+    local luasnip = require("luasnip")
 
     -- dictionary
     require("cmp_dictionary").setup({
@@ -71,7 +72,11 @@ return {
           -- 2. 如果光标在代码片段的可跳转节点上，跳转到下一节点
           -- 3. 否则，执行 fallback (插入 Tab 字符)
           ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
+            if luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            elseif luasnip.locally_jumpable(1) then
+              luasnip.jump(1)
+            elseif cmp.visible() then
               cmp.select_next_item()
             -- elseif luasnip.expand_or_jumpable() then
             --   luasnip.expand_or_jump()
@@ -85,8 +90,8 @@ return {
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item()
-            -- elseif luasnip.jumpable(-1) then
-            --   luasnip.jump(-1)
+            elseif luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
             else
               fallback()
             end
