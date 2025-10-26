@@ -67,8 +67,31 @@ return {
             end,
             desc = "print terminal list size",
             mode = { "n", "t" },
-
+        },
+        {
+            "<leader>sf",
+            function()
+                require("snacks").picker.lsp_symbols({
+                    filter = {
+                        cpp = {
+                            "Function",
+                            "Method",
+                            "Variable",
+                            "Struct"
+                        }
+                    }
+                })
+            end,
+            desc = "snacks picker lsp show all functions",
+            mode = { "n" },
+        },
+        {
+            "<leader>sj",
+            function()
+                require("snacks").picker.jumps()
+            end,
+            desc = "snacks picker show vim jumps",
+            mode = { "n" },
         }
-
     }
 }
