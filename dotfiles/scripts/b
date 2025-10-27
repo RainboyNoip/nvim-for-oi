@@ -41,7 +41,8 @@ def check_file_exists(file_path):
 
 def get_cxx_version():
     """检查C++支持的最高标准"""
-    standards = ["20", "17", "14", "11"]
+    # standards = ["20", "17", "14", "11"]
+    standards = ["17", "14", "11"]
     for std in standards:
         try:
             # clang++ 需要不同的参数来检查标准支持
@@ -111,15 +112,21 @@ def select_file(files):
         # 如果curses失败，返回第一个文件
         return files[0] if files else None
 
-def compile_source(source_file, target_file, std_option, debug_flag):
+def compile_source(source_file, target_file, std_option, args):
+# def compile_source(source_fi,std_option,args):
     """编译源文件"""
     compile_args = [CXX] + CXXFLAG
 
     if std_option:
         compile_args.append(f"-std=c++{std_option}")
 
-    if debug_flag:
+    if args.freopen:
+        compile_args.append("-DFREOPEN")
+
+    if args.debug:
         compile_args.append("-DDEBUG")
+    else:
+        compile_args.append("-DONLINE_JUDGE -O2")
 
     compile_args.extend(["-o", target_file, source_file])
 
@@ -178,6 +185,7 @@ def main():
     parser.add_argument("-I", "--no-input", action="store_true", help="不需要输入文件")
     parser.add_argument("-d", "--debug", action="store_true", help="添加编译宏 -DDEBUG")
     parser.add_argument("-s", "--std", help="编译标准,如11,14,17,20")
+    parser.add_argument("-f", "--freopen", help="使用freopen重定向输入到in")
     parser.add_argument("-n", "--norun", action="store_true", help="编译后不要运行")
     parser.add_argument("-v", "--version", action="version", version=f"version: {VERSION}")
 
@@ -217,7 +225,7 @@ def main():
 
     # 编译
     if not os.path.exists(target_file) or os.path.getmtime(source_file) > os.path.getmtime(target_file):
-        if not compile_source(source_file, target_file, std_option, args.debug):
+        if not compile_source(source_file,target_file,std_option,args):
             return 1
     else:
         print(f">>> 源码 {source_file} 没有 {target_file} 新,不编译")
