@@ -31,6 +31,10 @@ return {
             pos=i(0),
         })
     ),
+    s("lf", -- line for
+        fmt( [[ for(int i = 1;i <= n ;++i ) {pos} ]],
+        { pos=i(0) })
+    ),
     -- f n
     s({
         trig = "f%s+(%w+)",

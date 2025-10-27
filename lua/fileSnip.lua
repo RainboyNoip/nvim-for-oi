@@ -129,7 +129,15 @@ function M.setup(opts)
 	-- 绑定快捷键 F1 所有模式
 	-- vim.api.nvim_set_keymap("n", "<leader>oi", ":Choose<CR>", { noremap = true, silent = true })
 
+	-- 设置wichkey group name
+
 	vim.keymap.set('n', '<leader>os', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
+
+	-- 来自 rbook_nunjucks 
+	vim.keymap.set('n', '<leader>oe', ":OICodeSnipPick<CR>", { buffer = true, silent = true, desc = "OICodeSnipPick explorer" })
+
+	vim.keymap.set('n', '<leader>of', ":OICodeSnip<CR>", { buffer = true, silent = true, desc = "OICodeSnip file picker" })
+
 	-- -- 绑定快捷键 F1 insert 模式
 	-- vim.api.nvim_set_keymap("i", "<F1>", "<C-o>:Choose<CR>", { noremap = true, silent = true })
 	-- -- 绑定快捷键 F1 所有模式

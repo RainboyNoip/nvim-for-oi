@@ -7,6 +7,7 @@ return {
         dashboard = require("plugins.snacks.dashboard"),
         -- 默认配置 的 explorer
         explorer = {}, 
+        notifier = { timeout = 5000 }, -- 替代 vim.notify
         terminal = {
             win = {
                 position = "float", -- 默认浮动
@@ -91,6 +92,14 @@ return {
                 require("snacks").picker.jumps()
             end,
             desc = "snacks picker show vim jumps",
+            mode = { "n" },
+        },
+        {
+            "<leader>sj",
+            function()
+                require("snacks").picker.buffers()
+            end,
+            desc = "snacks picker show all buffers",
             mode = { "n" },
         }
     }

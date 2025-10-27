@@ -26,5 +26,28 @@ return {
             end,
             desc = "Buffer Local Keymaps (which-key)",
         },
+        {
+            "<leader>op",
+            function()
+                Snacks.picker.select(
+                -- items
+                { "pbcopy","pcopy copy","wl-copy" },
+                {
+                    prompt = "Select Server to Paste:",
+                },
+                function(item)
+                    if not item then return end
+                    local output = vim.trim(vim.api.nvim_command_output("%w !" .. item))
+                    if output ~= "" then
+                        vim.notify(output, vim.log.levels.INFO, { title = "Command Output" })
+                    else
+                        vim.notify("Buffer content copied via " .. item, vim.log.levels.INFO, { title = "Success" })
+                    end
+                end
+            )
+            end,
+            desc = "select server to paste",
+
+        }
     },
 }
