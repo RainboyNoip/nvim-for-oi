@@ -18,6 +18,7 @@ import glob
 import curses
 from pathlib import Path
 import platform
+from mylib.gum import filter as gum_filter
 
 VERSION = "20240825"
 # 根据操作系统选择编译器
@@ -67,50 +68,6 @@ def get_cxx_version():
         except subprocess.TimeoutExpired:
             continue
     return "11"  # 默认返回C++11
-
-def select_file(files):
-    """使用curses实现简单的文件选择器"""
-    if not files:
-        return None
-
-    if len(files) == 1:
-        return files[0]
-
-    def draw_menu(stdscr):
-        curses.curs_set(0)
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
-
-        selected_idx = 0
-        while True:
-            stdscr.clear()
-            stdscr.addstr(0, 0, "选择文件 (使用上下键导航, 回车确认, q退出):")
-
-            for idx, file in enumerate(files):
-                if idx >= height - 2:
-                    break
-                if idx == selected_idx:
-                    stdscr.addstr(idx + 1, 0, f"> {file}", curses.A_REVERSE)
-                else:
-                    stdscr.addstr(idx + 1, 0, f"  {file}")
-
-            stdscr.refresh()
-            key = stdscr.getch()
-
-            if key == curses.KEY_UP and selected_idx > 0:
-                selected_idx -= 1
-            elif key == curses.KEY_DOWN and selected_idx < len(files) - 1:
-                selected_idx += 1
-            elif key == ord('\n'):  # Enter
-                return files[selected_idx]
-            elif key == ord('q'):
-                return None
-
-    try:
-        return curses.wrapper(draw_menu)
-    except Exception:
-        # 如果curses失败，返回第一个文件
-        return files[0] if files else None
 
 def compile_source(source_file, target_file, std_option, args):
 # def compile_source(source_fi,std_option,args):
@@ -193,12 +150,18 @@ def main():
 
     # 处理源文件
     source_file = args.source_file
+
     if not source_file:
         cpp_files = find_files("*.cpp")
-        source_file = select_file(cpp_files)
+        # source_file = select_file(cpp_files)
+        source_file = gum_filter(cpp_files,header="选择源文件")
         if not source_file:
             print("未选择源文件")
             return 1
+
+    # 源文件以 `.` 结尾
+    if source_file and source_file.endswith("."):
+        source_file = f"{source_file}"
 
     # 确保源文件以.cpp结尾
     if not source_file.endswith(".cpp"):
