@@ -344,6 +344,7 @@ def main():
         if gum_input:
             problem_id = gum_input(
                 placeholder="请输入题目ID (例如: 1001 或 B3634)",
+                value= os.path.basename(os.getcwd()),
                 prompt="题目ID: "
             )
         else:
