@@ -15,7 +15,7 @@ return {
         wk.add({
             { "<leader>d", group = "dap : debug", desc = "debug:nvim-dap short keys" },
 
-            { "<leader>o", group = "oi snip", desc = "debug:nvim-dap short keys" },
+            { "<leader>o", group = "oi相关", desc = "debug:nvim-dap short keys" },
         })
     end,
     keys = {
