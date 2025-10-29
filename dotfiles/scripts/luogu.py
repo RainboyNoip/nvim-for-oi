@@ -244,6 +244,12 @@ class Luogu:
             with open(input_filename, 'w', encoding='utf-8') as f:
                 f.write(input_data)
             print(f"已保存输入数据到: {input_filename}")
+            if i == 1 and not os.path.exists("in"): 
+                # copy in1 to in
+                with open("in", 'w', encoding='utf-8') as f:
+                    f.write(input_data)
+                print(f"in 文件不存在, copy in1 to in")
+
             
             # 保存输出数据
             output_filename = f"out{i}"
