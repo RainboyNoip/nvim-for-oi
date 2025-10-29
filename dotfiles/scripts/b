@@ -142,7 +142,7 @@ def main():
     parser.add_argument("-I", "--no-input", action="store_true", help="不需要输入文件")
     parser.add_argument("-d", "--debug", action="store_true", help="添加编译宏 -DDEBUG")
     parser.add_argument("-s", "--std", help="编译标准,如11,14,17,20")
-    parser.add_argument("-f", "--freopen", help="使用freopen重定向输入到in")
+    parser.add_argument("-f", "--freopen", action="store_true",help="使用freopen重定向输入到in")
     parser.add_argument("-n", "--norun", action="store_true", help="编译后不要运行")
     parser.add_argument("-v", "--version", action="version", version=f"version: {VERSION}")
 
@@ -150,6 +150,7 @@ def main():
 
     # 处理源文件
     source_file = args.source_file
+    print(f"source_file: {source_file}")
 
     if not source_file:
         cpp_files = find_files("*.cpp")
@@ -161,7 +162,7 @@ def main():
 
     # 源文件以 `.` 结尾
     if source_file and source_file.endswith("."):
-        source_file = f"{source_file}"
+        source_file = source_file[:-1] # 移除末尾的点
 
     # 确保源文件以.cpp结尾
     if not source_file.endswith(".cpp"):
@@ -175,13 +176,15 @@ def main():
     target_file = f"{source_file[:-4]}_debug.out" if args.debug else f"{source_file[:-4]}.out"
 
     # 处理输入文件
-    input_file = args.input_file or "in"
-    if args.choose_input:
-        input_files = find_files("*in*")
-        input_file = select_file(input_files)
-    elif not args.no_input and not check_file_exists(input_file):
-        input_files = find_files("*in*")
-        input_file = select_file(input_files)
+    input_file = None
+    if not args.freopen:
+        input_file = args.input_file or "in"
+        if args.choose_input:
+            input_files = find_files("*in*")
+            input_file = gum_filter(input_files)
+        elif not args.no_input and not check_file_exists(input_file):
+            input_files = find_files("*in*")
+            input_file = gum_filter(input_files)
 
     # 检查C++标准
     std_option = args.std or get_cxx_version()
@@ -197,6 +200,7 @@ def main():
     if args.norun:
         return 0
 
+    # 如果没有输入文件,询问是否运行
     if not args.no_input and input_file and not check_file_exists(input_file):
         do_run = input("输入文件为[空] 或 [不存在],是否执行代码[Y/n]? ").strip().lower()
         if do_run in ['n', 'no']:
