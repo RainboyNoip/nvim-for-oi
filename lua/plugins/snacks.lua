@@ -7,6 +7,7 @@ return {
         dashboard = require("plugins.snacks.dashboard"),
         -- 默认配置 的 explorer
         explorer = {}, 
+        zen = {},
         notifier = { timeout = 5000 }, -- 替代 vim.notify
         terminal = {
             win = {
@@ -21,6 +22,14 @@ return {
             interactive = true,
             auto_insert = true,
             auto_close = false, -- 保持终端打开
+        },
+        styles = {
+            zen = {
+                backdrop = {
+                    transparent = false,
+                    blend = 90,
+                }
+            }
         }
     },
     keys = {
@@ -101,6 +110,14 @@ return {
             end,
             desc = "snacks picker show all buffers",
             mode = { "n" },
-        }
+        },
+        {
+            "<leader>sz",
+            function()
+                require("snacks").zen.zen()
+            end,
+            desc = "zen mode",
+            mode = { "n" },
+        },
     }
 }
