@@ -19,6 +19,9 @@ return {
         })
     end,
     keys = {
+        -- vim.keymap.set('n', 'g;', 'g;', { desc = '跳转到 [上] 一个编辑点 (Change List)' })
+        {'g;', 'g;', desc = '跳转到 [上] 一个编辑点 (Change List)'},
+        {'g,', 'g,', desc = '跳转到 [下] 一个编辑点 (Change List)'},
         {
             "<leader>?",
             function()
