@@ -1,6 +1,14 @@
 -- from :https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#clangd
 return {
-    cmd = { 'clangd' },
+    cmd = {
+        "clangd",
+        "--background-index",
+        "--clang-tidy",
+        "--header-insertion=iwyu",
+        "--completion-style=detailed",
+        "--function-arg-placeholders",
+        "--fallback-style=llvm",
+    },
     -- Filetypes to automatically attach to.
     filetypes = { 'cpp' },
     -- Sets the "workspace" to the directory where any of these files is found.
@@ -8,10 +16,15 @@ return {
     -- Nested lists indicate equal priority, see |vim.lsp.Config|.
     root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "compile_flags.txt", "configure.ac", ".git" },
 
+--     Diagnostics:
+--   IncludeCleaner:
+--     Check: Never
+
     init_options = {
         fallbackFlags = { '--std=c++17' },
         Diagnostics = {
-            Suppress = { "unused-includes" },
+            -- Suppress = { "unused-includes" },
+            UnusedIncludes = "None"
         },
     },
 

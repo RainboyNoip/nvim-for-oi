@@ -1,3 +1,7 @@
-// rename file to .clangd and delete this line
+# rename file to .clangd and delete this line
 CompileFlags:
-  Add: [-std=c++17]
+  Add: [-std=c++17, -DDEBUG]
+
+# find config from here : https://clangd.llvm.org/config#unusedincludes
+Diagnostics:
+  UnusedIncludes: None

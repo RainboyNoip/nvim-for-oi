@@ -164,13 +164,15 @@ return {
             mode = { "n" },
         },
         {
-            "<leader>sj",
+            "<leader>sb",
             function()
                 require("snacks").picker.buffers()
             end,
             desc = "snacks picker show all buffers",
             mode = { "n" },
         },
+        { "<leader>sd", function() Snacks.picker.diagnostics() end,        desc = "Diagnostics" },
+        { "<leader>sD", function() Snacks.picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
         {
             "<leader>sz",
             function()
