@@ -12,6 +12,7 @@ return {
     s({trig="ln",desc="out.ln()"},t("out.ln();",""));
     -- int a,b,c;
     s(
+        -- int a ,b,c;
         {
             trig = "i%s+([%w_ ]+)",
             -- trig="sc((\\S+ )*\\S+)( )?",
@@ -32,12 +33,12 @@ return {
     -- std::cin
     s(
         {
-            trig = "ci%s+([%w_ ]+)",
+            trig = "ci%s+([%w_. ]+)",
             -- trig="sc((\\S+ )*\\S+)( )?",
             regTrig = true,
             trigEngine="pattern",
-            name="in.read(a,b,c)",
-            desc="in.read(a,b,c)"
+            name="std::cin >> a >> b >> c",
+            desc="std::cin >> a >> b >> c"
         },
         f( function (args,snip)
             -- print(snip.captures[1])
@@ -46,6 +47,25 @@ return {
                 str1 = str1 .. ' >> ' ..  word;
             end
             return string.format('std::cin%s;',str1);
+        end,{})
+    ),
+    -- std::cout
+    s(
+        {
+            trig = "co%s+([%w_. ]+)",
+            -- trig="sc((\\S+ )*\\S+)( )?",
+            regTrig = true,
+            trigEngine="pattern",
+            name="std::cout << a << b << c",
+            desc="std::cout << a << b << c"
+        },
+        f( function (args,snip)
+            -- print(snip.captures[1])
+            local str1 = ""
+            for word in string.gmatch(snip.captures[1],"%S+") do
+                str1 = str1 .. ' << ' ..  word;
+            end
+            return string.format('std::cout%s;',str1);
         end,{})
     ),
     -- fastIo in
