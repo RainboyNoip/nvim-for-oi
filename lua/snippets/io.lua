@@ -90,7 +90,7 @@ return {
     -- scanf
     s(
         {
-            trig = "sc%s+([%w_ ]+)",
+            trig = "sc%s+([%w_. ]+)",
             -- trig="sc((\\S+ )*\\S+)( )?",
             regTrig = true,
             trigEngine="pattern",
@@ -108,5 +108,21 @@ return {
             return string.format('scanf("%s"%s);',str1,str2);
 
         end,{})
+    ),
+    -- scanf, 使用 select 选择哪种类型 int, long long ,char ,string,scc
+    s(
+        {
+            -- trig = "scc%s+([%w_. ]+)",
+            trig = "trig"
+            -- regTrig = true,
+            -- trigEngine="pattern",
+            -- name="scanf with type selection",
+            -- desc="scanf with type selection (int, long long, char, string)"
+        },
+        c(1,{
+            t"option 1",
+            t"option 2",
+            t"option 3",
+        })
     )
 }
