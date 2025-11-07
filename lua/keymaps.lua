@@ -62,3 +62,10 @@ vim.keymap.set('i', '<A-Up>', '<Esc>:m .-2<CR>==gi', opts)
 -- ctrl-shift-enter 在当前行上方插入新行
 -- vim.keymap.set('n', '<C-S-CR>', 'O<Esc>', opts)
 -- vim.keymap.set('i', '<C-S-CR>', '<Esc>O', opts)
+
+
+-- for luasnip
+vim.api.nvim_set_keymap("i", "<C-n>", "<Plug>luasnip-next-choice", {})
+vim.api.nvim_set_keymap("s", "<C-n>", "<Plug>luasnip-next-choice", {})
+vim.api.nvim_set_keymap("i", "<C-p>", "<Plug>luasnip-prev-choice", {})
+vim.api.nvim_set_keymap("s", "<C-p>", "<Plug>luasnip-prev-choice", {})
