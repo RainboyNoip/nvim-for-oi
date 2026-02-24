@@ -4,13 +4,13 @@ return {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter.configs").setup({
+            return {
                 ensure_installed = { "cpp" ,"c"},
                 auto_install = true,
                 highlight = {
                     enable = true,
                 },
-            })
+            }
         end,
     },
 }

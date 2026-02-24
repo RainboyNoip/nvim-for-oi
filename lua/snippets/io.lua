@@ -33,7 +33,7 @@ return {
     -- std::cin
     s(
         {
-            trig = "ci%s+([%w_. ]+)",
+            trig = "ci%s+(%S+)",
             -- trig="sc((\\S+ )*\\S+)( )?",
             regTrig = true,
             trigEngine="pattern",
@@ -52,7 +52,7 @@ return {
     -- std::cout
     s(
         {
-            trig = "co%s+([%w_. ]+)",
+            trig = "co%s+(%S+)",
             -- trig="sc((\\S+ )*\\S+)( )?",
             regTrig = true,
             trigEngine="pattern",
@@ -87,27 +87,45 @@ return {
             return string.format('in.read(%s);',string.sub(str1,1,-2));
         end,{})
     ),
-    -- scanf
     s(
         {
-            trig = "sc%s+([%w_. ]+)",
-            -- trig="sc((\\S+ )*\\S+)( )?",
+            -- sc([cl]?) : 匹配 sc, scc, scl
+            --    sc     -> 捕获组1为空 -> 对应 %d
+            --    scc    -> 捕获组1为c  -> 对应 %c
+            --    scl    -> 捕获组1为l  -> 对应 %lld
+            trig = "sc([cl]?)%s+([%w_%.%[%] ]+)",
             regTrig = true,
-            trigEngine="pattern",
-            name="scanf",
-            desc="scanf"
+            trigEngine = "pattern",
+            name = "scanf_smart",
+            desc = "sc->%d, scc->%c, scl->%lld"
         },
-        f( function (args,snip)
-            -- print(snip.captures[1])
-            local str1 = ""
-            local str2 = ""
-            for word in string.gmatch(snip.captures[1],"%S+") do
-                str1 = str1 .. "%d"
-                str2 = str2 .. ',&' .. word;
-            end
-            return string.format('scanf("%s"%s);',str1,str2);
+        f(function(_, snip)
+            -- 获取后缀 (空, "c", 或 "l")
+            local type_suffix = snip.captures[1]
+            -- 获取变量列表字符串
+            local input_vars = snip.captures[2]
 
-        end,{})
+            -- 定义后缀到格式化符的映射
+            local fmt_map = {
+                [""]  = "%d",
+                ["c"] = "%c",
+                ["l"] = "%lld"
+            }
+
+            -- 默认为 %d
+            local fmt_code = fmt_map[type_suffix] or "%d"
+
+            local fmt_str = ""
+            local args_str = ""
+
+            -- 循环拼接
+            for word in string.gmatch(input_vars, "%S+") do
+                fmt_str = fmt_str .. fmt_code
+                args_str = args_str .. ",&" .. word
+            end
+
+            return string.format('scanf("%s"%s);', fmt_str, args_str)
+        end, {})
     ),
     -- scanf, 使用 select 选择哪种类型 int, long long ,char ,string,scc
     s(

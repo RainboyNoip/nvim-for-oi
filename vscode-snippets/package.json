@@ -20,6 +20,14 @@
             {
                 "language": "cpp",
                 "path": "./cpp/cppdoc.json"
+            },
+            {
+                "language": "markdown",
+                "path": "./markdown.json"
+            },
+            {
+                "language": "haskell",
+                "path": "./haskell.json"
             }
         ]
     }

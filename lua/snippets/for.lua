@@ -37,7 +37,7 @@ return {
     ),
     -- f n
     s({
-        trig = "f%s+(%w+)",
+        trig = "f%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -56,7 +56,7 @@ return {
     ),
     -- f 1 n
     s({
-        trig = "f%s+(%w+)%s+(%w+)",
+        trig = "f%s+(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -76,7 +76,7 @@ return {
     ),
     -- fj -> for(int j = 1;j <= n;++j)
     s({
-        trig = "f(%w+)",
+        trig = "f(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -97,7 +97,7 @@ return {
     ),
     -- fi n
     s({
-        trig = "f(%w+)%s+(%w+)",
+        trig = "f(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -118,7 +118,7 @@ return {
     ),
     -- fi 1 10
     s({
-        trig = "f(%w+)%s+(%w+)%s+(%w+)",
+        trig = "f(%S+)%s+(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",

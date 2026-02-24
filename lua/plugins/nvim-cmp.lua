@@ -68,14 +68,14 @@ return {
         -- end,
 
         -- [[ 主要改动点 4: 智能的 Tab 键 ]]
-          -- 1. 如果补全菜单可见，选择下一项
-          -- 2. 如果光标在代码片段的可跳转节点上，跳转到下一节点
+          -- 1. 如果光标在代码片段的可跳转节点上，跳转到下一节点
+          -- 2. 如果补全菜单可见，选择下一项
           -- 3. 否则，执行 fallback (插入 Tab 字符)
           ["<Tab>"] = cmp.mapping(function(fallback)
-            if luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            elseif luasnip.locally_jumpable(1) then
+            if luasnip.locally_jumpable(1) then
               luasnip.jump(1)
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
             elseif cmp.visible() then
               cmp.select_next_item()
             -- elseif luasnip.expand_or_jumpable() then

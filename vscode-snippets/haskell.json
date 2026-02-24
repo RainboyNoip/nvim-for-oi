@@ -1,0 +1,14 @@
+{
+    "main": {
+        "prefix": "main",
+        "body": [
+            "import Data.List",
+            "import Data.Char",
+            "",
+            "main = do",
+            "   putStrLn \"Hello world!\"",
+            "$0"
+        ],
+        "description": "problem 题目解析文章前置元数据 - title默认使用文件名"
+    }
+}
