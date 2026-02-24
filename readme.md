@@ -124,6 +124,7 @@ CompileFlags:
 - **ellisonleao/gruvbox.nvim**: 主题
 - **nvim-tree/nvim-web-devicons**: 图标
 - **nvim-lua/plenary.nvim**: Lua 函数库
+- **LmanTW/themify.nvim**: Theme管理, 使用 `:Themify`, `<I>` 来安装主题
 
 ## 自定义配置
 
