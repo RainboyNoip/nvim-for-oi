@@ -51,6 +51,13 @@ return {
             end,
             desc = "select server to paste",
 
+        },
+        {
+            "<leader>oh",
+            function()
+                require("cheatsheet").show()
+            end,
+            desc = "Rainboy Cheat Sheet",
         }
     },
 }
