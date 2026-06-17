@@ -1,216 +1,125 @@
 local ls = require("luasnip")
-local lse = require("luasnip.extras")
 local s = ls.snippet
-local sn = ls.snippet_node
 local i = ls.insert_node
 local t = ls.text_node
-local c = ls.choice_node
-local d = ls.dynamic_node
 local f = ls.function_node
-local rep = lse.rep 
 local fmt = require("luasnip.extras.fmt").fmt
 
+local function node(value)
+    if type(value) == "string" then
+        return t(value)
+    end
+    return value
+end
 
+local function capture(index, default)
+    return f(function(_, snip)
+        return snip.captures[index] or default
+    end, {})
+end
 
--- 常用的for循环
-
-return {
-
-    -- Yank to array
-    -- 1d array
-    -- f
-    s("f",
+local function forward_for(trigger, var, left, right)
+    return s(trigger,
         fmt(
         [[
-            for(int i = 1;i <= n ;++i ) // i: 1->n
+            for(int {var} = {left};{var} <= {right} ;++{var} ) // {var}: {left}->{right}
             {{
                 {pos}
             }}
         ]],
         {
-            pos=i(0),
+            var = node(var),
+            left = node(left),
+            right = node(right),
+            pos = i(0),
         })
-    ),
-    s("lf", -- line for
+    )
+end
+
+local function reverse_for(trigger, var, left, right)
+    return s(trigger,
+        fmt(
+        [[
+            for(int {var} = {right};{var} >= {left} ;--{var} ) // {var}: {right}->{left}
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            var = node(var),
+            left = node(left),
+            right = node(right),
+            pos = i(0),
+        })
+    )
+end
+
+return {
+    forward_for("f", "i", "1", "n"),
+
+    s("lf",
         fmt( [[ for(int i = 1;i <= n ;++i ) {pos} ]],
-        { pos=i(0) })
+        { pos = i(0) })
     ),
-    -- f n
-    s({
+
+    forward_for({
         trig = "f%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
-    },
-        fmt(
-        [[
-            for(int i = 1;i <= {func} ;++i ) // i: 1->{func}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func = f(function(args,snip) return snip.captures[1]; end,{})
-        })
-    ),
-    -- f 1 n
-    s({
+    }, "i", "1", capture(1)),
+
+    forward_for({
         trig = "f%s+(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
-    },
-        fmt(
-        [[
-            for(int i = {func1};i <= {func2} ;++i ) // i: {func1}->{func2}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func1 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func2 = f(function(args,snip) return snip.captures[2]; end,{})
-        })
-    ),
-    -- fj -> for(int j = 1;j <= n;++j)
-    s({
+    }, "i", capture(1), capture(2)),
+
+    forward_for({
         trig = "f(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
-    },
-        fmt(
-        [[
-            for(int {func0} = {func1};{func0} <= {func2} ;++{func0} ) // {func0}: {func1}->{func2}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func1 = f(function(args,snip) return "1"; end,{}),
-            func2 = f(function(args,snip) return "n"; end,{})
-        })
-    ),
-    -- fi n
-    s({
+    }, capture(1), "1", "n"),
+
+    forward_for({
         trig = "f(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
-    },
-        fmt(
-        [[
-            for(int {func0} = {func1};{func0} <= {func2} ;++{func0} ) // {func0}: {func1}->{func2}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func1 = f(function(args,snip) return "1"; end,{}),
-            func2 = f(function(args,snip) return snip.captures[2]; end,{})
-        })
-    ),
-    -- fi 1 10
-    s({
+    }, capture(1), "1", capture(2)),
+
+    forward_for({
         trig = "f(%S+)%s+(%S+)%s+(%S+)",
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
-    },
-        fmt(
-        [[
-            for(int {func0} = {func1};{func0} <= {func2} ;++{func0} ) // {func0}: {func1}->{func2}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func1 = f(function(args,snip) return snip.captures[2]; end,{}),
-            func2 = f(function(args,snip) return snip.captures[3]; end,{})
-        })
-    ),
-    -- reverse for: rf -> for(int i = n; i >= 1; --i)
-    s("rf",
-        fmt(
-        [[
-            for(int i = n;i >= 1 ;--i ) // i: n->1
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-        })
-    ),
-    -- rf m
-    s({
+    }, capture(1), capture(2), capture(3)),
+
+    reverse_for("rf", "i", "1", "n"),
+
+    reverse_for({
         trig = "rf%s+(%S+)",
         regTrig = true,
         name = "reverse for n",
         desc = "倒序循环",
-    },
-        fmt(
-        [[
-            for(int i = {func};i >= 1 ;--i ) // i: {func}->1
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func = f(function(args,snip) return snip.captures[1]; end,{})
-        })
-    ),
-    -- rfi m
-    s({
+    }, "i", "1", capture(1)),
+
+    reverse_for({
         trig = "rf(%S+)%s+(%S+)",
         regTrig = true,
         name = "reverse for n",
         desc = "指定变量名的倒序循环",
-    },
-        fmt(
-        [[
-            for(int {func0} = {func1};{func0} >= 1 ;--{func0} ) // {func0}: {func1}->1
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func1 = f(function(args,snip) return snip.captures[2]; end,{})
-        })
-    ),
-    -- rfi l r
-    s({
+    }, capture(1), "1", capture(2)),
+
+    reverse_for({
         trig = "rf(%S+)%s+(%S+)%s+(%S+)",
         regTrig = true,
         name = "reverse for range",
         desc = "指定变量名和区间的倒序循环",
-    },
-        fmt(
-        [[
-            for(int {func0} = {func2};{func0} >= {func1} ;--{func0} ) // {func0}: {func2}->{func1}
-            {{
-                {pos}
-            }}
-        ]],
-        {
-            pos=i(0),
-            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
-            func1 = f(function(args,snip) return snip.captures[2]; end,{}),
-            func2 = f(function(args,snip) return snip.captures[3]; end,{})
-        })
-    ),
-    -- 2d array
+    }, capture(1), capture(2), capture(3)),
+
     s("2f",
         fmt(
         [[
@@ -221,26 +130,7 @@ return {
             }}
         ]],
         {
-            pos=i(0),
+            pos = i(0),
         })
     )
-    -- 3d array
-
-
-    --- 2025-5-31 我创建的动态的节点
-    --- 2025-5-31 我创建的函数的节点
-    -- s("for", {
-    --     t("for("),
-    --     t("int "),
-    --     i(1, "i"),
-    --     t(" = "),
-    --     i(2, "0"),
-    --     t("; "),
-    --     rep(1),
-    --     t("<="),
-    --     t(""20;++i;){"),
-    --     t({"","\t"}),
-    --     i(0),
-    --     t({"","}"}),
-    -- }),
 }

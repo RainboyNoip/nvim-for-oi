@@ -1,95 +1,88 @@
--- 输入输出相关的 snip
 local ls = require("luasnip")
 local s = ls.snippet
-local sn = ls.snippet_node
-local i = ls.insert_node
 local t = ls.text_node
-local c = ls.choice_node
 local f = ls.function_node
-local fmt = require("luasnip.extras.fmt").fmt
+
+local function words(text)
+    local result = {}
+    for word in string.gmatch(text or "", "%S+") do
+        table.insert(result, word)
+    end
+    return result
+end
+
+local function capture_words(snip, index)
+    return words(snip.captures[index])
+end
+
+local function join_prefixed(values, prefix)
+    local result = ""
+    for _, value in ipairs(values) do
+        result = result .. prefix .. value
+    end
+    return result
+end
+
+local function join_csv(values)
+    return table.concat(values, ",")
+end
+
+local function token_transform(trigger, name, desc, transform)
+    return s(
+        {
+            trig = trigger,
+            regTrig = true,
+            trigEngine = "pattern",
+            name = name,
+            desc = desc
+        },
+        f(function(_, snip)
+            return transform(capture_words(snip, 1), snip)
+        end, {})
+    )
+end
 
 return {
-    s({trig="ln",desc="out.ln()"},t("out.ln();",""));
-    -- int a,b,c;
-    s(
-        -- int a ,b,c;
-        {
-            trig = "i%s+([%w_ ]+)",
-            -- trig="sc((\\S+ )*\\S+)( )?",
-            regTrig = true,
-            trigEngine="pattern",
-            name="int a,b,c",
-            desc="int a,b,c"
-        },
-        f( function (args,snip)
-            -- print(snip.captures[1])
-            local str1 = ""
-            for word in string.gmatch(snip.captures[1],"%S+") do
-                str1 = str1 ..  word .. ",";
-            end
-            return string.format('int %s;',string.sub(str1,1,-2));
-        end,{})
+    s({ trig = "ln", desc = "out.ln()" }, t("out.ln();", "")),
+
+    token_transform(
+        "i%s+([%w_ ]+)",
+        "int a,b,c",
+        "int a,b,c",
+        function(vars)
+            return string.format("int %s;", join_csv(vars))
+        end
     ),
-    -- std::cin
-    s(
-        {
-            trig = "ci%s+(.+)",
-            regTrig = true,
-            trigEngine="pattern",
-            name="std::cin >> a >> b >> c",
-            desc="std::cin >> a >> b >> c"
-        },
-        f( function (args,snip)
-            -- print(snip.captures[1])
-            local str1 = ""
-            for word in string.gmatch(snip.captures[1],"%S+") do
-                str1 = str1 .. ' >> ' ..  word;
-            end
-            return string.format('std::cin%s;',str1);
-        end,{})
+
+    token_transform(
+        "ci%s+(.+)",
+        "std::cin >> a >> b >> c",
+        "std::cin >> a >> b >> c",
+        function(vars)
+            return string.format("std::cin%s;", join_prefixed(vars, " >> "))
+        end
     ),
-    -- std::cout
-    s(
-        {
-            trig = "co%s+(.+)",
-            regTrig = true,
-            trigEngine="pattern",
-            name="std::cout << a << b << c",
-            desc="std::cout << a << b << c"
-        },
-        f( function (args,snip)
-            -- print(snip.captures[1])
-            local str1 = ""
-            for word in string.gmatch(snip.captures[1],"%S+") do
-                str1 = str1 .. ' << ' ..  word;
-            end
-            return string.format('std::cout%s;',str1);
-        end,{})
+
+    token_transform(
+        "co%s+(.+)",
+        "std::cout << a << b << c",
+        "std::cout << a << b << c",
+        function(vars)
+            return string.format("std::cout%s;", join_prefixed(vars, " << "))
+        end
     ),
-    -- fastIo in
-    s(
-        {
-            trig = "in%s+(.+)",
-            regTrig = true,
-            trigEngine="pattern",
-            name="in.read(a,b,c)",
-            desc="in.read(a,b,c)"
-        },
-        f( function (args,snip)
-            -- print(snip.captures[1])
-            local str1 = ""
-            for word in string.gmatch(snip.captures[1],"%S+") do
-                str1 = str1 ..  word .. ",";
-            end
-            return string.format('in.read(%s);',string.sub(str1,1,-2));
-        end,{})
+
+    token_transform(
+        "in%s+(.+)",
+        "in.read(a,b,c)",
+        "in.read(a,b,c)",
+        function(vars)
+            return string.format("in.read(%s);", join_csv(vars))
+        end
     ),
+
     s(
         {
-            -- sc([cl]?) : 匹配 sc, scc, scl
-            --    sc     -> 捕获组1为空 -> 对应 %d
-            --    scc    -> 捕获组1为c  -> 对应 %c
-            --    scl    -> 捕获组1为l  -> 对应 %lld
             trig = "sc([cl]?)%s+([%w_%.%[%] ]+)",
             regTrig = true,
             trigEngine = "pattern",
@@ -97,28 +90,18 @@ return {
             desc = "sc->%d, scc->%c, scl->%lld"
         },
         f(function(_, snip)
-            -- 获取后缀 (空, "c", 或 "l")
-            local type_suffix = snip.captures[1]
-            -- 获取变量列表字符串
-            local input_vars = snip.captures[2]
-
-            -- 定义后缀到格式化符的映射
             local fmt_map = {
                 [""]  = "%d",
                 ["c"] = "%c",
                 ["l"] = "%lld"
             }
-
-            -- 默认为 %d
-            local fmt_code = fmt_map[type_suffix] or "%d"
-
+            local fmt_code = fmt_map[snip.captures[1]] or "%d"
             local fmt_str = ""
             local args_str = ""
 
-            -- 循环拼接
-            for word in string.gmatch(input_vars, "%S+") do
+            for _, var in ipairs(capture_words(snip, 2)) do
                 fmt_str = fmt_str .. fmt_code
-                args_str = args_str .. ",&" .. word
+                args_str = args_str .. ",&" .. var
             end
 
             return string.format('scanf("%s"%s);', fmt_str, args_str)

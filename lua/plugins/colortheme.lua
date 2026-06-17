@@ -19,7 +19,7 @@ return {
 
             loader = function ()
                 local Themify = require('themify.api')
-                Themify.set_current("folke/tokyonight.nvim","tokyonight-night")
+                Themify.set_current("bluz71/vim-nightfly-colors","nightfly")
             end
         }
     },
