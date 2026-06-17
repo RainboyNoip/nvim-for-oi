@@ -49,6 +49,22 @@
 | `<C-E>` | 切换 choice 节点 |
 | `<C-n>` / `<C-p>` | 下/上一个 choice |
 
+## Snacks / Picker
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<Leader>e` | 打开 Snacks Explorer |
+| `<Leader>tt` | 切换 Snacks Terminal |
+| `<Leader>tc` | 选择已有 terminal 并切换 |
+| `<Leader>tf` | 打开 bash terminal |
+| `<Leader>sf` | 查看当前文件的 C++ 符号 |
+| `<Leader>sj` | 查看 jump list |
+| `<Leader>sb` | 查看 buffer 列表 |
+| `<Leader>sd` | 查看项目诊断 |
+| `<Leader>sD` | 查看当前 buffer 诊断 |
+| `<Leader>sc` | 查看当前文件更改位置 |
+| `<Leader>sz` | 切换 zen mode |
+
 ## C++ Snippets
 
 | 触发 | 展开结果 |
