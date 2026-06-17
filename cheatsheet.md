@@ -15,6 +15,18 @@
 | `g;` / `g,` | 跳转到上/下一个编辑位置 |
 | `<Leader>?` | 显示当前 buffer 的 which-key 快捷键 |
 | `<Leader>oh` | 打开这个 cheat sheet |
+| `<S-h>` / `<S-l>` | 上/下一个 buffer |
+| `[b` / `]b` | 上/下一个 buffer |
+| `[B` / `]B` | 向左/右移动 buffer |
+
+## Buffer 管理
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<Leader>bp` | 固定 / 取消固定 buffer |
+| `<Leader>bP` | 关闭未固定 buffer |
+| `<Leader>br` | 关闭右侧 buffer |
+| `<Leader>bl` | 关闭左侧 buffer |
 
 ## OI / 模板入口
 
@@ -60,6 +72,7 @@
 | 快捷键 | 说明 |
 | --- | --- |
 | `<Leader>e` | 打开 Snacks Explorer |
+| `<Leader>t` | 终端分组 |
 | `<Leader>tt` | 切换 Snacks Terminal |
 | `<Leader>tc` | 选择已有 terminal 并切换 |
 | `<Leader>tf` | 打开 bash terminal |
@@ -71,6 +84,8 @@
 | `<Leader>sD` | 当前 buffer 诊断 |
 | `<Leader>sc` | 当前文件更改位置 |
 | `<Leader>sz` | 专注模式 |
+
+`<Leader>sf` 依赖 clangd 的 LSP symbols。当前 C++ 文件存在严重语法错误时，列表可能为空。
 
 ## C++ Snippets
 

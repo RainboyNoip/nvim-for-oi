@@ -39,11 +39,11 @@ return {
             function()
                 require("snacks").explorer()
             end,
-            desc = "Toggle Snacks Explorer",
+            desc = "切换文件浏览器",
         },
         {
             "<leader>t",
-            group = "Terminal",
+            group = "终端",
             mode = { "n", "t" },
         },
         {
@@ -51,7 +51,7 @@ return {
             function()
                 require("snacks.terminal").toggle()
             end,
-            desc = "Toggle Snacks Terminal",
+            desc = "切换终端",
             mode = { "n", "t" },
         },
         {
@@ -59,7 +59,7 @@ return {
             function()
                 require("plugins.snacks.terminal").select_toggle()
             end,
-            desc = "Select Snacks Terminal",
+            desc = "选择已有终端",
             mode = { "n", "t" },
         },
         {
@@ -67,7 +67,7 @@ return {
             function()
                 require("snacks.terminal").get("bash", { auto_close = false })
             end,
-            desc = "Open Snacks Terminal",
+            desc = "打开 Bash 终端",
             mode = { "n", "t" },
         },
     }, picker_keys)

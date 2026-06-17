@@ -10,9 +10,9 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 - **LSP 支持**: 针对 C++ 的 clangd 语言服务器配置
 - **调试支持**: 集成 nvim-dap 调试器
 - **代码补全**: 使用 nvim-cmp 提供智能补全
-- **主题**: 使用 moonfly 主题
+- **主题**: 默认使用 nightfly 主题，并通过 themify 管理可切换主题
 - **状态栏**: 使用 lualine 状态栏
-- **文件浏览**: 使用 snacks.nvim 的 dashboard
+- **文件浏览 / Picker**: 使用 snacks.nvim 的 explorer、picker 和 dashboard
 
 ## 安装
 
@@ -82,6 +82,7 @@ brew install gum find fd
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
 - `<Leader>of`: 打开 rbook 正式代码模板
 - `<Leader>oe`: 浏览 rbook 全部代码文件
+- `<Leader>sf`: 查看当前文件 LSP 符号，C++ 中可用于函数/方法跳转
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
@@ -104,6 +105,9 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 - 查找引用
 - 重命名符号
 - 代码诊断
+- 当前文件符号列表 (`<Leader>sf`)
+
+`<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 
 
 使用`clangd`,在项目的根目录下创建`.clangd`文件，内容如下:
@@ -123,16 +127,16 @@ CompileFlags:
 
 ## 插件列表
 
-- **folke/snacks.nvim**: 提供 dashboard、终端等实用功能
+- **folke/snacks.nvim**: 提供 dashboard、explorer、picker、终端等实用功能
 - **nvim-lualine/lualine.nvim**: 状态栏
 - **folke/which-key.nvim**: 快捷键提示
-- **nvim-telescope/telescope.nvim**: 模糊搜索
 - **neovim/nvim-lspconfig**: LSP 配置
 - **hrsh7th/nvim-cmp**: 代码补全
 - **mfussenegger/nvim-dap**: 调试器
 - **rcarriga/nvim-dap-ui**: 调试界面
 - **numToStr/Comment.nvim**: 快速注释
-- **bluz71/vim-moonfly-colors**: 主题
+- **bluz71/vim-nightfly-colors**: 默认主题
+- **bluz71/vim-moonfly-colors**: 备用主题
 - **nvim-tree/nvim-web-devicons**: 图标
 - **nvim-lua/plenary.nvim**: Lua 函数库
 - **LmanTW/themify.nvim**: Theme管理, 使用 `:Themify`, `<I>` 来安装主题
