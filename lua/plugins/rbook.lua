@@ -1,51 +1,47 @@
--- 我写的rbook 作为插件
--- return {
---     'rainboyOJ/rbook_nunjucks',
---     lazy = false,
---     config = function()
---         require('rbook').setup()
---         print("rbook loaded")
---     end,
--- }
-
--- 在你的 lazy.nvim 配置中的某个文件里
-
 return {
-  -- 插件的本地路径
-  -- 我们使用 vim.fn.expand 来正确处理 "~"
-  dir = vim.fn.expand("~/mycode/rbook_nunjucks"),
+  -- rbook.nvim 位于电子书仓库的 nvim/ 子目录。
+  -- 插件本身完全离线读取 repo_root/book 下的文章和代码模板。
+  dir = vim.fn.expand("~/mycode/rbook_nunjucks/nvim"),
 
-  -- 强制指定一个名字，这样在其他地方引用会很方便
-  -- 如果不指定，lazy.nvim 会根据目录名 'my_plugin' 来推断
-  name = "rbook",
-  
-  -- 确保插件不会被懒加载
-  -- 因为我正在开发这个插件，所以需要立即加载
-  lazy = false,
+  name = "rbook.nvim",
 
-  -- ！！！这是最关键的一步！！！
-  -- 启用开发模式，这使得 :Lazy reload <插件名> 命令可用
+  lazy = true,
+  cmd = {
+    "RbookCode",
+    "RbookCodeFiles",
+    "RbookCodeRefresh",
+    "RbookOpenArticle",
+    "RbookDoctor",
+  },
+
   dev = true,
 
-  -- 如果你的插件有其他依赖，也在这里列出
   dependencies = {
     "folke/snacks.nvim",
   },
-  config = function()
-    require('rbook').setup()
-    local TemplateEngine = require("rbook.template_engine")
-    TemplateEngine.setup({
-      vars = {
-        name = "rainboy",
-        blog = "https://blog.roj.ac.cn",
-        github = 'https://github.com/rainboylvx',
-      }
-    })
-  end,
-  -- 如果你的插件有配置项，在这里设置
 
-  -- 插件的配置项
+  opts = {
+    repo_root = vim.fn.expand("~/mycode/rbook_nunjucks"),
+  },
+
+  config = function(_, opts)
+    -- rbook.nvim 使用 lyaml。这里把用户级 luarocks 5.1 路径加入 Neovim，
+    -- 这样 `luarocks --lua-version=5.1 --local install lyaml` 后可以直接被 require 到。
+    local luarocks = vim.fn.expand("~/.luarocks")
+    package.path = package.path
+      .. ";" .. luarocks .. "/share/lua/5.1/?.lua"
+      .. ";" .. luarocks .. "/share/lua/5.1/?/init.lua"
+    package.cpath = package.cpath
+      .. ";" .. luarocks .. "/lib/lua/5.1/?.so"
+
+    require("rbook").setup(opts)
+  end,
+
   keys = {
-    { "<leader>ot", "<cmd>ApplyTempCpp<cr>", desc = "使用Rbook template.cpp" },
-  }
+    { "<leader>rc", "<cmd>RbookCode<cr>", desc = "Rbook 正式代码模板" },
+    { "<leader>rf", "<cmd>RbookCodeFiles<cr>", desc = "Rbook 浏览全部代码文件" },
+    { "<leader>ra", "<cmd>RbookOpenArticle<cr>", desc = "Rbook 打开文章" },
+    { "<leader>rr", "<cmd>RbookCodeRefresh<cr>", desc = "Rbook 刷新索引" },
+    { "<leader>rd", "<cmd>RbookDoctor<cr>", desc = "Rbook 检查模板索引" },
+  },
 }

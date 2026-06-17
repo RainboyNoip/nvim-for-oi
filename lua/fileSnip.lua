@@ -133,10 +133,10 @@ function M.setup(opts)
 
 	vim.keymap.set('n', '<leader>os', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
 
-	-- 来自 rbook_nunjucks 
-	vim.keymap.set('n', '<leader>oe', ":OICodeSnipPick<CR>", { buffer = true, silent = true, desc = "OICodeSnipPick explorer" })
+	-- rbook.nvim 的代码模板入口。旧的 OICodeSnip 命令已经被 RbookCode/RbookCodeFiles 替代。
+	vim.keymap.set('n', '<leader>oe', ":RbookCodeFiles<CR>", { buffer = true, silent = true, desc = "Rbook 浏览全部代码文件" })
 
-	vim.keymap.set('n', '<leader>of', ":OICodeSnip<CR>", { buffer = true, silent = true, desc = "OICodeSnip file picker" })
+	vim.keymap.set('n', '<leader>of', ":RbookCode<CR>", { buffer = true, silent = true, desc = "Rbook 正式代码模板" })
 
 	-- -- 绑定快捷键 F1 insert 模式
 	-- vim.api.nvim_set_keymap("i", "<F1>", "<C-o>:Choose<CR>", { noremap = true, silent = true })
