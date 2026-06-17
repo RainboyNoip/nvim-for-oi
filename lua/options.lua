@@ -1,44 +1,44 @@
--- Hint: use `:h <option>` to figure out the meaning if needed
-vim.opt.clipboard = 'unnamedplus' -- use system clipboard
+-- 基础编辑行为
+vim.opt.clipboard = 'unnamedplus' -- 使用系统剪贴板
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-vim.opt.mouse = 'a' -- allow the mouse to be used in nvim
+vim.opt.mouse = 'a' -- 允许鼠标操作
 
--- Tab
-vim.opt.tabstop = 4 -- number of visual spaces per TAB
-vim.opt.softtabstop = 4 -- number of spaces in tab when editing
-vim.opt.shiftwidth = 4 -- insert 4 spaces on a tab
-vim.opt.expandtab = true -- tabs are spaces, mainly because of Python
+-- 缩进：OJ/C++ 和 Python 都统一使用 4 空格。
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
 
--- UI config
-vim.opt.number = true -- show absolute number
-vim.opt.relativenumber = true -- add numbers to each line on the left side
-vim.opt.cursorline = true -- highlight cursor line underneath the cursor horizontally
-vim.opt.splitbelow = true -- open new vertical split bottom
-vim.opt.splitright = true -- open new horizontal splits right
-vim.opt.termguicolors = true        -- enable 24-bit RGB color in the TUI
-vim.opt.showmode = false -- we are experienced, wo don't need the "-- INSERT --" mode hint
+-- 界面显示
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.cursorline = true
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.termguicolors = true
+vim.opt.showmode = false -- 状态栏已经显示模式，不需要默认的 "-- INSERT --"。
+vim.opt.signcolumn = "auto:2-3" -- 固定 sign column 宽度，避免诊断标记推动代码。
 
--- Searching
-vim.opt.incsearch = true -- search as characters are entered
-vim.opt.hlsearch = false -- do not highlight matches
-vim.opt.ignorecase = true -- ignore case in searches by default
-vim.opt.smartcase = true -- but make it case sensitive if an uppercase is entered
+-- 搜索
+vim.opt.incsearch = true
+vim.opt.hlsearch = false
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
--- enable fold
+-- 折叠：配合 oiSnippets 插入的 //oisnip_begin / //oisnip_end。
 vim.opt.foldenable = true
-vim.opt.foldmethod = "marker" -- use marker to fold code
+vim.opt.foldmethod = "marker"
 vim.opt.foldmarker = { "//oisnip_begin", "//oisnip_end" }
 vim.opt.foldlevel = 99
--- open all folds by default
 -- opt.foldopen:append("all")
 -- opt.foldopen:append("hor") -- open folds when opening a horizontal split
 
--- undofile
-vim.opt.undofile = true -- save undo history
+-- 文件状态
+vim.opt.undofile = true
 -- vim.opt.undodir = vim.fn.stdpath('config') .. '/undodir'
-vim.opt.swapfile = false -- don't use swapfile
+vim.opt.swapfile = false
 
-
+-- 注释续行
 vim.opt.formatoptions:remove({ 'r', 'o' })
 
 -- 不知道那个插件设置了这个，导致在cpp文件中，按o会自动插入注释
@@ -51,15 +51,11 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
--- 设置 sign column 固定宽度，避免文字推动
-vim.opt.signcolumn = "auto:2-3"  -- 自动调整，但最少2-3个字符宽度
-
--- 自动保存配置
+-- 自动保存
 vim.opt.autowrite = true        -- 在执行某些命令时自动保存
 vim.opt.autowriteall = true     -- 在更多情况下自动保存
 vim.opt.autoread = true         -- 文件被外部修改时自动重新加载
 
--- 配置自动保存的自动命令组
 local autosave_group = vim.api.nvim_create_augroup('AutoSave', { clear = true })
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'FocusLost', 'BufLeave' }, {
     group = autosave_group,
@@ -72,7 +68,7 @@ vim.api.nvim_create_autocmd({ 'InsertLeave', 'FocusLost', 'BufLeave' }, {
     end,
 })
 
--- LSP 诊断配置
+-- LSP 诊断
 vim.diagnostic.config({
     virtual_text = true,           -- 在代码行末尾显示诊断信息
     underline = true,              -- 在错误下方显示下划线
