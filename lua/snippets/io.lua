@@ -33,7 +33,7 @@ return {
     -- std::cin
     s(
         {
-            trig = "ci%s+([%w_ ]+)",
+            trig = "ci%s+(.+)",
             regTrig = true,
             trigEngine="pattern",
             name="std::cin >> a >> b >> c",
@@ -51,7 +51,7 @@ return {
     -- std::cout
     s(
         {
-            trig = "co%s+([%w_ ]+)",
+            trig = "co%s+(.+)",
             regTrig = true,
             trigEngine="pattern",
             name="std::cout << a << b << c",
