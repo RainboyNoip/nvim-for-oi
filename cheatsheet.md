@@ -57,13 +57,14 @@
 | `<Leader>tt` | 切换 Snacks Terminal |
 | `<Leader>tc` | 选择已有 terminal 并切换 |
 | `<Leader>tf` | 打开 bash terminal |
-| `<Leader>sf` | 查看当前文件的 C++ 符号 |
-| `<Leader>sj` | 查看 jump list |
-| `<Leader>sb` | 查看 buffer 列表 |
-| `<Leader>sd` | 查看项目诊断 |
-| `<Leader>sD` | 查看当前 buffer 诊断 |
-| `<Leader>sc` | 查看当前文件更改位置 |
-| `<Leader>sz` | 切换 zen mode |
+| `<Leader>s` | 搜索 / 跳转分组 |
+| `<Leader>sf` | 当前文件符号，C++ 中可用于函数/方法跳转 |
+| `<Leader>sj` | 跳转历史 |
+| `<Leader>sb` | Buffer 列表 |
+| `<Leader>sd` | 项目诊断 |
+| `<Leader>sD` | 当前 buffer 诊断 |
+| `<Leader>sc` | 当前文件更改位置 |
+| `<Leader>sz` | 专注模式 |
 
 ## C++ Snippets
 
@@ -91,6 +92,7 @@
 | --- | --- |
 | `ln` | `out.ln();` |
 | `i a b c` | `int a,b,c;` |
+| `i0 a b c` | `int a=0,b=0,c=0;` |
 | `ci a b c` | `std::cin >> a >> b >> c;` |
 | `ci a[1] a[2]` | `std::cin >> a[1] >> a[2];` |
 | `co a b c` | `std::cout << a << b << c;` |
