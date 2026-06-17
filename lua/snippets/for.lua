@@ -137,6 +137,79 @@ return {
             func2 = f(function(args,snip) return snip.captures[3]; end,{})
         })
     ),
+    -- reverse for: rf -> for(int i = n; i >= 1; --i)
+    s("rf",
+        fmt(
+        [[
+            for(int i = n;i >= 1 ;--i ) // i: n->1
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            pos=i(0),
+        })
+    ),
+    -- rf m
+    s({
+        trig = "rf%s+(%S+)",
+        regTrig = true,
+        name = "reverse for n",
+        desc = "倒序循环",
+    },
+        fmt(
+        [[
+            for(int i = {func};i >= 1 ;--i ) // i: {func}->1
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            pos=i(0),
+            func = f(function(args,snip) return snip.captures[1]; end,{})
+        })
+    ),
+    -- rfi m
+    s({
+        trig = "rf(%S+)%s+(%S+)",
+        regTrig = true,
+        name = "reverse for n",
+        desc = "指定变量名的倒序循环",
+    },
+        fmt(
+        [[
+            for(int {func0} = {func1};{func0} >= 1 ;--{func0} ) // {func0}: {func1}->1
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            pos=i(0),
+            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
+            func1 = f(function(args,snip) return snip.captures[2]; end,{})
+        })
+    ),
+    -- rfi l r
+    s({
+        trig = "rf(%S+)%s+(%S+)%s+(%S+)",
+        regTrig = true,
+        name = "reverse for range",
+        desc = "指定变量名和区间的倒序循环",
+    },
+        fmt(
+        [[
+            for(int {func0} = {func2};{func0} >= {func1} ;--{func0} ) // {func0}: {func2}->{func1}
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            pos=i(0),
+            func0 = f(function(args,snip) return snip.captures[1]; end,{}),
+            func1 = f(function(args,snip) return snip.captures[2]; end,{}),
+            func2 = f(function(args,snip) return snip.captures[3]; end,{})
+        })
+    ),
     -- 2d array
     s("2f",
         fmt(
