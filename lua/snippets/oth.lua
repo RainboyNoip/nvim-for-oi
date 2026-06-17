@@ -1,4 +1,5 @@
--- 输入输出相关的 snip
+-- 其他零散 snippet。
+-- 暂时只放不适合归入 io/for/algo 的小工具。
 local ls = require("luasnip")
 local s = ls.snippet
 local sn = ls.snippet_node
@@ -9,7 +10,7 @@ local f = ls.function_node
 local fmt = require("luasnip.extras.fmt").fmt
 
 return {
-    -- return ?
+    -- re x -> return x;
     s(
         {
             trig = "re%s+(%S+)",
