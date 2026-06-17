@@ -61,7 +61,7 @@ brew install gum find fd
 
 此配置包含一个专门为算法竞赛设计的代码片段系统。当前按职责分成三类:
 
-- `lua-snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
+- `lua/snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
 - `oiSnippets/`: 本地整块代码片段，例如模板、随机数据、log、图生成工具。
 - `vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
 

@@ -6,9 +6,9 @@ return {
     build = "make install_jsregexp",
     config = function ()
         local ls = require("luasnip")
-        -- Load VSCode snippets
+        -- 加载 VSCode JSON snippets 和 LuaSnip Lua snippets。
         require("luasnip.loaders.from_vscode").lazy_load({ paths = { vim.fn.stdpath("config") .. "/vscode-snippets" } })
-        require("luasnip.loaders.from_lua").load({ paths =  vim.fn.stdpath("config") .. "/lua-snippets"  })
+        require("luasnip.loaders.from_lua").load({ paths =  vim.fn.stdpath("config") .. "/lua/snippets"  })
         
         -- Set up keymaps
         vim.keymap.set({ "i" }, "<C-K>", function() ls.expand() end, { silent = true })
