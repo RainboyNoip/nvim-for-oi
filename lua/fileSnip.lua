@@ -5,19 +5,6 @@ local M = {}
 -- M.snippetPath = "$HOME/.config/nvim/snippets/"
 M.snippetPath = vim.fn.stdpath('config') .. '/oiSnippets/'
 
--- 获取 snippets 列表
-local function get_snippet_list()
-  local handle = io.popen("find " .. M.snippetPath .. " -type f -printf '%P\\n'")
-  if not handle then return {} end
-  
-  local snippets = {}
-  for line in handle:lines() do
-    table.insert(snippets, line)
-  end
-  handle:close()
-  return snippets
-end
-
 -- 读取 snippet 内容
 local function read_snippet_content(path)
   local lines = vim.fn.readfile(path)
@@ -31,7 +18,7 @@ local function insert_code_snippet(snip_path)
 
 	local function add_fold_markers()
 		table.insert(lines, 1, "//oisnip_begin" .. filename)
-		table.insert(lines, "/oisnip_begin")
+		table.insert(lines, "//oisnip_end")
 	end
 
 
@@ -48,9 +35,8 @@ local function insert_code_snippet(snip_path)
 	end
 
 
-	-- 获取当前缓冲区和窗口
+	-- 获取当前缓冲区和光标位置
 	local bufnr = vim.api.nvim_get_current_buf()
-	local winid = vim.api.nvim_get_current_win()
 	local cur_pos = vim.api.nvim_win_get_cursor(0)
 	-- 加入到当前行
 	vim.api.nvim_buf_set_lines(bufnr, cur_pos[1] - 1, cur_pos[1], false, lines)
@@ -76,10 +62,7 @@ local function insert_code_snippet(snip_path)
 	
 end
 
-function InsertSnippet()
-	local bufnr = vim.api.nvim_get_current_buf()
-	local winid = vim.api.nvim_get_current_win()
-	
+local function insert_snippet()
 	-- 使用 Snacks picker
 	-- print(M.snippetPath)
 	Snacks.picker.pick("files",{
@@ -123,7 +106,7 @@ function M.setup(opts)
 	-- 创建命令 Choose
 
 	vim.api.nvim_create_user_command("OISnipChoose", function()
-		InsertSnippet()
+		insert_snippet()
 	end, {})
 
 	-- 绑定快捷键 F1 所有模式

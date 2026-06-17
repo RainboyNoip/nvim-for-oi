@@ -1,6 +1,7 @@
 # Neovim 配置
 
 这是一个为 C++ 开发优化的 Neovim 配置，特别适用于算法竞赛和 Competitive Programming (CP)。
+Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snippet、模板插入和调试配置；编译、运行、拉样例、对拍等命令行工作流不接入 Neovim。
 
 ## 特性
 
@@ -9,7 +10,7 @@
 - **LSP 支持**: 针对 C++ 的 clangd 语言服务器配置
 - **调试支持**: 集成 nvim-dap 调试器
 - **代码补全**: 使用 nvim-cmp 提供智能补全
-- **主题**: 使用 gruvbox 主题
+- **主题**: 使用 moonfly 主题
 - **状态栏**: 使用 lualine 状态栏
 - **文件浏览**: 使用 snacks.nvim 的 dashboard
 
@@ -58,12 +59,15 @@ brew install gum find fd
 
 ### 代码片段
 
-此配置包含一个专门为算法竞赛设计的代码片段系统。你可以通过以下方式使用:
+此配置包含一个专门为算法竞赛设计的代码片段系统。当前按职责分成三类:
 
-1. 在 Neovim 中按 `<Leader>s` (默认为空格键+s) 打开代码片段选择器
-2. 选择你需要的代码片段，它将被插入到当前光标位置
+- `lua-snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
+- `oiSnippets/`: 本地整块代码片段，例如模板、随机数据、log、图生成工具。
+- `vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
 
-代码片段位于 `oiSnippets/` 目录中，目前包含以下实用工具:
+在 Neovim 中按 `<Leader>os` 打开 `oiSnippets/` 选择器，选择后会插入到当前光标位置。
+
+`oiSnippets/` 目前包含以下实用工具:
 - `log.cpp`: 调试用的日志宏
 - `random.cpp`: 随机数生成工具
 - `random_dag1.cpp`, `random_dag2.cpp`: DAG 生成工具
@@ -74,7 +78,9 @@ brew install gum find fd
 ### 快捷键
 
 - `<Leader>` 键设置为空格键
-- `<Leader>s`: 打开代码片段选择器
+- `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
+- `<Leader>of`: 打开 rbook 正式代码模板
+- `<Leader>oe`: 浏览 rbook 全部代码文件
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
@@ -121,7 +127,7 @@ CompileFlags:
 - **mfussenegger/nvim-dap**: 调试器
 - **rcarriga/nvim-dap-ui**: 调试界面
 - **numToStr/Comment.nvim**: 快速注释
-- **ellisonleao/gruvbox.nvim**: 主题
+- **bluz71/vim-moonfly-colors**: 主题
 - **nvim-tree/nvim-web-devicons**: 图标
 - **nvim-lua/plenary.nvim**: Lua 函数库
 - **LmanTW/themify.nvim**: Theme管理, 使用 `:Themify`, `<I>` 来安装主题
