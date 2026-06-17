@@ -19,9 +19,6 @@ local fmta = require("luasnip.extras.fmt").fmta
 local types = require("luasnip.util.types")
 local conds = require("luasnip.extras.conditions.expand")
 
--- local myfor = require("xxfor")
--- vim.notify("myfor loaded",myfor)
-
 local return_type = function(args)
     if args[1][1] == "void" then
         return ""

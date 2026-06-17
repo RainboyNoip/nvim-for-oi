@@ -131,14 +131,6 @@ return {
             mode = { "n", "t" },
         },
         {
-            "<leader>ts",
-            function()
-                print(#require("snacks.terminal").list())
-            end,
-            desc = "print terminal list size",
-            mode = { "n", "t" },
-        },
-        {
             "<leader>sf",
             function()
                 require("snacks").picker.lsp_symbols({

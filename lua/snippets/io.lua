@@ -33,8 +33,7 @@ return {
     -- std::cin
     s(
         {
-            trig = "ci%s+(%S+)",
-            -- trig="sc((\\S+ )*\\S+)( )?",
+            trig = "ci%s+([%w_ ]+)",
             regTrig = true,
             trigEngine="pattern",
             name="std::cin >> a >> b >> c",
@@ -52,8 +51,7 @@ return {
     -- std::cout
     s(
         {
-            trig = "co%s+(%S+)",
-            -- trig="sc((\\S+ )*\\S+)( )?",
+            trig = "co%s+([%w_ ]+)",
             regTrig = true,
             trigEngine="pattern",
             name="std::cout << a << b << c",
