@@ -48,17 +48,6 @@ function M.setup()
   vim.bo.softtabstop = 4
   vim.bo.expandtab = true
 
-  -- Toggle current line (linewise) using C-/
-  local api = require("Comment.api")
-  vim.keymap.set({ 'n', 'v' }, '<C-_>', api.toggle.linewise.current, { buffer = true, silent = true, desc = "切换注释" })
-  -- Toggle current line (blockwise) using C-\
-  vim.keymap.set('n', '<C-\\>', api.toggle.blockwise.current, { buffer = true, silent = true, desc = "切换注释" })
-
-  -- // TODO 更多的注释快捷键
-  -- // 选中多行注释
-  -- // 快速注释，一个函数
-
-
   vim.keymap.set('n', '<leader>;', conditional_add_semicolon_normal, { buffer = true, silent = true, desc = "在行尾添加分号" })
 
   -- vim.keymap.set('n', '<leader>;', 'A;<Esc>', { buffer = true, silent = true, desc = "在行尾添加分号" })

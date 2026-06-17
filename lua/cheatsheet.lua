@@ -1,72 +1,30 @@
 local M = {}
 
-local lines = {
-    "Rainboy Cheat Sheet",
-    "",
-    "通用编辑",
-    "  <C-s>              保存当前文件",
-    "  <C-h/j/k/l>        在窗口间移动",
-    "  <C-Up/Down>        调整窗口高度",
-    "  <C-Left/Right>     调整窗口宽度",
-    "  <A-Up/Down>        上下移动当前行",
-    "  < / >              Visual 模式缩进并保持选区",
-    "  g; / g,            跳转到上/下一个编辑位置",
-    "",
-    "OI / 模板入口",
-    "  <leader>os         选择 oiSnippets 代码片段",
-    "  <leader>of         Rbook 正式代码模板",
-    "  <leader>oe         Rbook 浏览全部代码文件",
-    "  <leader>op         选择复制命令并复制当前 buffer",
-    "",
-    "C++ buffer",
-    "  <leader>;          当前行末尾补分号",
-    "  <C-_>              行注释切换",
-    "  <C-\\>             块注释切换",
-    "",
-    "LuaSnip 操作",
-    "  <C-K>              展开 snippet",
-    "  <C-L> / <C-J>      跳到下/上一个 snippet 节点",
-    "  <C-E>              切换 choice 节点",
-    "  <C-n> / <C-p>      下/上一个 choice",
-    "",
-    "C++ snippets",
-    "  main               最小 main 模板",
-    "  magic              fast iostream",
-    "  f                  for i = 1..n",
-    "  f n                for i = 1..n",
-    "  f l r              for i = l..r",
-    "  fi n               for i = 1..n",
-    "  fi l r             for i = l..r",
-    "  rf                 reverse for i = n..1",
-    "  rf n               reverse for i = n..1",
-    "  rfi n              reverse for i = n..1",
-    "  rfi l r            reverse for i = r..l",
-    "  2f                 双层 FF(i,n) / FF(j,m)",
-    "",
-    "IO snippets",
-    "  i a b c            int a,b,c;",
-    "  ci a b c           std::cin >> a >> b >> c;",
-    "  co a b c           std::cout << a << b << c;",
-    "  in a b c           in.read(a,b,c);",
-    "  sc a b             scanf(\"%d%d\",&a,&b);",
-    "  scc ch             scanf(\"%c\",&ch);",
-    "  scl x y            scanf(\"%lld%lld\",&x,&y);",
-    "  re x               return x;",
-    "  linklist           linklist<maxn> e; 并自动补 include",
-    "",
-    "关闭",
-    "  q / <Esc>          关闭此窗口",
-}
+local cheatsheet_path = vim.fn.stdpath("config") .. "/cheatsheet.md"
 
-local function get_window_size()
-    local width = math.min(90, math.floor(vim.o.columns * 0.8))
-    local height = math.min(32, math.floor(vim.o.lines * 0.7), #lines)
+local function read_cheatsheet_lines()
+    if vim.fn.filereadable(cheatsheet_path) == 0 then
+        vim.notify("找不到 cheat sheet: " .. cheatsheet_path, vim.log.levels.ERROR)
+        return nil
+    end
+
+    return vim.fn.readfile(cheatsheet_path)
+end
+
+local function get_window_size(line_count)
+    local width = math.min(100, math.floor(vim.o.columns * 0.85))
+    local height = math.min(36, math.floor(vim.o.lines * 0.75), line_count)
 
     return width, height
 end
 
 function M.show()
-    local width, height = get_window_size()
+    local lines = read_cheatsheet_lines()
+    if not lines then
+        return
+    end
+
+    local width, height = get_window_size(#lines)
     local row = math.floor((vim.o.lines - height) / 2 - 1)
     local col = math.floor((vim.o.columns - width) / 2)
 
@@ -75,7 +33,7 @@ function M.show()
     vim.bo[bufnr].bufhidden = "wipe"
     vim.bo[bufnr].modifiable = false
     vim.bo[bufnr].readonly = true
-    vim.bo[bufnr].filetype = "rainboy-cheatsheet"
+    vim.bo[bufnr].filetype = "markdown"
 
     local winid = vim.api.nvim_open_win(bufnr, true, {
         relative = "editor",

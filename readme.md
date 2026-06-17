@@ -78,12 +78,17 @@ brew install gum find fd
 ### 快捷键
 
 - `<Leader>` 键设置为空格键
+- `<Leader>oh`: 打开 `cheatsheet.md` 浮动窗口，查看自定义快捷键和 snippet 触发
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
 - `<Leader>of`: 打开 rbook 正式代码模板
 - `<Leader>oe`: 浏览 rbook 全部代码文件
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
+
+### Cheat Sheet
+
+`cheatsheet.md` 是快捷键和 snippet 触发的手工维护清单。`<Leader>oh` 会读取这个 Markdown 文件并显示在浮动窗口里；更新提示内容时只需要修改 `cheatsheet.md`。
 
 ### 折叠
 
