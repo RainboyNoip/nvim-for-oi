@@ -1,4 +1,9 @@
 return {
+    {
+        "bluz71/vim-nightfly-colors",
+        lazy = false,
+        priority = 1000,
+    },
 
     {
         'lmantw/themify.nvim',
@@ -19,7 +24,11 @@ return {
 
             loader = function ()
                 local Themify = require('themify.api')
-                Themify.set_current("bluz71/vim-nightfly-colors","nightfly")
+                local ok = pcall(Themify.set_current, "bluz71/vim-nightfly-colors", "nightfly")
+
+                if not ok then
+                    vim.cmd.colorscheme("moonfly")
+                end
             end
         }
     },
