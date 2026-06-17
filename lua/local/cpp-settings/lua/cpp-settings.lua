@@ -9,19 +9,34 @@ local function conditional_add_semicolon_normal()
   end
 end
 
--- 插入模式下的函数
-local function conditional_add_semicolon_insert()
-  local line = vim.api.nvim_get_current_line()
-  -- 检查行尾是否已经有分号 (忽略末尾的空白字符)
-  if not line:match(";%s*$") then
-    local pos = vim.api.nvim_win_get_cursor(0)
-    vim.api.nvim_buf_set_lines(0, pos[1] - 1, pos[1], false, { line .. ";" })
-    vim.api.nvim_win_set_cursor(0, pos)
-  end
-end
-
 -- 创建一个名为 M 的 table，代表我们的模块
 local M = {}
+local did_create_fold_autocmd = false
+
+local function create_cpp_fold_autocmd()
+  if did_create_fold_autocmd then
+    return
+  end
+  did_create_fold_autocmd = true
+
+  local group = vim.api.nvim_create_augroup("RainboyCppAutoFold", { clear = true })
+  vim.api.nvim_create_autocmd("BufEnter", {
+    group = group,
+    pattern = { "*.cpp", "*.hpp", "*.h", "*.cc", "*.cxx" },
+    callback = function(args)
+      if not vim.api.nvim_buf_is_valid(args.buf) then
+        return
+      end
+
+      vim.defer_fn(function()
+        if vim.api.nvim_buf_is_valid(args.buf) and vim.api.nvim_get_current_buf() == args.buf then
+          vim.cmd("normal! zM")
+        end
+      end, 10)
+    end,
+    desc = "打开C++文件后自动折叠所有代码"
+  })
+end
 
 -- 创建一个 setup 函数，这是模块的入口点
 function M.setup()
@@ -32,15 +47,6 @@ function M.setup()
   vim.bo.shiftwidth = 4
   vim.bo.softtabstop = 4
   vim.bo.expandtab = true
-
-  -- 设定缓冲区局部的快捷键
-  local opts = { buffer = true, silent = true }
-  -- vim.keymap.set('n', '<F5>', ':w <bar> !g++ -std=c++17 % -o %< && ./%< <CR>', {
-  --   buffer = true,
-  --   desc = "Compile & Run C++ file"
-  -- })
-
-  -- ... 你未来可以添加更多快捷键和设置在这里 ...
 
   -- Toggle current line (linewise) using C-/
   local api = require("Comment.api")
@@ -53,30 +59,12 @@ function M.setup()
   -- // 快速注释，一个函数
 
 
-  -- 在行尾添加分号 (如果需要)
-
   vim.keymap.set('n', '<leader>;', conditional_add_semicolon_normal, { buffer = true, silent = true, desc = "在行尾添加分号" })
-
-  -- 如果启用这个快捷键 <leader> 在插入模式下，就会有lag
-  -- vim.keymap.set('i', '<leader>;', conditional_add_semicolon_insert, { buffer = true, silent = true, desc = "在行尾添加分号" })
 
   -- vim.keymap.set('n', '<leader>;', 'A;<Esc>', { buffer = true, silent = true, desc = "在行尾添加分号" })
   -- vim.keymap.set('i', '<leader>;', '<C-o>A;', { buffer = true, silent = true, desc = "在行尾添加分号" })
 
-
-  -- 在打开 cpp 文件后自动折叠
-  -- 设置折叠方法为语法折叠
-  -- 创建autocmd，在打开cpp文件后自动执行zM折叠所有代码
-  vim.api.nvim_create_autocmd("BufEnter", {
-    pattern = "*.cpp,*.hpp,*.h,*.cc,*.cxx",
-    callback = function()
-      -- 延迟执行以确保文件完全加载
-      vim.defer_fn(function()
-        vim.cmd("normal! zM")
-      end, 10)
-    end,
-    desc = "打开C++文件后自动折叠所有代码"
-  })
+  create_cpp_fold_autocmd()
 end
 
 -- 返回这个模块，这样其他文件才能 require 它
