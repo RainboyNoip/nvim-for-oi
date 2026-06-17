@@ -1,8 +1,6 @@
 local Snacks = require("snacks")
 local M = {}
 
--- default snippet path
--- M.snippetPath = "$HOME/.config/nvim/snippets/"
 M.snippetPath = vim.fn.stdpath('config') .. '/oiSnippets/'
 
 -- 读取 snippet 内容
@@ -21,38 +19,25 @@ local function insert_code_snippet(snip_path)
 		table.insert(lines, "//oisnip_end")
 	end
 
-
 	if filename == "simaple_template.cpp" then
-		-- 替换日期
 		local date = os.date("%Y-%m-%d %H:%M:%S")
 		for i, line in ipairs(lines) do
 			lines[i] = line:gsub("2025%-10%-02 10:34:43", date)
 		end
-	-- snip_path include "template"
 	elseif not string.find(snip_path,"template") then
-		-- 添加 //oisnip_begin filename 和 //oisnip_end 到文件的开头和结尾
 		add_fold_markers()
 	end
 
-
-	-- 获取当前缓冲区和光标位置
 	local bufnr = vim.api.nvim_get_current_buf()
 	local cur_pos = vim.api.nvim_win_get_cursor(0)
-	-- 加入到当前行
 	vim.api.nvim_buf_set_lines(bufnr, cur_pos[1] - 1, cur_pos[1], false, lines)
 
-	-- after insert, move cursor to the end of the snippet
-	-- vim.api.nvim_win_set_cursor(0, {cur_pos[1] + #lines, 0})
-
 	if filename == "simaple_template.cpp" then
-		-- fold the snippet
 		vim.cmd("normal! zM")
-		-- move cur_pos to function main 
 		for i, line in ipairs(lines) do
 			if line:find("void init") then
 				vim.api.nvim_win_set_cursor(0, {i+1, 4})
 				vim.cmd("normal! zz")
-				-- run <c-y>
 				vim.api.nvim_input("<c-y>")
 				vim.api.nvim_input("<c-y>")
 				break
@@ -63,8 +48,6 @@ local function insert_code_snippet(snip_path)
 end
 
 local function insert_snippet()
-	-- 使用 Snacks picker
-	-- print(M.snippetPath)
 	Snacks.picker.pick("files",{
 		dirs = {M.snippetPath},
 		hidden = true,
@@ -75,21 +58,9 @@ local function insert_snippet()
 					if item then
 						picker:close()
 						insert_code_snippet(item.file)
-						-- print("item.file", item.file)
-						-- vim.api.nvim_input(item.file)
 					end
 				end)
-				-- print("item.file", item.file)
-				-- local lines = read_snippet_content(item.path)
-				-- vim.api.nvim_buf_set_lines(bufnr, vim.api.nvim_win_get_cursor(winid)[1] - 1, vim.api.nvim_win_get_cursor(winid)[1], false, lines)
 		end
-		-- items = items,
-		-- cb = function(item)
-		-- 	if item and item.path then
-		-- 		local lines = read_snippet_content(item.path)
-		-- 		vim.api.nvim_buf_set_lines(bufnr, vim.api.nvim_win_get_cursor(winid)[1] - 1, vim.api.nvim_win_get_cursor(winid)[1], false, lines)
-		-- 	end
-		-- end
 	})
 end
 
@@ -98,21 +69,14 @@ function M.setup(opts)
 
 	-- 设置 snippet 路径
 	M.snippetPath = opts.snippetPath or M.snippetPath
-	-- print("Snippet path: %s", M.snippetPath)
 	-- 确保路径存在
 	if not vim.fn.isdirectory(M.snippetPath) then
 		vim.fn.mkdir(M.snippetPath, "p")
 	end
-	-- 创建命令 Choose
 
 	vim.api.nvim_create_user_command("OISnipChoose", function()
 		insert_snippet()
 	end, {})
-
-	-- 绑定快捷键 F1 所有模式
-	-- vim.api.nvim_set_keymap("n", "<leader>oi", ":Choose<CR>", { noremap = true, silent = true })
-
-	-- 设置wichkey group name
 
 	vim.keymap.set('n', '<leader>os', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
 
@@ -120,11 +84,6 @@ function M.setup(opts)
 	vim.keymap.set('n', '<leader>oe', ":RbookCodeFiles<CR>", { buffer = true, silent = true, desc = "Rbook 浏览全部代码文件" })
 
 	vim.keymap.set('n', '<leader>of', ":RbookCode<CR>", { buffer = true, silent = true, desc = "Rbook 正式代码模板" })
-
-	-- -- 绑定快捷键 F1 insert 模式
-	-- vim.api.nvim_set_keymap("i", "<F1>", "<C-o>:Choose<CR>", { noremap = true, silent = true })
-	-- -- 绑定快捷键 F1 所有模式
-	-- vim.api.nvim_set_keymap("n", "<F1>", ":Choose<CR>", { noremap = true, silent = true })
 end
 
 return M

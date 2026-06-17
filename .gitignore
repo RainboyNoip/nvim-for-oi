@@ -37,3 +37,5 @@ local.vim
 local_*.vim
 
 __pycache__
+
+codex_resume

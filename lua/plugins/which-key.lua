@@ -9,17 +9,14 @@ return {
     config = function()
         local wk = require("which-key")
 
-        --  手动添加 dap 快捷键 提示
-        -- TODO fix: 为什么写在这里, 因为dap/keys.lua 写,可能不会 有好的提示
-        -- 和 wk 加载的实践有关系
+        -- 这里补充按键组名称，让 which-key 的第一层提示更清楚。
         wk.add({
-            { "<leader>d", group = "dap : debug", desc = "debug:nvim-dap short keys" },
-
-            { "<leader>o", group = "oi相关", desc = "debug:nvim-dap short keys" },
+            { "<leader>c", group = "comment", desc = "注释" },
+            { "<leader>d", group = "dap", desc = "调试" },
+            { "<leader>o", group = "oi", desc = "OI / 模板" },
         })
     end,
     keys = {
-        -- vim.keymap.set('n', 'g;', 'g;', { desc = '跳转到 [上] 一个编辑点 (Change List)' })
         {'g;', 'g;', desc = '跳转到 [上] 一个编辑点 (Change List)'},
         {'g,', 'g,', desc = '跳转到 [下] 一个编辑点 (Change List)'},
         {
@@ -33,7 +30,6 @@ return {
             "<leader>op",
             function()
                 Snacks.picker.select(
-                -- items
                 { "pbcopy","pcopy copy","wl-copy" },
                 {
                     prompt = "Select Server to Paste:",
@@ -49,7 +45,7 @@ return {
                 end
             )
             end,
-            desc = "select server to paste",
+            desc = "复制当前 buffer",
 
         },
         {
