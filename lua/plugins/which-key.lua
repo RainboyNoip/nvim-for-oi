@@ -14,6 +14,7 @@ return {
             { "<leader>c", group = "注释", desc = "注释" },
             { "<leader>d", group = "调试", desc = "调试" },
             { "<leader>o", group = "OI / 模板", desc = "OI / 模板" },
+            { "<leader>r", group = "Rbook 题解 / 模板", desc = "Rbook 题解 / 模板" },
             { "<leader>s", group = "搜索 / 跳转", desc = "搜索 / 跳转" },
         })
     end,
