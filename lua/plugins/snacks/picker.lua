@@ -77,7 +77,7 @@ function M.keys()
                     }
                 })
             end,
-            desc = "snacks picker lsp show all functions",
+            desc = "当前文件符号",
             mode = { "n" },
         },
         {
@@ -85,7 +85,7 @@ function M.keys()
             function()
                 require("snacks").picker.jumps()
             end,
-            desc = "snacks picker show vim jumps",
+            desc = "跳转历史",
             mode = { "n" },
         },
         {
@@ -93,7 +93,7 @@ function M.keys()
             function()
                 require("snacks").picker.buffers()
             end,
-            desc = "snacks picker show all buffers",
+            desc = "Buffer 列表",
             mode = { "n" },
         },
         {
@@ -101,21 +101,21 @@ function M.keys()
             function()
                 require("snacks").picker.diagnostics()
             end,
-            desc = "Diagnostics",
+            desc = "项目诊断",
         },
         {
             "<leader>sD",
             function()
                 require("snacks").picker.diagnostics_buffer()
             end,
-            desc = "Buffer Diagnostics",
+            desc = "当前 buffer 诊断",
         },
         {
             "<leader>sz",
             function()
                 require("snacks").zen.zen()
             end,
-            desc = "zen mode",
+            desc = "专注模式",
             mode = { "n" },
         },
         {
@@ -123,7 +123,7 @@ function M.keys()
             function()
                 M.changes()
             end,
-            desc = "列出当前文件中的更改",
+            desc = "当前文件更改位置",
             mode = { "n" },
         },
     }

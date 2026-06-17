@@ -11,9 +11,10 @@ return {
 
         -- 这里补充按键组名称，让 which-key 的第一层提示更清楚。
         wk.add({
-            { "<leader>c", group = "comment", desc = "注释" },
-            { "<leader>d", group = "dap", desc = "调试" },
-            { "<leader>o", group = "oi", desc = "OI / 模板" },
+            { "<leader>c", group = "注释", desc = "注释" },
+            { "<leader>d", group = "调试", desc = "调试" },
+            { "<leader>o", group = "OI / 模板", desc = "OI / 模板" },
+            { "<leader>s", group = "搜索 / 跳转", desc = "搜索 / 跳转" },
         })
     end,
     keys = {
@@ -24,7 +25,7 @@ return {
             function()
                 require("which-key").show({ global = false })
             end,
-            desc = "Buffer Local Keymaps (which-key)",
+            desc = "当前 buffer 快捷键",
         },
         {
             "<leader>op",
@@ -53,7 +54,7 @@ return {
             function()
                 require("cheatsheet").show()
             end,
-            desc = "Rainboy Cheat Sheet",
+            desc = "Rainboy 速查表",
         }
     },
 }
