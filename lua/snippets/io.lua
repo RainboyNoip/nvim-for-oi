@@ -38,6 +38,15 @@ local function join_csv(values)
     return table.concat(values, ",")
 end
 
+-- 生成带默认值的声明片段，例如 a=0,b=0,c=0。
+local function join_initialized(values, init_value)
+    local result = {}
+    for _, value in ipairs(values) do
+        table.insert(result, string.format("%s=%s", value, init_value))
+    end
+    return table.concat(result, ",")
+end
+
 -- 构造“捕获变量列表 -> 转换成一整段代码”的 snippet。
 -- trigger 负责匹配，transform 只关心变量列表如何变成最终文本。
 local function token_transform(trigger, name, desc, transform)
@@ -66,6 +75,16 @@ return {
         "int a,b,c",
         function(vars)
             return string.format("int %s;", join_csv(vars))
+        end
+    ),
+
+    -- i0 a b c -> int a=0,b=0,c=0;
+    token_transform(
+        "i0%s+([%w_ ]+)",
+        "int a=0,b=0,c=0",
+        "int a=0,b=0,c=0",
+        function(vars)
+            return string.format("int %s;", join_initialized(vars, "0"))
         end
     ),
 
