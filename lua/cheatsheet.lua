@@ -18,6 +18,23 @@ local function get_window_size(line_count)
     return width, height
 end
 
+local function enable_markdown_render(winid)
+    local ok, render = pcall(require, "render-markdown")
+    if not ok then
+        return
+    end
+
+    pcall(vim.api.nvim_win_call, winid, function()
+        if type(render.buf_enable) == "function" then
+            render.buf_enable()
+        elseif type(render.set_buf) == "function" then
+            render.set_buf(true)
+        elseif type(render.enable) == "function" then
+            render.enable()
+        end
+    end)
+end
+
 function M.show()
     local lines = read_cheatsheet_lines()
     if not lines then
@@ -49,6 +66,7 @@ function M.show()
 
     vim.wo[winid].wrap = false
     vim.wo[winid].cursorline = true
+    enable_markdown_render(winid)
 
     local close = function()
         if vim.api.nvim_win_is_valid(winid) then
