@@ -18,6 +18,13 @@ function M.capture_words(snip, index)
     return M.words(snip.captures[index])
 end
 
+-- 把指定捕获组包装成 function_node，供 fmt() 模板直接使用。
+function M.capture_node(index, default)
+    return f(function(_, snip)
+        return snip.captures[index] or default or ""
+    end, {})
+end
+
 -- 构造“第一个捕获组的变量列表 -> 转换成代码”的 snippet。
 -- 适合 ci/co/all/so 这类后面跟一串 token 的触发方式。
 function M.token_transform(trigger, name, desc, transform)

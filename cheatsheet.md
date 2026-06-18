@@ -125,6 +125,22 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `pq q` | `priority_queue<int> q;` |
 | `pqg q` | `priority_queue<int, vector<int>, greater<int>> q;` |
 
+## Graph / Linklist Snippets
+
+这些 snippet 面向 `linklist` 图存储，默认图对象名是 `e`。
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `ea u v` | `e.add(u,v);` |
+| `eaw u v w` | `e.add(u,v,w);` |
+| `ea2 u v` | `e.add2(u,v);` |
+| `ea2w u v w` | `e.add2(u,v,w);` |
+| `ef u` | 遍历 `e.h[u]`，自动取 `v = e[i].v` 和 `w = e[i].w` |
+| `ee m` | 读 `m` 条有向无权边并 `e.add(u,v);` |
+| `eew m` | 读 `m` 条有向带权边并 `e.add(u,v,w);` |
+| `ee2 m` | 读 `m` 条无向无权边并 `e.add2(u,v);` |
+| `ee2w m` | 读 `m` 条无向带权边并 `e.add2(u,v,w);` |
+
 ## Debug Snippets
 
 这些 snippet 使用模板里的 `log(...)` / `fenc` 调试宏；`logdef` 可在临时代码里补完整宏定义。
