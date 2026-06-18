@@ -127,14 +127,12 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 
 ## Debug Snippets
 
-这些 snippet 依赖模板里的 `log(...)` / `fenc` 调试宏，只负责快速插入调用。
+这些 snippet 使用模板里的 `log(...)` / `fenc` 调试宏；`logdef` 可在临时代码里补完整宏定义。
 
 | 触发 | 展开结果 |
 | --- | --- |
 | `lg a b c` | `log(a,b,c);` |
-| `fe` | `fenc;` |
-| `clg a b c` | `// log(a,b,c);` |
-| `lgi i a[i]` | `log(i,a[i]);` |
+| `logdef` | 插入 `log/fenc/err` 调试宏定义，OJ / `NO_DEBUG` 下自动关闭 |
 
 ## IO Snippets
 
