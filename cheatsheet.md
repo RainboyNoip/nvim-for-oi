@@ -107,6 +107,22 @@
 | `rfi l r` | `for(int i = r; i >= l; --i)`，变量名和区间来自输入 |
 | `2f` | 双层 `FF(i,n)` / `FF(j,m)` |
 
+## STL / OJ Snippets
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `all a` | `a.begin(), a.end()` |
+| `so a` | `sort(a.begin(), a.end());` |
+| `rs a` | `reverse(a.begin(), a.end());` |
+| `uq a` | `a.erase(unique(a.begin(), a.end()), a.end());` |
+| `lb a x` | `lower_bound(a.begin(), a.end(), x) - a.begin()` |
+| `ub a x` | `upper_bound(a.begin(), a.end(), x) - a.begin()` |
+| `vi a n` | `vector<int> a(n + 1);` |
+| `vl a n` | `vector<long long> a(n + 1);` |
+| `pii` | `pair<int,int>` |
+| `pq q` | `priority_queue<int> q;` |
+| `pqg q` | `priority_queue<int, vector<int>, greater<int>> q;` |
+
 ## IO Snippets
 
 | 触发 | 展开结果 |
