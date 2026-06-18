@@ -125,6 +125,17 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `pq q` | `priority_queue<int> q;` |
 | `pqg q` | `priority_queue<int, vector<int>, greater<int>> q;` |
 
+## Debug Snippets
+
+这些 snippet 依赖模板里的 `log(...)` / `fenc` 调试宏，只负责快速插入调用。
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `lg a b c` | `log(a,b,c);` |
+| `fe` | `fenc;` |
+| `clg a b c` | `// log(a,b,c);` |
+| `lgi i a[i]` | `log(i,a[i]);` |
+
 ## IO Snippets
 
 | 触发 | 展开结果 |
