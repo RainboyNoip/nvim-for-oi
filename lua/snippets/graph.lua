@@ -8,46 +8,6 @@ local utils = require("snippets.utils")
 -- 这里贴合 linkList 的真实接口：e.add/e.add2 加边，e.h[u] + e[i].next 手动遍历。
 
 return {
-    -- ea u v -> e.add(u,v);
-    utils.capture_transform(
-        "ea%s+(%S+)%s+(%S+)",
-        "e.add(u,v)",
-        "linklist 有向无权加边",
-        function(captures)
-            return string.format("e.add(%s,%s);", captures[1], captures[2])
-        end
-    ),
-
-    -- eaw u v w -> e.add(u,v,w);
-    utils.capture_transform(
-        "eaw%s+(%S+)%s+(%S+)%s+(%S+)",
-        "e.add(u,v,w)",
-        "linklist 有向带权加边",
-        function(captures)
-            return string.format("e.add(%s,%s,%s);", captures[1], captures[2], captures[3])
-        end
-    ),
-
-    -- ea2 u v -> e.add2(u,v);
-    utils.capture_transform(
-        "ea2%s+(%S+)%s+(%S+)",
-        "e.add2(u,v)",
-        "linklist 无向无权加边",
-        function(captures)
-            return string.format("e.add2(%s,%s);", captures[1], captures[2])
-        end
-    ),
-
-    -- ea2w u v w -> e.add2(u,v,w);
-    utils.capture_transform(
-        "ea2w%s+(%S+)%s+(%S+)%s+(%S+)",
-        "e.add2(u,v,w)",
-        "linklist 无向带权加边",
-        function(captures)
-            return string.format("e.add2(%s,%s,%s);", captures[1], captures[2], captures[3])
-        end
-    ),
-
     -- ef u -> 遍历 u 的所有出边，同时取 v/w。
     s(
         {

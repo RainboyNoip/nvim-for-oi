@@ -95,18 +95,13 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | --- | --- |
 | `main` | 最小 `main` 模板 |
 | `magic` | `std::ios::sync_with_stdio(false);` 和 `std::cin.tie(nullptr);` |
-| `f` | `for(int i = 1; i <= n; ++i)` |
+| `f` | `for(int i = 1; i <= n; ++i)`，展开后可改循环变量名并同步 |
 | `lf` | 单行 `for(int i = 1; i <= n; ++i)` |
-| `f n` | `for(int i = 1; i <= n; ++i)`，上界来自输入 |
-| `f l r` | `for(int i = l; i <= r; ++i)` |
-| `fi` | `for(int i = 1; i <= n; ++i)`，变量名来自 `f` 后面的字符 |
-| `fi n` | `for(int i = 1; i <= n; ++i)`，变量名和上界来自输入 |
-| `fi l r` | `for(int i = l; i <= r; ++i)`，变量名和区间来自输入 |
-| `fj` / `fk` | `for(int j/k = 1; j/k <= n; ++j/k)` |
-| `rf` | `for(int i = n; i >= 1; --i)` |
+| `f n` | `for(int i = 1; i <= n; ++i)`，上界来自输入，循环变量可改 |
+| `f l r` | `for(int i = l; i <= r; ++i)`，循环变量可改 |
+| `rf` | `for(int i = n; i >= 1; --i)`，展开后可改循环变量名并同步 |
 | `rf n` | `for(int i = n; i >= 1; --i)`，起点来自输入 |
-| `rfi n` | `for(int i = n; i >= 1; --i)`，变量名和起点来自输入 |
-| `rfi l r` | `for(int i = r; i >= l; --i)`，变量名和区间来自输入 |
+| `rf l r` | `for(int i = r; i >= l; --i)`，循环变量可改 |
 | `2f` | 双层 `FF(i,n)` / `FF(j,m)` |
 
 ## STL / OJ Snippets
@@ -131,10 +126,6 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 
 | 触发 | 展开结果 |
 | --- | --- |
-| `ea u v` | `e.add(u,v);` |
-| `eaw u v w` | `e.add(u,v,w);` |
-| `ea2 u v` | `e.add2(u,v);` |
-| `ea2w u v w` | `e.add2(u,v,w);` |
 | `ef u` | 遍历 `e.h[u]`，自动取 `v = e[i].v` 和 `w = e[i].w` |
 | `ee m` | 读 `m` 条有向无权边并 `e.add(u,v);` |
 | `eew m` | 读 `m` 条有向带权边并 `e.add(u,v,w);` |
