@@ -60,9 +60,9 @@ BasedPyright 配置遵循以下约定：
 
 该模块负责：
 
-- 明确设置 4 空格缩进和 `expandtab`。
-- 设置 Python comment string。
-- 将 marker fold 注释改为 `#oisnip_begin` / `#oisnip_end`，避免继承 C++ 的 `//` marker。
+- 以 buffer-local 选项明确设置 4 空格缩进、`expandtab` 和 Python comment string。
+- 以 window-local 选项将 marker fold 改为 `#oisnip_begin` / `#oisnip_end`，
+  避免继承 C++ 的 `//` marker。
 - 作为以后添加 Python buffer 局部行为的唯一入口。
 
 Python 文件不自动执行 `zM`，打开后默认保持可读状态。
@@ -152,7 +152,9 @@ uv tool install basedpyright
 sudo pacman -S python-debugpy
 ```
 
-安装后应能执行 `basedpyright-langserver --version`，并且 `python3 -c 'import debugpy'` 成功。Python Treesitter parser 通过 Neovim 的 `:TSInstall python` 安装。
+安装后应能执行 `basedpyright --version`，`command -v basedpyright-langserver`
+应能找到 LSP 服务端入口，并且 `python3 -c 'import debugpy'` 成功。Python
+Treesitter parser 通过 Neovim 的 `:TSInstall python` 安装。
 
 ## 使用文档
 
