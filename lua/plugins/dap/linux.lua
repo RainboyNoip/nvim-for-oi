@@ -41,6 +41,8 @@ return {
                     stopAtEntry = true,
                 },
             }
+
+            require("plugins.dap.python").setup(dap)
         end,
         keys = require("plugins.dap.keys"),
     }

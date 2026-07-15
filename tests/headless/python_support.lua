@@ -113,6 +113,20 @@ local function run()
     inclusive_range:find("for i in range(left, right + 1):", 1, true),
     "fri snippet must include the right endpoint"
   )
+
+  local dap = require("dap")
+  assert_equal(type(dap.adapters.python), "function", "Python DAP adapter type")
+
+  local python_configurations = dap.configurations.python or {}
+  assert_equal(#python_configurations, 1, "Python DAP configuration count")
+
+  local python_configuration = python_configurations[1]
+  assert_equal(python_configuration.name, "Launch current Python file", "Python DAP name")
+  assert_equal(python_configuration.type, "python", "Python DAP type")
+  assert_equal(python_configuration.request, "launch", "Python DAP request")
+  assert_equal(python_configuration.console, "integratedTerminal", "Python DAP console")
+  assert_equal(python_configuration.justMyCode, true, "Python DAP justMyCode")
+  assert_equal(#(dap.configurations.cpp or {}), 1, "C++ DAP configuration count")
 end
 
 local ok, err = xpcall(run, debug.traceback)
