@@ -1,14 +1,14 @@
 # Neovim 配置
 
-这是一个为 C++ 开发优化的 Neovim 配置，特别适用于算法竞赛和 Competitive Programming (CP)。
+这是一个为 C++ 和 Python 开发优化的 Neovim 配置，特别适用于算法竞赛和 Competitive Programming (CP)。
 Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snippet、模板插入和调试配置；编译、运行、拉样例、对拍等命令行工作流不接入 Neovim。
 
 ## 特性
 
 - **插件管理**: 使用 lazy.nvim 管理插件
 - **代码片段**: 自定义代码片段系统，特别为算法竞赛设计
-- **LSP 支持**: 针对 C++ 的 clangd 语言服务器配置
-- **调试支持**: 集成 nvim-dap 调试器
+- **LSP 支持**: C++ 使用 clangd，Python 使用宽松诊断的 BasedPyright
+- **调试支持**: 通过 nvim-dap 调试 C++，通过 debugpy 调试 Python
 - **代码补全**: 使用 nvim-cmp 提供智能补全
 - **主题**: 默认使用 nightfly 主题，并通过 themify 管理可切换主题
 - **状态栏**: 使用 lualine 状态栏
@@ -46,10 +46,21 @@ brew install gum find fd
    ```
 
 3. 确保你已安装以下依赖:
-   - Neovim 0.9+
+   - Neovim 0.12+
    - git
    - clangd (用于 C++ LSP 支持)
    - nodejs (某些插件可能需要)
+
+   Arch Linux 上的 Python OJ 依赖:
+
+   ```bash
+   uv tool install basedpyright
+   uv tool update-shell
+   sudo pacman -S --needed python-debugpy
+   ```
+
+   在 Neovim 中执行 `:TSInstall python` 安装 Python parser。完整安装、使用和
+   排错说明见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
 
 4. 安装调试器(for nvim-dap)
    5. `vscode-cpptools` 扩展(linux): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
@@ -73,7 +84,8 @@ brew install gum find fd
 - `random_dag1.cpp`, `random_dag2.cpp`: DAG 生成工具
 - `random_graph.cpp`: 随机图生成工具
 
-所有插入的代码片段都会自动包装在 `//oisnip_begin` 和 `//oisnip_end` 标记之间，便于折叠和管理。
+`oiSnippets/` 中的非模板 C++ 工具会自动包装在 `//oisnip_begin` 和
+`//oisnip_end` 标记之间。Python 模板不添加 marker。
 
 ### 快捷键
 
@@ -82,7 +94,7 @@ brew install gum find fd
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
 - `<Leader>of`: 打开 rbook 正式代码模板
 - `<Leader>oe`: 浏览 rbook 全部代码文件
-- `<Leader>sf`: 查看当前文件 LSP 符号，C++ 中可用于函数/方法跳转
+- `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
@@ -94,8 +106,8 @@ brew install gum find fd
 ### 折叠
 
 代码折叠已配置为使用标记折叠，标记为:
-- 开始标记: `//oisnip_begin`
-- 结束标记: `//oisnip_end`
+- C++: `//oisnip_begin` / `//oisnip_end`
+- Python: `#oisnip_begin` / `#oisnip_end`
 
 ### LSP
 
@@ -108,6 +120,9 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 - 当前文件符号列表 (`<Leader>sf`)
 
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
+
+Python LSP 由 BasedPyright 提供，使用适合 OJ 的宽松诊断。Python 的模板、
+17 个 snippets、DAP 和故障排查见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
 
 
 使用`clangd`,在项目的根目录下创建`.clangd`文件，内容如下:

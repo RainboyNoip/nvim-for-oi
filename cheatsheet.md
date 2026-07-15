@@ -58,6 +58,15 @@
 | `gb` + motion | 按 motion 块注释切换 |
 | Visual `gb` | 选区块注释切换 `/* */` |
 
+## Python Buffer
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<C-/>` | 行注释切换 `#`，等价于 `gcc` / Visual `gc` |
+| `<Leader>cc` | 行注释切换 `#` |
+| `<Leader>sf` | 当前 Python 文件符号 |
+| `<Leader>sD` | 当前 Python buffer 诊断 |
+
 ## LuaSnip 操作
 
 | 快捷键 | 说明 |
@@ -77,7 +86,7 @@
 | `<Leader>tc` | 选择已有 terminal 并切换 |
 | `<Leader>tf` | 打开 bash terminal |
 | `<Leader>s` | 搜索 / 跳转分组 |
-| `<Leader>sf` | 当前文件符号，C++ 中可用于函数/方法跳转 |
+| `<Leader>sf` | 当前文件符号，支持 C++ 和 Python |
 | `<Leader>sj` | 跳转历史 |
 | `<Leader>sb` | Buffer 列表 |
 | `<Leader>sd` | 项目诊断 |
@@ -85,7 +94,7 @@
 | `<Leader>sc` | 当前文件更改位置 |
 | `<Leader>sz` | 专注模式 |
 
-`<Leader>sf` 依赖 clangd 的 LSP symbols。当前 C++ 文件存在严重语法错误时，列表可能为空。
+`<Leader>sf` 依赖当前语言的 LSP symbols。C++ 使用 clangd，Python 使用 BasedPyright。
 
 ## C++ Snippets
 
@@ -103,6 +112,43 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `rf n` | `for(int i = n; i >= 1; --i)`，起点来自输入 |
 | `rf l r` | `for(int i = r; i >= l; --i)`，循环变量可改 |
 | `2f` | 双层 `FF(i,n)` / `FF(j,m)` |
+
+## Python Snippets
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `main` | buffered input、`solve()` 和 main guard |
+| `solve` | `def solve():` |
+| `fastin` | `input = sys.stdin.buffer.readline` |
+| `ii` | `n = int(input())` |
+| `ints` | `a, b = map(int, input().split())` |
+| `listi` | `a = list(map(int, input().split()))` |
+| `strin` | `s = input().strip().decode()` |
+| `f` | `for i in range(n):` |
+| `fr` | `for i in range(left, right):`，半开区间 |
+| `fri` | `for i in range(left, right + 1):`，闭区间 |
+| `rf` | `for i in range(n - 1, -1, -1):` |
+| `enum` | `for index, value in enumerate(items):` |
+| `tests` | 读取测试组数并重复调用 `solve()` |
+| `heap` | 导入 `heapq` 并初始化最小堆 |
+| `bisect` | 导入 `bisect_left` / `bisect_right` |
+| `deque` | 导入并初始化 `deque` |
+| `dbg` | `print(value, file=sys.stderr)` |
+
+## Python 调试
+
+调试前先保存当前文件。标准输入在 debugpy 打开的集成终端中输入。
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<F4>` | 结束调试 |
+| `<F5>` | 启动 / 继续 |
+| `<F6>` | 切换断点 |
+| `<F7>` | Step Into |
+| `<F8>` | Step Over |
+| `<F9>` | Run to Cursor |
+| `<Leader>dw` | 查看光标处变量 |
+| `<Leader>dr` | 切换 DAP REPL |
 
 ## STL / OJ Snippets
 
