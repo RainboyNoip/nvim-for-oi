@@ -34,6 +34,22 @@ local function run()
   for _, name in ipairs(disabled_diagnostics) do
     assert_equal(analysis.diagnosticSeverityOverrides[name], "none", name)
   end
+
+  local bufnr = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(bufnr, vim.fn.tempname() .. ".py")
+  vim.api.nvim_win_set_buf(0, bufnr)
+  vim.cmd("setfiletype python")
+
+  vim.wait(1000, function()
+    return vim.bo[bufnr].filetype == "python"
+  end, 10)
+
+  assert_equal(vim.bo[bufnr].tabstop, 4, "python tabstop")
+  assert_equal(vim.bo[bufnr].softtabstop, 4, "python softtabstop")
+  assert_equal(vim.bo[bufnr].shiftwidth, 4, "python shiftwidth")
+  assert_equal(vim.bo[bufnr].expandtab, true, "python expandtab")
+  assert_equal(vim.bo[bufnr].commentstring, "# %s", "python commentstring")
+  assert_equal(vim.wo.foldmarker, "#oisnip_begin,#oisnip_end", "python foldmarker")
 end
 
 local ok, err = xpcall(run, debug.traceback)
