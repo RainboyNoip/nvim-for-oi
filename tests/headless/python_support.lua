@@ -50,6 +50,69 @@ local function run()
   assert_equal(vim.bo[bufnr].expandtab, true, "python expandtab")
   assert_equal(vim.bo[bufnr].commentstring, "# %s", "python commentstring")
   assert_equal(vim.wo.foldmarker, "#oisnip_begin,#oisnip_end", "python foldmarker")
+
+  local luasnip = require("luasnip")
+  local python_snippets = luasnip.get_snippets("python")
+  assert_equal(#python_snippets, 17, "python snippet count")
+
+  local actual_triggers = {}
+  for _, snippet in ipairs(python_snippets) do
+    actual_triggers[snippet.trigger] = true
+  end
+
+  local expected_triggers = {
+    "main",
+    "solve",
+    "fastin",
+    "ii",
+    "ints",
+    "listi",
+    "strin",
+    "f",
+    "fr",
+    "fri",
+    "rf",
+    "enum",
+    "tests",
+    "heap",
+    "bisect",
+    "deque",
+    "dbg",
+  }
+
+  for _, trigger in ipairs(expected_triggers) do
+    assert(actual_triggers[trigger], "missing Python snippet: " .. trigger)
+  end
+
+  assert_equal(#luasnip.get_snippets("cpp"), 37, "C++ snippet count")
+
+  local function expand_snippet(trigger)
+    if luasnip.in_snippet() then
+      luasnip.unlink_current()
+    end
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "" })
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+    for _, snippet in ipairs(python_snippets) do
+      if snippet.trigger == trigger then
+        luasnip.snip_expand(snippet)
+        return table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
+      end
+    end
+
+    error("cannot expand missing snippet: " .. trigger)
+  end
+
+  local main_expansion = expand_snippet("main")
+  assert(main_expansion:find("def solve():", 1, true), "main snippet must define solve()")
+  assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
+  assert(main_expansion:find("    solve()", 1, true), "main snippet must call solve()")
+
+  local inclusive_range = expand_snippet("fri")
+  assert(
+    inclusive_range:find("for i in range(left, right + 1):", 1, true),
+    "fri snippet must include the right endpoint"
+  )
 end
 
 local ok, err = xpcall(run, debug.traceback)
