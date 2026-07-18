@@ -26,9 +26,9 @@
     "Lambda 表达式": {
         "prefix": "lm",
         "body": [
-            "${1:function_name} = lambda ${2:args}: ${0:expression}"
+            "lambda ${1:args}: ${0:expression}"
         ],
-        "description": "定义并命名 lambda 表达式"
+        "description": "定义 lambda 表达式"
     },
     "定义类": {
         "prefix": "cls",
