@@ -110,7 +110,7 @@ return {
       -- 使用 lspkind 替代 LazyVim.config.icons
       formatting = {
         format = lspkind.cmp_format({
-          mode = "symbol_text",   -- 显示 图标 和 文本
+          mode = "text", -- nvim-cmp 已用独立 icon 列显示 lspkind 图标。
           maxwidth = {
             -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
             -- can also be a function to dynamically calculate max width such as
