@@ -32,6 +32,8 @@ Neovim 不负责：
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 加载 `lua/snippets/` |
 | `lua/snippets/python.lua` | 17 个 Python OJ snippets |
+| `vscode-snippets/python.json` | 24 个 Neovim / VSCode 共用的通用 Python snippets |
+| `vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
 | `oiSnippets/template/simple_template.py` | Python 完整 OJ 模板 |
 | `lua/plugins/dap/python.lua` | debugpy adapter、launch 配置和启动前检查 |
@@ -162,6 +164,8 @@ if __name__ == "__main__":
 输入 trigger 后按 `<C-K>` 展开。使用 `<C-L>` / `<C-J>` 跳到下一个或
 上一个字段，`<C-E>` 切换 choice node。
 
+### OJ snippets（17 个）
+
 | Trigger | 默认展开结果 |
 | --- | --- |
 | `main` | buffered input、`solve()` 和 main guard |
@@ -186,13 +190,48 @@ if __name__ == "__main__":
 `strin` 包含 `.decode()`，因为 buffered input 返回 bytes。`dbg` 依赖已经
 导入 `sys`，使用完整模板或 `fastin` 时会满足这一条件。
 
+### 通用 snippets（24 个）
+
+这些 snippets 来自 `vscode-snippets/python.json`，Neovim 和 VSCode 使用
+相同的 trigger 和 placeholder。
+
+| Trigger | 默认展开结果 |
+| --- | --- |
+| `df` | 无类型注解的 `def function_name(...):` |
+| `dft` | 带参数和返回值类型注解的函数 |
+| `adf` | 无类型注解的 `async def` |
+| `lm` | 命名 lambda 表达式 |
+| `cls` | 最小 class 骨架 |
+| `init` | 带类型参数和属性赋值的 `__init__` |
+| `dcls` | 导入并定义普通 `@dataclass` |
+| `prop` | property getter、setter 和同步的底层属性名 |
+| `deco` | 使用 `functools.wraps` 的函数装饰器 |
+| `ifm` | `if __name__ == "__main__":` |
+| `ife` | `if / else` 分支 |
+| `mt` | 一个 case 和 `_` fallback 的 `match` |
+| `fe` | 使用 `enumerate` 遍历索引和值 |
+| `wh` | `while` 循环 |
+| `tr` | `try / except` |
+| `trf` | `try / except / finally` |
+| `wth` | `with expression as value` |
+| `ctx` | 获取、yield、释放资源的 context manager |
+| `lc` | 带可选过滤条件的列表推导式 |
+| `sc` | 带可选过滤条件的集合推导式 |
+| `dictc` | 带可选过滤条件的字典推导式 |
+| `gen` | 带可选过滤条件的生成器表达式 |
+| `ta` | Python 3.10 `TypeAlias` |
+| `opt` | `name: Type | None = None` |
+
+`lc`、`sc`、`dictc` 和 `gen` 默认不带过滤条件；展开后按 `<C-E>` 可
+切换为 `if condition`。
+
 检查 snippets 是否加载：
 
 ```vim
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `17`。
+应输出 `41`：17 个 OJ snippets 加 24 个通用 snippets。
 
 ## 调试
 
@@ -262,7 +301,7 @@ basedpyright --version
 ### Snippet 不展开
 
 1. 用 `:set filetype?` 确认是 `python`。
-2. 用前面的 Lua 命令确认数量是 17。
+2. 用前面的 Lua 命令确认数量是 41。
 3. 在 Insert 模式输入完整 trigger，再按 `<C-K>`。
 4. 执行 `:Lazy`，确认 LuaSnip 已加载。
 

@@ -1,0 +1,224 @@
+{
+    "定义函数": {
+        "prefix": "df",
+        "body": [
+            "def ${1:function_name}(${2}):",
+            "    ${0:pass}"
+        ],
+        "description": "定义无类型注解的函数"
+    },
+    "定义带类型函数": {
+        "prefix": "dft",
+        "body": [
+            "def ${1:function_name}(${2:arg}: ${3:Type}) -> ${4:ReturnType}:",
+            "    ${0:pass}"
+        ],
+        "description": "定义带参数和返回值类型注解的函数"
+    },
+    "定义异步函数": {
+        "prefix": "adf",
+        "body": [
+            "async def ${1:function_name}(${2}):",
+            "    ${0:pass}"
+        ],
+        "description": "定义异步函数"
+    },
+    "Lambda 表达式": {
+        "prefix": "lm",
+        "body": [
+            "${1:function_name} = lambda ${2:args}: ${0:expression}"
+        ],
+        "description": "定义并命名 lambda 表达式"
+    },
+    "定义类": {
+        "prefix": "cls",
+        "body": [
+            "class ${1:ClassName}:",
+            "    ${0:pass}"
+        ],
+        "description": "定义最小类骨架"
+    },
+    "定义构造函数": {
+        "prefix": "init",
+        "body": [
+            "def __init__(self, ${1:name}: ${2:Type}) -> None:",
+            "    self.$1 = $1",
+            "    ${0:pass}"
+        ],
+        "description": "定义构造函数并初始化一个属性"
+    },
+    "定义数据类": {
+        "prefix": "dcls",
+        "body": [
+            "from dataclasses import dataclass",
+            "",
+            "@dataclass",
+            "class ${1:ClassName}:",
+            "    ${2:field}: ${3:Type}",
+            "    ${0:pass}"
+        ],
+        "description": "导入并定义普通 dataclass"
+    },
+    "定义属性": {
+        "prefix": "prop",
+        "body": [
+            "@property",
+            "def ${1:name}(self) -> ${2:Type}:",
+            "    return self._$1",
+            "",
+            "@$1.setter",
+            "def $1(self, value: $2) -> None:",
+            "    self._$1 = value",
+            "    ${0:pass}"
+        ],
+        "description": "定义带 getter 和 setter 的属性"
+    },
+    "定义装饰器": {
+        "prefix": "deco",
+        "body": [
+            "from functools import wraps",
+            "",
+            "def ${1:decorator}(func):",
+            "    @wraps(func)",
+            "    def wrapper(*args, **kwargs):",
+            "        ${0:return func(*args, **kwargs)}",
+            "    return wrapper"
+        ],
+        "description": "使用 functools.wraps 定义函数装饰器"
+    },
+    "主程序入口": {
+        "prefix": "ifm",
+        "body": [
+            "if __name__ == \"__main__\":",
+            "    ${0:main()}"
+        ],
+        "description": "定义 Python main guard"
+    },
+    "条件分支": {
+        "prefix": "ife",
+        "body": [
+            "if ${1:condition}:",
+            "    ${2:pass}",
+            "else:",
+            "    ${0:pass}"
+        ],
+        "description": "定义 if/else 分支"
+    },
+    "模式匹配": {
+        "prefix": "mt",
+        "body": [
+            "match ${1:value}:",
+            "    case ${2:1}:",
+            "        ${3:pass}",
+            "    case _:",
+            "        ${0:pass}"
+        ],
+        "description": "定义一个 case 和默认分支的 match 语句"
+    },
+    "带索引循环": {
+        "prefix": "fe",
+        "body": [
+            "for ${1:index}, ${2:value} in enumerate(${3:items}):",
+            "    ${0:pass}"
+        ],
+        "description": "使用 enumerate 遍历索引和值"
+    },
+    "条件循环": {
+        "prefix": "wh",
+        "body": [
+            "while ${1:condition}:",
+            "    ${0:pass}"
+        ],
+        "description": "定义 while 循环"
+    },
+    "捕获异常": {
+        "prefix": "tr",
+        "body": [
+            "try:",
+            "    ${1:pass}",
+            "except ${2:Exception} as ${3:exc}:",
+            "    ${0:pass}"
+        ],
+        "description": "定义 try/except 异常处理"
+    },
+    "捕获异常并清理": {
+        "prefix": "trf",
+        "body": [
+            "try:",
+            "    ${1:pass}",
+            "except ${2:Exception} as ${3:exc}:",
+            "    ${4:pass}",
+            "finally:",
+            "    ${0:pass}"
+        ],
+        "description": "定义 try/except/finally 异常处理"
+    },
+    "资源管理": {
+        "prefix": "wth",
+        "body": [
+            "with ${1:expression} as ${2:value}:",
+            "    ${0:pass}"
+        ],
+        "description": "使用 with 管理上下文资源"
+    },
+    "定义上下文管理器": {
+        "prefix": "ctx",
+        "body": [
+            "from contextlib import contextmanager",
+            "",
+            "@contextmanager",
+            "def ${1:managed_resource}():",
+            "    ${2:resource} = ${3:acquire}()",
+            "    try:",
+            "        yield $2",
+            "    finally:",
+            "        ${4:release}($2)",
+            "        ${0:pass}"
+        ],
+        "description": "定义带获取、yield 和释放阶段的上下文管理器"
+    },
+    "列表推导式": {
+        "prefix": "lc",
+        "body": [
+            "[${1:expression} for ${2:item} in ${3:iterable}${4|, if condition|}]$0"
+        ],
+        "description": "定义带可选过滤条件的列表推导式"
+    },
+    "集合推导式": {
+        "prefix": "sc",
+        "body": [
+            "{${1:expression} for ${2:item} in ${3:iterable}${4|, if condition|}}$0"
+        ],
+        "description": "定义带可选过滤条件的集合推导式"
+    },
+    "字典推导式": {
+        "prefix": "dictc",
+        "body": [
+            "{${1:key}: ${2:value} for ${3:item} in ${4:iterable}${5|, if condition|}}$0"
+        ],
+        "description": "定义带可选过滤条件的字典推导式"
+    },
+    "生成器表达式": {
+        "prefix": "gen",
+        "body": [
+            "(${1:expression} for ${2:item} in ${3:iterable}${4|, if condition|})$0"
+        ],
+        "description": "定义带可选过滤条件的生成器表达式"
+    },
+    "定义类型别名": {
+        "prefix": "ta",
+        "body": [
+            "from typing import TypeAlias",
+            "",
+            "${1:Alias}: TypeAlias = ${0:ExistingType}"
+        ],
+        "description": "使用 TypeAlias 定义 Python 3.10 类型别名"
+    },
+    "定义可选变量": {
+        "prefix": "opt",
+        "body": [
+            "${1:name}: ${2:Type} | None = None$0"
+        ],
+        "description": "定义使用联合类型的可选变量"
+    }
+}

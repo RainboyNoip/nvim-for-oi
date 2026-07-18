@@ -113,7 +113,7 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `rf l r` | `for(int i = r; i >= l; --i)`，循环变量可改 |
 | `2f` | 双层 `FF(i,n)` / `FF(j,m)` |
 
-## Python Snippets
+## Python OJ Snippets
 
 | 触发 | 展开结果 |
 | --- | --- |
@@ -134,6 +134,37 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `bisect` | 导入 `bisect_left` / `bisect_right` |
 | `deque` | 导入并初始化 `deque` |
 | `dbg` | `print(value, file=sys.stderr)` |
+
+## Python 通用 Snippets
+
+这些 snippets 同时由 Neovim 和 VSCode 从 `vscode-snippets/python.json` 加载。
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `df` | 定义无类型注解函数 |
+| `dft` | 定义带类型注解函数 |
+| `adf` | 定义异步函数 |
+| `lm` | 命名 lambda 表达式 |
+| `cls` | 最小 class 骨架 |
+| `init` | 构造函数和属性初始化 |
+| `dcls` | 普通 `@dataclass` |
+| `prop` | property getter + setter |
+| `deco` | 使用 `wraps` 的装饰器 |
+| `ifm` | Python main guard |
+| `ife` | `if / else` |
+| `mt` | `match / case / _` |
+| `fe` | `enumerate` 循环 |
+| `wh` | `while` 循环 |
+| `tr` | `try / except` |
+| `trf` | `try / except / finally` |
+| `wth` | `with ... as ...` |
+| `ctx` | 函数式 context manager |
+| `lc` | 列表推导式，可选过滤条件 |
+| `sc` | 集合推导式，可选过滤条件 |
+| `dictc` | 字典推导式，可选过滤条件 |
+| `gen` | 生成器表达式，可选过滤条件 |
+| `ta` | Python 3.10 类型别名 |
+| `opt` | 可选变量声明 |
 
 ## Python 调试
 

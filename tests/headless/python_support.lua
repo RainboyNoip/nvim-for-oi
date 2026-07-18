@@ -53,14 +53,14 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 17, "python snippet count")
+  assert_equal(#python_snippets, 41, "python snippet count")
 
-  local actual_triggers = {}
+  local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
-    actual_triggers[snippet.trigger] = true
+    trigger_counts[snippet.trigger] = (trigger_counts[snippet.trigger] or 0) + 1
   end
 
-  local expected_triggers = {
+  local oj_triggers = {
     "main",
     "solve",
     "fastin",
@@ -80,11 +80,53 @@ local function run()
     "dbg",
   }
 
-  for _, trigger in ipairs(expected_triggers) do
-    assert(actual_triggers[trigger], "missing Python snippet: " .. trigger)
+  local general_triggers = {
+    "df",
+    "dft",
+    "adf",
+    "lm",
+    "cls",
+    "init",
+    "dcls",
+    "prop",
+    "deco",
+    "ifm",
+    "ife",
+    "mt",
+    "fe",
+    "wh",
+    "tr",
+    "trf",
+    "wth",
+    "ctx",
+    "lc",
+    "sc",
+    "dictc",
+    "gen",
+    "ta",
+    "opt",
+  }
+
+  for _, trigger in ipairs(oj_triggers) do
+    assert_equal(trigger_counts[trigger], 1, "OJ Python snippet: " .. trigger)
+  end
+
+  for _, trigger in ipairs(general_triggers) do
+    assert_equal(trigger_counts[trigger], 1, "general Python snippet: " .. trigger)
   end
 
   assert_equal(#luasnip.get_snippets("cpp"), 37, "C++ snippet count")
+
+  local package_path = vim.fn.stdpath("config") .. "/vscode-snippets/package.json"
+  local package = vim.json.decode(table.concat(vim.fn.readfile(package_path), "\n"))
+  local python_registered = false
+  for _, contribution in ipairs(package.contributes.snippets) do
+    if contribution.language == "python" and contribution.path == "./python.json" then
+      python_registered = true
+      break
+    end
+  end
+  assert(python_registered, "vscode-snippets/package.json must register python.json")
 
   local function expand_snippet(trigger)
     if luasnip.in_snippet() then
@@ -113,6 +155,60 @@ local function run()
     inclusive_range:find("for i in range(left, right + 1):", 1, true),
     "fri snippet must include the right endpoint"
   )
+
+  local property = expand_snippet("prop")
+  assert(property:find("@property", 1, true), "prop snippet must define a property")
+  assert(property:find("@name.setter", 1, true), "prop snippet must define a setter")
+  assert(property:find("self._name = value", 1, true), "prop snippet must update the backing attribute")
+
+  local decorator = expand_snippet("deco")
+  assert(decorator:find("from functools import wraps", 1, true), "deco snippet must import wraps")
+  assert(decorator:find("@wraps(func)", 1, true), "deco snippet must preserve function metadata")
+
+  local context_manager = expand_snippet("ctx")
+  assert(context_manager:find("@contextmanager", 1, true), "ctx snippet must use contextmanager")
+  assert(context_manager:find("yield resource", 1, true), "ctx snippet must yield its resource")
+  assert(context_manager:find("release(resource)", 1, true), "ctx snippet must release its resource")
+
+  local list_comprehension = expand_snippet("lc")
+  assert(
+    list_comprehension:find("[expression for item in iterable]", 1, true),
+    "lc snippet default must not require a filter"
+  )
+
+  local choice_reached = false
+  for _ = 1, 5 do
+    if luasnip.choice_active() then
+      choice_reached = true
+      break
+    end
+    if luasnip.jumpable(1) then
+      luasnip.jump(1)
+    end
+  end
+  assert(choice_reached, "lc snippet must provide a filter choice")
+  luasnip.change_choice(1)
+  local filtered_comprehension = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
+  assert(
+    filtered_comprehension:find("[expression for item in iterable if condition]", 1, true),
+    "lc filter choice must insert `if condition`"
+  )
+
+  for _, trigger in ipairs(general_triggers) do
+    local expansion = expand_snippet(trigger)
+    local result = vim.system({
+      "python3",
+      "-c",
+      "import sys; compile(sys.argv[1], '<" .. trigger .. ">', 'exec')",
+      expansion,
+    }, { text = true }):wait()
+    assert(result.code == 0, string.format(
+      "%s snippet is not valid Python:\n%s\n%s",
+      trigger,
+      expansion,
+      result.stderr or ""
+    ))
+  end
 
   local dap = require("dap")
   assert_equal(type(dap.adapters.python), "function", "Python DAP adapter type")

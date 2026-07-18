@@ -122,7 +122,8 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 
 Python LSP 由 BasedPyright 提供，使用适合 OJ 的宽松诊断。Python 的模板、
-17 个 snippets、DAP 和故障排查见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
+17 个 OJ snippets、24 个通用 snippets、DAP 和故障排查见
+[Python OJ 使用指南](docs/how-to-use-in-python.md)。
 
 
 使用`clangd`,在项目的根目录下创建`.clangd`文件，内容如下:
