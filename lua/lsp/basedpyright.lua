@@ -14,6 +14,7 @@ return {
         typeCheckingMode = "basic",
         diagnosticSeverityOverrides = {
           reportMissingTypeStubs = "none",
+          reportPossiblyUnboundVariable = "error",
           reportUnusedCallResult = "none",
           reportUnusedImport = "none",
           reportUnusedVariable = "none",

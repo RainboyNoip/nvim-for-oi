@@ -18,6 +18,11 @@ local function run()
   local analysis = config.settings.basedpyright.analysis
   assert_equal(analysis.diagnosticMode, "openFilesOnly", "diagnostic mode")
   assert_equal(analysis.typeCheckingMode, "basic", "type checking mode")
+  assert_equal(
+    analysis.diagnosticSeverityOverrides.reportPossiblyUnboundVariable,
+    "error",
+    "possibly unbound variable severity"
+  )
 
   local disabled_diagnostics = {
     "reportMissingTypeStubs",

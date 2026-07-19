@@ -10,13 +10,19 @@ local function run()
   assert(received, "basedpyright did not publish diagnostics within 10 seconds")
 
   local messages = {}
+  local codes = {}
   for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
     table.insert(messages, diagnostic.message:lower())
+    codes[diagnostic.code] = true
   end
 
   local joined = table.concat(messages, "\n")
   assert(joined:find("not_defined", 1, true), "missing diagnostic for not_defined")
   assert(joined:find("not defined", 1, true), "not_defined diagnostic has unexpected wording")
+  assert(
+    codes.reportPossiblyUnboundVariable,
+    "missing reportPossiblyUnboundVariable diagnostic"
+  )
   assert(not joined:find("not accessed", 1, true), "unused import diagnostic should be disabled")
 end
 
