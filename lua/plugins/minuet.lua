@@ -9,7 +9,8 @@ return {
 
     require("minuet").setup({
       provider = "openai_fim_compatible",
-      n_completions = 1,
+      -- FIM providers issue one request per candidate; multiple candidates enable cycling.
+      n_completions = 4,
       context_window = 8000,
       throttle = 1500,
       debounce = 600,
@@ -24,7 +25,7 @@ return {
         auto_trigger_ft = has_deepseek_key and completion_filetypes or {},
         show_on_completion_menu = false,
         keymap = {
-          accept = nil,
+          accept = has_deepseek_key and "<M-a>" or nil,
           accept_line = has_deepseek_key and "<M-l>" or nil,
           accept_n_lines = nil,
           prev = has_deepseek_key and "<M-[>" or nil,

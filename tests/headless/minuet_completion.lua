@@ -15,7 +15,7 @@ local function run()
 
   local config = require("minuet").config
   assert_equal(config.provider, "openai_fim_compatible", "provider")
-  assert_equal(config.n_completions, 1, "completion count")
+  assert_equal(config.n_completions, 4, "completion count")
   assert_equal(config.context_window, 8000, "context window")
   assert_equal(config.throttle, 1500, "request throttle")
   assert_equal(config.debounce, 600, "request debounce")
@@ -25,13 +25,13 @@ local function run()
   local virtualtext = config.virtualtext
   assert_equal(virtualtext.auto_trigger_ft, { "c", "cpp", "python" }, "auto-trigger filetypes")
   assert_equal(virtualtext.show_on_completion_menu, false, "completion menu visibility")
-  assert_equal(virtualtext.keymap.accept, nil, "whole-completion keymap")
+  assert_equal(virtualtext.keymap.accept, "<M-a>", "whole-completion keymap")
   assert_equal(virtualtext.keymap.accept_line, "<M-l>", "line keymap")
   assert_equal(virtualtext.keymap.next, "<M-]>", "next keymap")
   assert_equal(virtualtext.keymap.prev, "<M-[>", "previous keymap")
   assert_equal(virtualtext.keymap.dismiss, "<M-e>", "dismiss keymap")
 
-  for _, lhs in ipairs({ "<M-l>", "<M-[>", "<M-]>", "<M-e>" }) do
+  for _, lhs in ipairs({ "<M-a>", "<M-l>", "<M-[>", "<M-]>", "<M-e>" }) do
     local mapping = vim.fn.maparg(lhs, "i", false, true)
     assert(not vim.tbl_isempty(mapping), "missing Minuet insert mapping: " .. lhs)
   end

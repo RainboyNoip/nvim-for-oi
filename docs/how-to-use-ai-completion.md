@@ -26,14 +26,15 @@ export DEEPSEEK_API_KEY="你的 API Key"
 
 | 按键 | 作用 |
 | --- | --- |
+| `<M-a>` | 接受当前建议的所有行 |
 | `<M-l>` | 接受当前建议的一行 |
 | `<M-]>` | 请求建议或切换到下一条建议 |
 | `<M-[>` | 切换到上一条建议 |
 | `<M-e>` | 取消当前建议 |
 | `<Leader>at` | 切换当前 buffer 的自动 AI 补全 |
 
-没有绑定“接受整个建议”，避免一次插入未经检查的多行代码。`<Tab>` 和
-`<CR>` 仍由现有 LuaSnip 和 `nvim-cmp` 配置处理。
+使用 `<M-a>` 前应先检查完整的 virtual text，避免一次插入未经检查的多行
+代码。`<Tab>` 和 `<CR>` 仍由现有 LuaSnip 和 `nvim-cmp` 配置处理。
 
 ## 启停
 
@@ -59,7 +60,8 @@ NVIM_APPNAME=rainboyNvim nvim main.cpp
 
 - Provider：DeepSeek FIM API。
 - 模型：`deepseek-v4-flash`。
-- 每次只请求一个候选，最多生成 96 tokens。
+- 每轮请求四个候选，以便使用 `<M-[>` / `<M-]>` 切换；每个候选最多生成
+  96 tokens。
 - 上下文最多 8000 个字符。
 - 输入停止 600ms 后才请求，两次请求至少间隔 1500ms。
 - 补全菜单打开时隐藏 AI virtual text。
