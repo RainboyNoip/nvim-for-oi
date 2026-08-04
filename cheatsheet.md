@@ -43,6 +43,21 @@
 | `<Leader>rr` | Rbook 刷新索引 |
 | `<Leader>rd` | Rbook 检查模板索引 |
 
+## AI 补全（Minuet）
+
+需要设置 `DEEPSEEK_API_KEY`，详见 `docs/how-to-use-ai-completion.md`。
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<M-a>` | 接受当前建议的所有行 |
+| `<M-l>` | 接受当前建议的一行 |
+| `<M-]>` | 请求或切换到下一条建议 |
+| `<M-[>` | 切换到上一条建议 |
+| `<M-e>` | 取消当前建议 |
+| `<Leader>at` | 切换当前 buffer 自动 AI 补全 |
+| `<Leader>af` | 切换到 Fast 模式 |
+| `<Leader>ac` | 切换到 Choice 模式 |
+
 ## C++ Buffer
 
 | 快捷键 | 说明 |

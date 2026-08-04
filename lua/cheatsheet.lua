@@ -35,6 +35,13 @@ local function enable_markdown_render(winid)
     end)
 end
 
+function M.setup()
+    vim.api.nvim_create_user_command("Cheatsheet", M.show, {
+        desc = "打开 Rainboy 速查表",
+        force = true,
+    })
+end
+
 function M.show()
     local lines = read_cheatsheet_lines()
     if not lines then

@@ -4,5 +4,6 @@ require("config.lazy")
 -- 编辑能力：LSP、代码片段、快捷键、基础选项。
 require("lsp")
 require("fileSnip").setup()
+require("cheatsheet").setup()
 require("keymaps")
 require("options")
