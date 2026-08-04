@@ -22,6 +22,29 @@ local function run()
   assert_equal(config.request_timeout, 3, "request timeout")
   assert_equal(config.cmp.enable_auto_complete, false, "nvim-cmp integration")
 
+  local minuet = require("minuet")
+  assert_equal(minuet.presets.fast.n_completions, 1, "fast completion count")
+  assert_equal(minuet.presets.fast.context_window, 4000, "fast context window")
+  assert_equal(minuet.presets.fast.provider_options.openai_fim_compatible.optional.max_tokens, 48, "fast tokens")
+  assert_equal(minuet.presets.choice.n_completions, 4, "choice completion count")
+  assert_equal(minuet.presets.choice.context_window, 8000, "choice context window")
+  assert_equal(minuet.presets.choice.provider_options.openai_fim_compatible.optional.max_tokens, 96, "choice tokens")
+
+  vim.cmd("Minuet change_preset fast")
+  assert_equal(minuet.config.n_completions, 1, "active fast completion count")
+  assert_equal(minuet.config.context_window, 4000, "active fast context window")
+  assert_equal(minuet.config.throttle, 800, "active fast throttle")
+  assert_equal(minuet.config.debounce, 300, "active fast debounce")
+  assert_equal(minuet.config.request_timeout, 2, "active fast timeout")
+  assert_equal(minuet.config.provider_options.openai_fim_compatible.optional.max_tokens, 48, "active fast tokens")
+  vim.cmd("Minuet change_preset choice")
+  assert_equal(minuet.config.n_completions, 4, "active choice completion count")
+  assert_equal(minuet.config.context_window, 8000, "active choice context window")
+  assert_equal(minuet.config.throttle, 1500, "active choice throttle")
+  assert_equal(minuet.config.debounce, 600, "active choice debounce")
+  assert_equal(minuet.config.request_timeout, 3, "active choice timeout")
+  assert_equal(minuet.config.provider_options.openai_fim_compatible.optional.max_tokens, 96, "active choice tokens")
+
   local virtualtext = config.virtualtext
   assert_equal(virtualtext.auto_trigger_ft, { "c", "cpp", "python" }, "auto-trigger filetypes")
   assert_equal(virtualtext.show_on_completion_menu, false, "completion menu visibility")
@@ -34,6 +57,10 @@ local function run()
   for _, lhs in ipairs({ "<M-a>", "<M-l>", "<M-[>", "<M-]>", "<M-e>" }) do
     local mapping = vim.fn.maparg(lhs, "i", false, true)
     assert(not vim.tbl_isempty(mapping), "missing Minuet insert mapping: " .. lhs)
+  end
+  for _, lhs in ipairs({ "<Space>af", "<Space>ac", "<Space>at" }) do
+    local mapping = vim.fn.maparg(lhs, "n", false, true)
+    assert(not vim.tbl_isempty(mapping), "missing Minuet normal mapping: " .. lhs)
   end
 
   local provider = config.provider_options.openai_fim_compatible

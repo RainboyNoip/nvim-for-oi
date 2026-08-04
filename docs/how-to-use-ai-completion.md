@@ -31,10 +31,32 @@ export DEEPSEEK_API_KEY="你的 API Key"
 | `<M-]>` | 请求建议或切换到下一条建议 |
 | `<M-[>` | 切换到上一条建议 |
 | `<M-e>` | 取消当前建议 |
+| `<Leader>af` | 切换到 Fast 模式 |
+| `<Leader>ac` | 切换到 Choice 模式 |
 | `<Leader>at` | 切换当前 buffer 的自动 AI 补全 |
 
 使用 `<M-a>` 前应先检查完整的 virtual text，避免一次插入未经检查的多行
 代码。`<Tab>` 和 `<CR>` 仍由现有 LuaSnip 和 `nvim-cmp` 配置处理。
+
+## Fast 与 Choice
+
+启动时默认使用 Choice，适合需要比较多种实现的代码段。两种模式可以随时
+切换，新的设置从下一次补全请求开始生效。
+
+| 模式 | 候选数 | 上下文 | 每个候选最大输出 | debounce / throttle |
+| --- | ---: | ---: | ---: | ---: |
+| Fast | 1 | 4000 字符 | 48 tokens | 300ms / 800ms |
+| Choice | 4 | 8000 字符 | 96 tokens | 600ms / 1500ms |
+
+Fast 只有一个候选，因此 `<M-[>` / `<M-]>` 不会切换到其他内容。需要比较
+候选时按 `<Leader>ac` 进入 Choice；完成后按 `<Leader>af` 返回 Fast。
+
+也可以直接执行：
+
+```vim
+:Minuet change_preset fast
+:Minuet change_preset choice
+```
 
 ## 启停
 
@@ -60,10 +82,9 @@ NVIM_APPNAME=rainboyNvim nvim main.cpp
 
 - Provider：DeepSeek FIM API。
 - 模型：`deepseek-v4-flash`。
-- 每轮请求四个候选，以便使用 `<M-[>` / `<M-]>` 切换；每个候选最多生成
-  96 tokens。
-- 上下文最多 8000 个字符。
-- 输入停止 600ms 后才请求，两次请求至少间隔 1500ms。
+- 默认 Choice 每轮请求四个候选；Fast 每轮只请求一个候选。
+- Choice 使用最多 8000 字符上下文和 96 tokens 输出；Fast 使用 4000 字符
+  上下文和 48 tokens 输出。
 - 补全菜单打开时隐藏 AI virtual text。
 
 代码上下文会发送给 DeepSeek。不要在源码或注释里保存不希望发送的题面、

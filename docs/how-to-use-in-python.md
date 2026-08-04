@@ -32,7 +32,7 @@ Neovim 不负责：
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 加载 `lua/snippets/` |
 | `lua/snippets/python.lua` | 17 个 Python OJ snippets |
-| `vscode-snippets/python.json` | 24 个 Neovim / VSCode 共用的通用 Python snippets |
+| `vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
 | `vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
 | `oiSnippets/template/simple_template.py` | Python 完整 OJ 模板 |
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 `strin` 包含 `.decode()`，因为 buffered input 返回 bytes。`dbg` 依赖已经
 导入 `sys`，使用完整模板或 `fastin` 时会满足这一条件。
 
-### 通用 snippets（24 个）
+### 通用 snippets（25 个）
 
 这些 snippets 来自 `vscode-snippets/python.json`，Neovim 和 VSCode 使用
 相同的 trigger 和 placeholder。
@@ -215,6 +215,7 @@ if __name__ == "__main__":
 | `trf` | `try / except / finally` |
 | `wth` | `with expression as value` |
 | `ctx` | 获取、yield、释放资源的 context manager |
+| `flow` | 按顺序执行多个函数转换 |
 | `lc` | 带可选过滤条件的列表推导式 |
 | `sc` | 带可选过滤条件的集合推导式 |
 | `dictc` | 带可选过滤条件的字典推导式 |
@@ -231,7 +232,7 @@ if __name__ == "__main__":
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `41`：17 个 OJ snippets 加 24 个通用 snippets。
+应输出 `42`：17 个 OJ snippets 加 25 个通用 snippets。
 
 ## 调试
 
@@ -301,7 +302,7 @@ basedpyright --version
 ### Snippet 不展开
 
 1. 用 `:set filetype?` 确认是 `python`。
-2. 用前面的 Lua 命令确认数量是 41。
+2. 用前面的 Lua 命令确认数量是 42。
 3. 在 Insert 模式输入完整 trigger，再按 `<C-K>`。
 4. 执行 `:Lazy`，确认 LuaSnip 已加载。
 

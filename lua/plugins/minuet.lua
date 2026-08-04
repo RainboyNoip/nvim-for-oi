@@ -10,12 +10,42 @@ return {
     require("minuet").setup({
       provider = "openai_fim_compatible",
       -- FIM providers issue one request per candidate; multiple candidates enable cycling.
-      n_completions = 4,
+      n_completions = 2,
       context_window = 8000,
       throttle = 1500,
       debounce = 600,
       request_timeout = 3,
       notify = "warn",
+      presets = {
+        fast = {
+          n_completions = 1,
+          context_window = 4000,
+          throttle = 800,
+          debounce = 300,
+          request_timeout = 2,
+          provider_options = {
+            openai_fim_compatible = {
+              optional = {
+                max_tokens = 48,
+              },
+            },
+          },
+        },
+        choice = {
+          n_completions = 2,
+          context_window = 8000,
+          throttle = 1500,
+          debounce = 600,
+          request_timeout = 3,
+          provider_options = {
+            openai_fim_compatible = {
+              optional = {
+                max_tokens = 96,
+              },
+            },
+          },
+        },
+      },
 
       -- Keep AI suggestions separate from the existing nvim-cmp pipeline.
       cmp = {
@@ -50,6 +80,12 @@ return {
 
     vim.keymap.set("n", "<leader>at", "<cmd>Minuet virtualtext toggle<cr>", {
       desc = "Toggle Minuet completion",
+    })
+    vim.keymap.set("n", "<leader>af", "<cmd>Minuet change_preset fast<cr>", {
+      desc = "Minuet fast preset",
+    })
+    vim.keymap.set("n", "<leader>ac", "<cmd>Minuet change_preset choice<cr>", {
+      desc = "Minuet choice preset",
     })
 
     if not has_deepseek_key then

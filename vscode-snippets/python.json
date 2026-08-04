@@ -177,6 +177,16 @@
         ],
         "description": "定义带获取、yield 和释放阶段的上下文管理器"
     },
+    "函数式流水线": {
+        "prefix": "flow",
+        "body": [
+            "def flow(value, *steps):",
+            "    for step in steps:",
+            "        value = step(value)",
+            "    return value"
+        ],
+        "description": "按顺序执行多个函数转换"
+    },
     "列表推导式": {
         "prefix": "lc",
         "body": [

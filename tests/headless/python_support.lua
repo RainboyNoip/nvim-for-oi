@@ -58,7 +58,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 41, "python snippet count")
+  assert_equal(#python_snippets, 42, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -104,6 +104,7 @@ local function run()
     "trf",
     "wth",
     "ctx",
+    "flow",
     "lc",
     "sc",
     "dictc",
@@ -174,6 +175,11 @@ local function run()
   assert(context_manager:find("@contextmanager", 1, true), "ctx snippet must use contextmanager")
   assert(context_manager:find("yield resource", 1, true), "ctx snippet must yield its resource")
   assert(context_manager:find("release(resource)", 1, true), "ctx snippet must release its resource")
+
+  local flow = expand_snippet("flow")
+  assert(flow:find("def flow(value, *steps):", 1, true), "flow snippet must define flow()")
+  assert(flow:find("for step in steps:", 1, true), "flow snippet must iterate over steps")
+  assert(flow:find("value = step(value)", 1, true), "flow snippet must apply each step")
 
   local list_comprehension = expand_snippet("lc")
   assert(

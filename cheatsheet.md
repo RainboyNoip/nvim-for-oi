@@ -159,6 +159,7 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `trf` | `try / except / finally` |
 | `wth` | `with ... as ...` |
 | `ctx` | 函数式 context manager |
+| `flow` | 按顺序执行多个函数转换 |
 | `lc` | 列表推导式，可选过滤条件 |
 | `sc` | 集合推导式，可选过滤条件 |
 | `dictc` | 字典推导式，可选过滤条件 |
