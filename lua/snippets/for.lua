@@ -4,7 +4,6 @@ local i = ls.insert_node
 local t = ls.text_node
 local f = ls.function_node
 local fmt = require("luasnip.extras.fmt").fmt
-local rep = require("luasnip.extras").rep
 
 -- for 循环类 snippet。
 -- 循环变量使用 mirror：展开后可以直接修改第一个 i，后面的 i 会同步变化。
@@ -35,48 +34,38 @@ local function value_node(value)
 end
 
 -- 生成形如 for(int i = 1; i <= n; ++i) 的正序循环。
+-- 循环变量固定为 i，不可修改，也没有 mirror。
 local function forward_for(trigger, left, right)
     return s(trigger,
         fmt(
         [[
-            for(int {var} = {left};{var2} <= {right} ;++{var3} ) // {var4}: {left2}->{right2}
+            for(int i = {left}; i <= {right} ;++i )
             {{
                 {pos}
             }}
         ]],
         {
-            var = i(1, "i"),
-            var2 = rep(1),
-            var3 = rep(1),
-            var4 = rep(1),
             left = value_node(left),
-            left2 = value_node(left),
             right = value_node(right),
-            right2 = value_node(right),
             pos = i(0),
         })
     )
 end
 
 -- 生成形如 for(int i = n; i >= 1; --i) 的倒序循环。
+-- 循环变量固定为 i，不可修改，也没有 mirror。
 local function reverse_for(trigger, left, right)
     return s(trigger,
         fmt(
         [[
-            for(int {var} = {right};{var2} >= {left} ;--{var3} ) // {var4}: {right2}->{left2}
+            for(int i = {right}; i >= {left} ;--i )
             {{
                 {pos}
             }}
         ]],
         {
-            var = i(1, "i"),
-            var2 = rep(1),
-            var3 = rep(1),
-            var4 = rep(1),
             left = value_node(left),
-            left2 = value_node(left),
             right = value_node(right),
-            right2 = value_node(right),
             pos = i(0),
         })
     )
