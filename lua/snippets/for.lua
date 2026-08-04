@@ -71,6 +71,29 @@ local function reverse_for(trigger, left, right)
     )
 end
 
+-- 生成形如 for(int {var} = {left}; {var} <= {right} ;++{var}) 的正序循环，
+-- 循环变量名由 trigger 捕获组提供（如 fabc 1 n -> abc）。
+-- 变量名固定，不可修改，也没有 mirror。
+local function forward_for_var(trigger, var, left, right)
+    return s(trigger,
+        fmt(
+        [[
+            for(int {var} = {left}; {var2} <= {right} ;++{var3} )
+            {{
+                {pos}
+            }}
+        ]],
+        {
+            var = value_node(var),
+            var2 = value_node(var),
+            var3 = value_node(var),
+            left = value_node(left),
+            right = value_node(right),
+            pos = i(0),
+        })
+    )
+end
+
 return {
     -- f -> 默认正序循环：i 从 1 到 n。
     forward_for("f", "1", "n"),
@@ -96,6 +119,30 @@ return {
         name = "for n",
         desc = "指定循环几次",
     }, 1, 2),
+
+    -- f{var} l r -> 循环变量名来自 trigger，从 l 到 r。
+    forward_for_var({
+        trig = "f([%a_]+)%s+(%S+)%s+(%S+)",
+        regTrig = true,
+        name = "for var range",
+        desc = "指定循环变量名和区间",
+    }, 1, 2, 3),
+
+    -- f{var} n -> 循环变量名来自 trigger，i 从 1 到 n。
+    forward_for_var({
+        trig = "f([%a_]+)%s+(%S+)",
+        regTrig = true,
+        name = "for var n",
+        desc = "指定循环变量名，循环 n 次",
+    }, 1, "1", 2),
+
+    -- f{var} -> 循环变量名来自 trigger，i 从 1 到 n。
+    forward_for_var({
+        trig = "f([%a_]+)",
+        regTrig = true,
+        name = "for var",
+        desc = "指定循环变量名的默认循环",
+    }, 1, "1", "n"),
 
     -- rf -> 默认倒序循环：i 从 n 到 1。
     reverse_for("rf", "1", "n"),
