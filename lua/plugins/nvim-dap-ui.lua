@@ -1,3 +1,4 @@
+--[==[
 return {
   "rcarriga/nvim-dap-ui",
   dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
@@ -49,4 +50,7 @@ return {
       dapui.close()
     end
   end,
-}
+}]==]
+
+-- DAP UI 已暂时禁用 (2026-08-22)：改用终端 cgdb/gdbgui。恢复调试时解开上面的块注释即可。
+return {}

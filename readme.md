@@ -135,6 +135,8 @@ CompileFlags:
 
 ### 调试
 
+> **注意**：nvim-dap 已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui [gdb-frontend](https://github.com/rohanrhu/gdb-frontend)。恢复方法：解开 `lua/plugins/dap.lua` 和 `lua/plugins/nvim-dap-ui.lua` 中的块注释。
+
 使用 nvim-dap 进行调试，支持:
 - 断点设置
 - 变量检查

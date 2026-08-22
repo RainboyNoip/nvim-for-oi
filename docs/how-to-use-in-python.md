@@ -1,5 +1,9 @@
 # 在本配置中使用 Python 写 OJ
 
+> **注意**：DAP/debugpy 调试已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui。
+> 文中调试相关章节保留作为将来恢复的参考（恢复方法：解开 `lua/plugins/dap.lua`
+> 和 `lua/plugins/nvim-dap-ui.lua` 中的块注释）。
+
 这份文档是 Python OJ 配置的长期使用入口。忘记依赖、模板、snippet、
 LSP 或调试方法时，从这里开始检查。
 
