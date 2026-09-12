@@ -25,7 +25,7 @@ vim.opt.hlsearch = false
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
--- 折叠：配合 oiSnippets 插入的 //oisnip_begin / //oisnip_end。
+-- 折叠：配合 file snippet 插入的 //oisnip_begin / //oisnip_end。
 vim.opt.foldenable = true
 vim.opt.foldmethod = "marker"
 vim.opt.foldmarker = { "//oisnip_begin", "//oisnip_end" }

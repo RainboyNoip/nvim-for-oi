@@ -71,6 +71,7 @@ brew install gum find fd
 ```
 rainboyVim-for-oi/
 ├── .gitignore
+├── CONTEXT.md                   # 领域术语：四类 snippet 资产的边界
 ├── init.lua                     # 入口：按顺序 require 下面这些模块
 ├── lazy-lock.json               # 插件版本锁（比赛机器上不会被更新背刺）
 ├── readme.md
@@ -81,7 +82,7 @@ rainboyVim-for-oi/
 │   ├── options.lua              # vim.opt 设置
 │   ├── keymaps.lua              # 全局键位
 │   ├── lsp.lua                  # vim.lsp.config + vim.lsp.enable
-│   ├── fileSnip.lua             # oiSnippets 选择器（<Leader>os / oe / of）
+│   ├── fileSnip.lua             # file snippet 选择器（<Leader>os）
 │   ├── cheatsheet.lua           # <Leader>oh 浮窗实现
 │   │
 │   ├── config/
@@ -131,38 +132,37 @@ rainboyVim-for-oi/
 │   │       ├── actions.lua      # 插入 / 打开 / 复制
 │   │       └── paths.lua  deps.lua  doctor.lua
 │   │
-│   └── （lua/ 下只放 Neovim 配置代码；snippet 源文件见下面的 lua_snippets/）
+│   └── （lua/ 下只放 Neovim 配置代码；snippet 资源见下面的 all_snippets/）
 │
-├── lua_snippets/                # LuaSnip 短触发片段（特意放在根目录）
-│   └── snippets/                # 套这一层是为了保留 require("snippets.*") 命名空间，
-│       │                        # 否则 io.lua / debug.lua 会撞 Lua 标准库
-│       ├── cpp.lua              # C++ 总入口（require 下面各模块）
-│       ├── for.lua              # f / f n / f l r / fabc ... / rf / 2f
-│       ├── io.lua  stl.lua  graph.lua  debug.lua  algo.lua  oth.lua
-│       ├── python.lua           # Python 侧（触发词与 C++ 对齐）
-│       └── utils.lua            # 公共捕获 / 转换工具
-│
-├── oiSnippets/                  # 整块代码片段（<Leader>os）
-│   ├── clangd_config            # 需要手动改名 .clangd 才生效
-│   ├── template/
-│   │   ├── simaple_template.cpp  simple_template.py  rnd_tree.cpp
-│   └── utils/
-│       ├── log.cpp  random.cpp  random_graph.cpp
-│       └── random_dag1.cpp  random_dag2.cpp
-│
-├── vscode-snippets/             # VSCode 格式片段（Neovim 与 VSCode 共用）
-│   ├── c/c.json  c/cdoc.json
-│   ├── cpp/cpp.json  cpp/cppdoc.json
-│   ├── python.json  haskell.json  markdown.json
-│   └── package.json
-│
-├── mini_rbook_code_template/    # rbook 的仓库内兜底模板库
-│   ├── code.yaml
-│   └── code/
-│       ├── cpp/main.cpp
-│       └── python/main.py
+├── all_snippets/                # 所有 snippet 资源归档（三组加载机制各不相同）
+│   ├── lua-snippets/            # LuaSnip 的 Lua 片段
+│   │   ├── cpp.lua              # C++ 入口：list_extend 下面的 cpp/*.lua
+│   │   ├── python.lua           # Python 入口（触发词与 C++ 对齐）
+│   │   ├── utils.lua            # 两个入口共用的捕获 / 转换工具
+│   │   └── cpp/
+│   │       ├── for.lua          # f / f n / f l r / fabc ... / rf / 2f
+│   │       └── io.lua  stl.lua  graph.lua  debug.lua  algo.lua  oth.lua
+│   │
+│   ├── vscode-snippets/         # VSCode 格式 JSON（Neovim 与 VSCode 共用）
+│   │   ├── c/c.json  c/cdoc.json
+│   │   ├── cpp/cpp.json  cpp/cppdoc.json
+│   │   ├── python.json  haskell.json  markdown.json
+│   │   └── package.json         # 向 VSCode 注册上面的 json
+│   │
+│   └── oi-snippets/             # OI 专用资源
+│       ├── files/               # file snippet（<Leader>os 选文件插入内容）
+│       │   ├── simple_template.cpp  rnd_tree.cpp
+│       │   ├── config/clangd_config   # 需手动改名 .clangd 才生效
+│       │   └── utils/
+│       │       ├── log.cpp  random.cpp  random_graph.cpp
+│       │       └── random_dag1.cpp  random_dag2.cpp
+│       └── rbook/               # rbook 模板库（<Leader>of / <Leader>oe）
+│           ├── code.yaml        # 兜底模板索引（可被 RBOOK_CODE_YAML 覆盖）
+│           └── code/cpp/main.cpp  code/python/main.py
 │
 ├── docs/
+│   ├── adr/
+│   │   └── 0001-snippet-asset-layout.md   # 为什么归档到 all_snippets/、为何显式注册入口
 │   ├── config-optimization.md   # 配置审计清单（带修复状态）
 │   ├── how-to-use-in-python.md
 │   ├── how-to-use-ai-completion.md
@@ -206,10 +206,10 @@ init.lua
 两个 snippet 体系靠不同机制加载：
 
 ```
-lua_snippets/snippets/*.lua   from_lua.load()          filetype 取自「直接子文件名」
-                              → 必须先把 lua_snippets 注入 package.path，
-                                因为 require("snippets.*") 不在 lua/ 里
-vscode-snippets/*.json        from_vscode.lazy_load()  按 filetype 懒加载
+all_snippets/lua-snippets/    ls.add_snippets()  显式注册 cpp / python 两个入口模块
+   cpp.lua / python.lua       → 不递归扫目录：入口已 list_extend 了实现模块，
+                                递归扫会把它们重复加载一遍（见 docs/adr/0001）
+all_snippets/vscode-snippets/ from_vscode.lazy_load()  按 filetype 懒加载
 ```
 
 启动期只加载 8 个插件（实测 `lazy.core.config`）：`Comment.nvim`、`lazy.nvim`、
@@ -230,21 +230,27 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 
 此配置包含一个专门为算法竞赛设计的代码片段系统。当前按职责分成三类:
 
-- `lua_snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
-- `oiSnippets/`: 本地整块代码片段，例如模板、随机数据、log、图生成工具。
-- `vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
+- `all_snippets/lua-snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
+- `all_snippets/oi-snippets/files/`: file snippet，例如模板、随机数据、log、图生成工具。
+- `all_snippets/vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
 
-在 Neovim 中按 `<Leader>os` 打开 `oiSnippets/` 选择器，选择后会插入到当前光标位置。
+三组都归档在 `all_snippets/` 下，但**加载机制各不相同**（Lua 模块注册 / JSON 懒加载 /
+picker 选文件插入 / rbook 索引），归档只是目录组织，不代表统一格式。术语与边界见
+[CONTEXT.md](CONTEXT.md) 与 [ADR 0001](docs/adr/0001-snippet-asset-layout.md)。
 
-`oiSnippets/` 目前包含以下实用工具:
+在 Neovim 中按 `<Leader>os` 打开 file snippet 选择器，选择后会插入到当前光标位置。
+
+`all_snippets/oi-snippets/files/` 目前包含以下实用工具:
 - `utils/log.cpp`: 调试用的日志宏
 - `utils/random.cpp`: 随机数生成工具
 - `utils/random_dag1.cpp`, `utils/random_dag2.cpp`: DAG 生成工具
 - `utils/random_graph.cpp`: 随机图生成工具
-- `template/`: `simaple_template.cpp`、`simple_template.py`、`rnd_tree.cpp`
+- `simple_template.cpp` / `simple_template.py` / `rnd_tree.cpp`: 完整模板（直接放在 `files/` 根下）
+- `config/clangd_config`: 需手动改名 `.clangd` 才生效
 
-`oiSnippets/` 中的非模板 C++ 工具会自动包装在 `//oisnip_begin` 和
-`//oisnip_end` 标记之间。Python 模板不添加 marker。
+`all_snippets/oi-snippets/files/` 中的工具（在 `utils/` 等子目录里）会自动包装在
+`//oisnip_begin` 和 `//oisnip_end` 标记之间；直接放在 `files/` 根下的模板不添加标记。
+Python 模板同样不添加 marker。
 
 ### 快捷键
 
@@ -253,7 +259,7 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 
 - `<Leader>` 键设置为空格键
 - `<Leader>oh`: 打开 `cheatsheet.md` 浮动窗口，查看自定义快捷键和 snippet 触发
-- `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
+- `<Leader>os`: 打开 file snippet 选择器
 - `<Leader>of`: 打开 rbook 正式代码模板（按当前文件类型过滤）
 - `<Leader>oe`: 浏览 rbook 代码文件（按当前文件类型过滤）
 - `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
@@ -283,7 +289,7 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 `code.yaml` 按这个顺序解析：
 
 1. 环境变量 `RBOOK_CODE_YAML`（仅当文件确实存在时采用）
-2. 本仓库自带的 mini 模板库 `mini_rbook_code_template/code.yaml`（只有 C++ / Python 各一个骨架）
+2. 本仓库自带的模板库 `all_snippets/oi-snippets/rbook/code.yaml`（只有 C++ / Python 各一个骨架）
 
 所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去（本仓库的 `alias v` 就是这么做的）：
 
@@ -374,11 +380,11 @@ CompileFlags:
 - `options.lua`: Neovim 选项设置
 - `keymaps.lua`: 快捷键映射
 - `lsp.lua`: LSP 配置
-- `fileSnip.lua`: `oiSnippets/` 选择器
+- `fileSnip.lua`: file snippet 选择器（默认目录 `all_snippets/oi-snippets/files/`）
 - `config/lazy.lua`: 插件管理配置
 - `plugins/`: 各个插件的详细配置
-- `lua_snippets/`: LuaSnip 短触发片段（仓库根目录，与 `oiSnippets/`、`vscode-snippets/` 平级）。
-  因为不在 Neovim 的 `lua/` 搜索路径里，`lua/plugins/LuaSnip.lua` 会把该目录注入 `package.path`。
+- `all_snippets/`: 全部 snippet 资源（三组加载机制不同，见上）。
+  `lua-snippets/` 不在 Neovim 的 `lua/` 搜索路径里，`lua/plugins/LuaSnip.lua` 会把它注入 `package.path`。
 - `local/`: 本地插件（cpp-settings / python-settings / rbook.nvim）
 
 ## 贡献

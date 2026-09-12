@@ -43,7 +43,7 @@
 
 | 快捷键 | 说明 |
 | --- | --- |
-| `<Leader>os` | 选择 `oiSnippets/` 代码片段 |
+| `<Leader>os` | 选择 file snippet（`all_snippets/oi-snippets/files/`） |
 | `<Leader>of` | Rbook 正式代码模板（按当前语言过滤） |
 | `<Leader>oe` | Rbook 浏览代码文件（按当前语言过滤） |
 | `<Leader>op` | 选择复制命令并复制当前 buffer |
@@ -126,8 +126,9 @@
 
 ## C++ Snippets
 
-Snippet 按用途拆在 `lua_snippets/snippets/` 下（仓库根目录，与 `oiSnippets/`、`vscode-snippets/` 平级）；
-公共捕获和转换工具在 `lua_snippets/snippets/utils.lua`。
+Snippet 按用途拆在 `all_snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`、Python 入口 `python.lua`，
+实现模块在 `cpp/`，共享工具在 `utils.lua`）。三组 snippet 的术语与边界见 CONTEXT.md 与
+`docs/adr/0001-snippet-asset-layout.md`。
 
 | 触发 | 展开结果 |
 | --- | --- |
@@ -220,7 +221,7 @@ for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、
 
 ## Python 通用 Snippets
 
-这些 snippets 同时由 Neovim 和 VSCode 从 `vscode-snippets/python.json` 加载。
+这些 snippets 同时由 Neovim 和 VSCode 从 `all_snippets/vscode-snippets/python.json` 加载。
 
 | 触发 | 展开结果 |
 | --- | --- |

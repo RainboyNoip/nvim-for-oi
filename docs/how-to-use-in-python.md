@@ -34,12 +34,12 @@ Neovim 不负责：
 | `lua/plugins/lang-python.lua` | 只在 Python buffer 加载本地设置 |
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
-| `lua/plugins/LuaSnip.lua` | 加载 `lua_snippets/snippets/` |
-| `lua_snippets/snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
-| `vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
-| `vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
+| `lua/plugins/LuaSnip.lua` | 显式注册 `all_snippets/lua-snippets/` 的 cpp / python 入口 |
+| `all_snippets/lua-snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `all_snippets/vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
+| `all_snippets/vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
-| `oiSnippets/template/simple_template.py` | Python 完整 OJ 模板 |
+| `all_snippets/oi-snippets/files/simple_template.py` | Python 完整 OJ 模板 |
 | `lua/plugins/dap/python.lua` | debugpy adapter、launch 配置和启动前检查 |
 | `lua/plugins/dap/linux.lua` | 在 Linux DAP 中接入 C++ 与 Python |
 | `tests/headless/python_support.lua` | LSP、buffer、snippet 和 DAP 结构检查 |
@@ -229,7 +229,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 
 ### 通用 snippets（25 个）
 
-这些 snippets 来自 `vscode-snippets/python.json`，Neovim 和 VSCode 使用
+这些 snippets 来自 `all_snippets/vscode-snippets/python.json`，Neovim 和 VSCode 使用
 相同的 trigger 和 placeholder。
 
 | Trigger | 默认展开结果 |

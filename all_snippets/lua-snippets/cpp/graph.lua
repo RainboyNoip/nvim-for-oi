@@ -2,7 +2,7 @@ local ls = require("luasnip")
 local s = ls.snippet
 local i = ls.insert_node
 local fmt = require("luasnip.extras.fmt").fmt
-local utils = require("snippets.utils")
+local utils = require("utils")
 
 -- linklist 图论短句 snippet。
 -- 这里贴合 linkList 的真实接口：e.add/e.add2 加边，e.h[u] + e[i].next 手动遍历。

@@ -2,7 +2,7 @@ local ls = require("luasnip")
 local s = ls.snippet
 local t = ls.text_node
 local f = ls.function_node
-local utils = require("snippets.utils")
+local utils = require("utils")
 
 -- 输入输出类 snippet。
 -- 这类 trigger 通常把后面的非空 token 当成变量名列表：

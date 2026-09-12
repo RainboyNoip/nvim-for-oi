@@ -5,7 +5,7 @@ local i = ls.insert_node
 local f = ls.function_node
 local fmt = require("luasnip.extras.fmt").fmt
 local rep = require("luasnip.extras").rep
-local utils = require("snippets.utils")
+local utils = require("utils")
 
 -- ===== for 循环的构造器（与 C++ 的 lua_snippets/snippets/for.lua 对齐）=====
 -- 触发词、正则捕获方式、循环变量规则都刻意和 C++ 版保持一致。

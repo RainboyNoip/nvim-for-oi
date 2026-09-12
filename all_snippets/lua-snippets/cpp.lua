@@ -37,12 +37,12 @@ local snippets = {
 }
 
 -- 子模块拆开维护，减少单个文件的认知负担。
-vim.list_extend(snippets,require("snippets.io"))
-vim.list_extend(snippets,require("snippets.for"))
-vim.list_extend(snippets,require("snippets.stl"))
-vim.list_extend(snippets,require("snippets.graph"))
-vim.list_extend(snippets,require("snippets.debug"))
-vim.list_extend(snippets,require("snippets.algo"))
-vim.list_extend(snippets,require("snippets.oth"))
+vim.list_extend(snippets,require("cpp.io"))
+vim.list_extend(snippets,require("cpp.for"))
+vim.list_extend(snippets,require("cpp.stl"))
+vim.list_extend(snippets,require("cpp.graph"))
+vim.list_extend(snippets,require("cpp.debug"))
+vim.list_extend(snippets,require("cpp.algo"))
+vim.list_extend(snippets,require("cpp.oth"))
 
 return snippets

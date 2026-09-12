@@ -1,7 +1,7 @@
 local ls = require("luasnip")
 local s = ls.snippet
 local t = ls.text_node
-local utils = require("snippets.utils")
+local utils = require("utils")
 
 -- STL / OJ 高频短句 snippet。
 -- 这里保持短触发风格，只覆盖写题中经常反复输入的小片段。

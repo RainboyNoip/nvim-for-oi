@@ -1,7 +1,9 @@
 local Snacks = require("snacks")
 local M = {}
 
-M.snippetPath = vim.fn.stdpath('config') .. '/oiSnippets/'
+-- file snippet（选一个文件、把内容插入当前 buffer）的默认目录。
+-- 可用 fileSnip.setup({ snippetPath = "..." }) 覆盖。
+M.snippetPath = vim.fn.stdpath('config') .. '/all_snippets/oi-snippets/files/'
 
 -- 读取 snippet 内容
 local function read_snippet_content(path)
@@ -14,17 +16,23 @@ local function insert_code_snippet(snip_path)
 	local lines = read_snippet_content(snip_path)
 	local filename = vim.fn.fnamemodify(snip_path, ":t")
 
+	-- 模板（直接放在 files/ 根下的整份骨架）不加折叠标记，只有 utils/ 下的工具才加。
+	-- 旧代码用 `string.find(snip_path, "template")` 判断，那是 template/ 目录时代的写法；
+	-- 新布局模板与工具同在 files/ 下，改用「是否在 files/ 的子目录里」判断。
+	local rel = snip_path:match("/files/(.+)$") or ""
+	local is_template_file = rel ~= "" and not rel:find("/")
+
 	local function add_fold_markers()
 		table.insert(lines, 1, "//oisnip_begin" .. filename)
 		table.insert(lines, "//oisnip_end")
 	end
 
-	if filename == "simaple_template.cpp" then
+	if filename == "simple_template.cpp" then
 		local date = os.date("%Y-%m-%d %H:%M:%S")
 		for i, line in ipairs(lines) do
 			lines[i] = line:gsub("2025%-10%-02 10:34:43", date)
 		end
-	elseif not string.find(snip_path,"template") then
+	elseif not is_template_file then
 		add_fold_markers()
 	end
 
@@ -32,7 +40,7 @@ local function insert_code_snippet(snip_path)
 	local cur_pos = vim.api.nvim_win_get_cursor(0)
 	vim.api.nvim_buf_set_lines(bufnr, cur_pos[1] - 1, cur_pos[1], false, lines)
 
-	if filename == "simaple_template.cpp" then
+	if filename == "simple_template.cpp" then
 		vim.cmd("normal! zM")
 		for i, line in ipairs(lines) do
 			if line:find("void init") then
@@ -81,7 +89,7 @@ function M.setup(opts)
 	-- 这些键必须全局绑定：setup() 只在启动时执行一次，`buffer = true` 会把它
 	-- 绑到当时的 current buffer，导致打开第二个文件后键消失。
 	-- 插入目标由 insert_code_snippet() 里的 nvim_get_current_buf() 决定，安全。
-	vim.keymap.set('n', '<leader>os', "<cmd>OISnipChoose<cr>", { silent = true, desc = "oiSnippets" })
+	vim.keymap.set('n', '<leader>os', "<cmd>OISnipChoose<cr>", { silent = true, desc = "file snippets" })
 
 	-- rbook.nvim 的代码模板入口。旧的 OICodeSnip 命令已经被 RbookCode/RbookCodeFiles 替代。
 	vim.keymap.set('n', '<leader>oe', "<cmd>RbookCodeFiles<cr>", { silent = true, desc = "Rbook 浏览代码文件（按当前语言）" })

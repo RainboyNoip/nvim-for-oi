@@ -40,7 +40,7 @@ return {
             { "<leader>of", icon = "" }, -- Rbook 正式代码模板 (cod-notebook_template U+EBBF)
             { "<leader>oh", icon = "" }, -- Rainboy 速查表 (fa-question U+F128)
             { "<leader>op", icon = "" }, -- 复制当前 buffer (cod-copy U+EBCC)
-            { "<leader>os", icon = "" }, -- oiSnippets (cod-symbol_snippet U+EB66)
+            { "<leader>os", icon = "" }, -- file snippets (cod-symbol_snippet U+EB66)
             { "<leader>rc", icon = "" }, -- Rbook 正式代码模板 (cod-notebook_template U+EBBF)
             { "<leader>rd", icon = "" }, -- Rbook 检查模板索引 (cod-checklist U+EAB3)
             { "<leader>rf", icon = "" }, -- Rbook 浏览代码文件 (cod-list_tree U+EB86)
