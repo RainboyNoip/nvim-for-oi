@@ -101,7 +101,7 @@ brew install gum find fd
 `code.yaml` 按这个顺序解析：
 
 1. 环境变量 `RBOOK_CODE_YAML`
-2. 本仓库自带的 mini 模板库 `rbook/code.yaml`（只有 C++ / Python 各一个骨架）
+2. 本仓库自带的 mini 模板库 `mini_rbook_code_template/code.yaml`（只有 C++ / Python 各一个骨架）
 
 所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去：
 

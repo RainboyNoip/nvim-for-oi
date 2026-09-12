@@ -1,3 +1,25 @@
+-- 解析 code.yaml 的位置。两级：
+--   1. 环境变量 RBOOK_CODE_YAML（仅当文件确实存在时采用）
+--   2. 本仓库自带的 mini 模板库 mini_rbook_code_template/code.yaml
+-- 放在 config() 里而不是 opts 里，有两个原因：
+--   ① opts 在启动期就会被求值，而告警只应该在真的用到 rbook 时才出现；
+--   ② 环境变量写了但文件不在（换了机器、书库又搬家）时能退到 mini 库，而不是
+--      把插件直接搞坏 —— 这一点很实际，因为 ~/.zshrc 的 alias v 里就是绝对路径。
+local function resolve_code_yaml_path()
+  local from_env = vim.env.RBOOK_CODE_YAML
+  if from_env and from_env ~= "" then
+    from_env = vim.fn.expand(from_env)
+    if vim.uv.fs_stat(from_env) then
+      return from_env
+    end
+    vim.notify(
+      ("rbook: RBOOK_CODE_YAML 指向的 code.yaml 不存在，已回退到仓库自带模板库\n  %s"):format(from_env),
+      vim.log.levels.WARN
+    )
+  end
+  return vim.fn.stdpath("config") .. "/mini_rbook_code_template/code.yaml"
+end
+
 return {
   dir = vim.fn.stdpath("config") .. "/lua/local/rbook.nvim",
   name = "rbook.nvim",
@@ -14,19 +36,8 @@ return {
     "folke/snacks.nvim",
   },
 
-  opts = {
-    -- 路径来源：环境变量 RBOOK_CODE_YAML 优先；没设时回退到**本仓库自带的 mini 模板库**
-    -- （rbook/code.yaml + rbook/code/，只有 cpp / python 各一个骨架）。
-    -- 这样在没有配环境变量的机器上（GUI/sudo/新机器）功能仍然可用，不会静默失效。
-    -- 要用完整的书籍模板库就设：
-    --   export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
-    --
-    -- 注：stdpath("config") 已经被解析成绝对路径，expand() 主要是为了处理
-    -- 环境变量里写 ~ 或 $HOME 的情况。
-    code_yaml_path = vim.fn.expand(
-      vim.env.RBOOK_CODE_YAML or (vim.fn.stdpath("config") .. "/rbook/code.yaml")
-    ),
-  },
+  -- 路径在 config() 里由 resolve_code_yaml_path() 填入，见文件顶部。
+  opts = {},
 
   config = function(_, opts)
     local luarocks = vim.fn.expand("~/.luarocks")
@@ -36,6 +47,7 @@ return {
     package.cpath = package.cpath
       .. ";" .. luarocks .. "/lib/lua/5.1/?.so"
 
+    opts.code_yaml_path = resolve_code_yaml_path()
     require("rbook").setup(opts)
 
     -- 路径不对时插件是静默失效的（catalog 拿不到数据，只有 :RbookDoctor 会提），
