@@ -26,13 +26,14 @@
 | 2.4 | `InsertLeave` 自动保存 | ⬜ 待修 | `lua/options.lua:60-70` |
 | 2.5 | Minuet AI 默认自动触发 | ⬜ 待修 | `lua/plugins/minuet.lua` |
 | 2.6 | cmp `<Tab>` 判定顺序 | ⬜ 待修 | `lua/plugins/nvim-cmp.lua:74-96` |
-| 2.7 | LuaSnip 启动期 eager 加载 | ⬜ 待修 | `lua/plugins/LuaSnip.lua` |
+| 2.7 | LuaSnip 启动期 eager 加载 | ✅ 已修 (`2026-09`) | `lua/plugins/LuaSnip.lua` |
 | 2.8 | `completeopt` 被设置两次 | ⬜ 待修 | `lua/options.lua:3` |
 | 3 | P2 可删项（9 项，含两套模板入口） | ⬜ 待修 | 见 §3 表 |
 | 4.1 | clangd 缺 `executable()` 保护 | ⬜ 待修 | `lua/lsp.lua` |
 
-**已完成的改动合计 3 个 lua 文件 + 删 `dictionary/` + `lazy-lock.json`**，启动时间无退化
-（空 42.8 / 43.9 / 55.2 ms，`nvim oi.cpp` 64.0 ms，对比 §0 基线）。
+**已完成的改动合计 4 个 lua 文件 + 删 `dictionary/` + `lazy-lock.json`**。启动时间：空启动
+42.8–55.2 ms → **23.0–24.4 ms**（2.7 的收益，只在不开 cpp/python 的场景体现），
+`nvim x.cpp` 63.1–64.0 ms（基本不变，见 §2.7 的"诚实的代价"）。
 
 ---
 
@@ -194,7 +195,7 @@ lazydev 的收益本来就是 0）。
 
 ---
 
-## 2. P1 — 对"只写 C++/Python OI"无用的开销（2.3 ✅ 已重做，其余 ⬜ 待修）
+## 2. P1 — 对"只写 C++/Python OI"无用的开销（2.3 ✅、2.7 ✅，其余 ⬜ 待修）
 
 ### 2.1 clangd 参数（`lua/lsp/clangd.lua:4-11`）⬜ 待修
 
@@ -352,18 +353,54 @@ end, { "i", "s" }),
 ```
 `<S-Tab>` 对称改成 `select_prev_item()` 优先。展开动作由 `<C-K>`（1.2 保留）负责。
 
-### 2.7 LuaSnip 在启动期 eager 加载（`lua/plugins/LuaSnip.lua`）⬜ 待修
+### 2.7 LuaSnip 在启动期 eager 加载（`lua/plugins/LuaSnip.lua`）✅ 已修
 
-spec 没有 `lazy` / `event` / `ft`，所以启动就 require。因为 `build = "make install_jsregexp"`，
-冷启动 `require('luasnip.util.jsregexp')` 占 36 ms（冷启动 122 ms 的 29%）；暖启动只
-3 ms。属于"顺手改"：
+**原状**：spec 没有 `lazy` / `event` / `ft`，所以启动就 require。
+
+**实际改动（✅ 已完成）**
 
 ```lua
-return { "L3MON4D3/LuaSnip", version = "v2.*", build = "make install_jsregexp",
-  ft = { "cpp", "c", "python" },   -- 或 event = "InsertEnter"
-  config = function() ... end }
+ft = { "c", "cpp", "python", "markdown", "haskell" },
+module = "luasnip",
 ```
-注意 `nvim-cmp` 依赖 `cmp_luasnip`，cmp 是 `InsertEnter` 加载，顺序上不冲突。
+
+两个点与本文最初的建议不同，都是查证后才发现的：
+
+1. **原来的建议 `ft = { "cpp", "c", "python" }` 不完整。** `vscode-snippets/` 里除了
+   `c/`、`cpp/`、`python.json`，还有 `markdown.json` 和 `haskell.json`；只写三个 ft 会
+   静默丢掉这两类 snippet（不报错，就是没了）。实测这三种 ft 确实各自有 1 个 snippet。
+   另外 `lua/snippets/` 里除了 `cpp.lua` / `python.lua`，还会被 `from_lua.load` 按**文件名**
+   额外注册成 `io` / `for` / `stl` / `graph` / `debug` / `algo` / `oth` 这些不存在的 filetype
+   （副作用，无害）。真正生效的入口只有 cpp / python。
+2. **`module = "luasnip"` 是必需的保险，不是可选项。** `nvim-cmp` 的 config 在 InsertEnter
+   会显式 `require("luasnip")`。如果当前 buffer 的 filetype 不在 `ft` 列表里（`.txt` 临时
+   buffer、gitcommit、`:enew` 空白 buffer），没有 `module` 时这个 require 会失败，cmp 的
+   整个 config 报错 —— 补全在该 buffer 里彻底失效，而不是"没 snippet"而已。lazy.nvim 的
+   `ft` 触发器不会拦 `require()`，只有 `module` 会。
+
+**验收结果**
+
+| 检查 | 改动前 | 改动后 |
+| --- | --- | --- |
+| 空启动（5 次） | 42.8 / 43.9 / 55.2 ms | **23.0 / 23.3 / 23.3 / 23.4 / 24.4 ms** |
+| `nvim x.cpp`（3 次） | 64.0 ms | 63.1 / 63.5 / 64.0 ms |
+| 启动期 `package.loaded["luasnip"]` | `true` | **`false`** |
+| 启动期 `...["luasnip.util.jsregexp"]` | 已加载 | **`false`** |
+| snippets：cpp / python / markdown / haskell / text | 86 / 61 / 1 / 1 / 0 | **完全一致** |
+| `.txt` buffer 进 InsertEnter 后 | — | luasnip 被 `module` 触发加载，`pcall(require,"cmp")` 正常 |
+| cpp buffer 下 `<C-K>/<C-L>/<C-J>/<C-E>` | 均在 | 均在（lua callback）|
+
+**诚实的代价**：这不是"凭空省 20 ms"，而是**把 LuaSnip 的加载从启动期搬到了第一个
+cpp/python buffer 的 FileType 事件**。`--startuptime` 里能直接看到 `require('luasnip')`
+(2.5 ms) / `from_vscode` (2.2 ms) / `util.parser` (1.8 ms) 这些现在挂在
+`FileType Autocommands for "cpp"` 下面。所以“打开第一个 cpp 文件”的总耗时几乎没变
+（64.0 → 63.1 ms），真正变快的是**不开 cpp/python 的场景**（dashbaord、临时 buffer、
+.md/.txt、git commit）：那才是 20 ms 的真收益。
+
+**顺带查清的一件事**：`<Tab>` 的 `desc` 是 `vim.snippet.jump if active, otherwise <Tab>`，
+这**不是**任何插件写的，而是 **Neovim 0.12 自带默认映射**
+（`runtime/lua/vim/_core/defaults.lua:248`，内置 snippet 引擎）。与本次改动无关；
+cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 
 ### 2.8 `completeopt` 被设置两次 ⬜ 待修
 
