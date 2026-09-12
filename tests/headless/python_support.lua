@@ -58,7 +58,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 61, "python snippet count")
+  assert_equal(#python_snippets, 67, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -74,8 +74,7 @@ local function run()
     "listi",
     "strin",
     "f",
-    "fr",
-    "fri",
+    "lf",
     "rf",
     "enum",
     "tests",
@@ -183,11 +182,15 @@ local function run()
   assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
   assert(main_expansion:find("    solve()", 1, true), "main snippet must call solve()")
 
-  local inclusive_range = expand_snippet("fri")
-  assert(
-    inclusive_range:find("for i in range(left, right + 1):", 1, true),
-    "fri snippet must include the right endpoint"
-  )
+  -- for 家族与 C++ 的 for.lua 对齐后的行为
+  local plain_for = expand_snippet("f")
+  assert(plain_for:find("for i in range(1, n + 1):", 1, true), "f must be inclusive from 1 to n")
+
+  local reverse_for = expand_snippet("rf")
+  assert(reverse_for:find("for i in range(n, 0, -1):", 1, true), "rf must count down to 0")
+
+  local line_for = expand_snippet("lf")
+  assert(line_for:find("for i in range(1, n + 1):", 1, true), "lf must be a single-line loop")
 
   local property = expand_snippet("prop")
   assert(property:find("@property", 1, true), "prop snippet must define a property")

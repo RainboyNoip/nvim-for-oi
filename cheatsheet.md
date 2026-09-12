@@ -2,11 +2,14 @@
 
 这个文件是 `<Leader>oh` 浮动窗口的内容源，手工维护。
 
+> `<Leader>` 菜单（which-key）的每个条目都带 Nerd Font 图标，字形名与码点逐个核对过本机字体。
+> 本文件只列「你按得出来」的键；键位的真源是 `lua/keymaps.lua` 和各插件的 `keys`。
+
 ## 通用编辑
 
 | 快捷键 | 说明 |
 | --- | --- |
-| `<C-s>` | 保存当前文件 |
+| `<C-s>` | 保存当前文件（Normal / Insert 模式；Visual / Select 模式是 `vim.lsp.buf.signature_help()`） |
 | `<C-h/j/k/l>` | 在窗口间移动 |
 | `<C-Up/Down>` | 调整窗口高度 |
 | `<C-Left/Right>` | 调整窗口宽度 |
@@ -18,6 +21,14 @@
 | `<S-h>` / `<S-l>` | 上/下一个 buffer |
 | `[b` / `]b` | 上/下一个 buffer |
 | `[B` / `]B` | 向左/右移动 buffer |
+| `<C-/>` | 行注释切换（Normal / Visual / Select 模式都可用） |
+| `gcc` / `gbc` | 当前行行注释 / 块注释切换 |
+| `gc` / `gb` + motion | 按 motion 注释，例如 `gcap` / `gbap` |
+| Visual `gc` / `gb` | 选区行注释 / 块注释切换 |
+| `<Leader>cc` / `<Leader>cb` | 行注释 / 块注释切换 |
+
+> 注释键由 Comment.nvim 提供，注释符跟随 filetype：C++ 是 `//` 与 `/* */`，Python 是 `#`。
+> 所以它们是**通用键**，不存在「Python 专属版本」。
 
 ## Buffer 管理
 
@@ -39,7 +50,6 @@
 | `<Leader>r` | Rbook 题解 / 模板分组 |
 | `<Leader>rc` | Rbook 正式代码模板（按当前语言过滤） |
 | `<Leader>rf` | Rbook 浏览代码文件（按当前语言过滤） |
-| `<Leader>ra` | Rbook 打开文章 |
 | `<Leader>rr` | Rbook 刷新索引 |
 | `<Leader>rd` | Rbook 检查模板索引 |
 
@@ -50,6 +60,10 @@
 ## AI 补全（Minuet）
 
 需要设置 `DEEPSEEK_API_KEY`，详见 `docs/how-to-use-ai-completion.md`。
+
+⚠ 下面前 5 个 `<M-*>` 键是**条件注册**的（`lua/plugins/minuet.lua` 里写成
+`accept = has_deepseek_key and "<M-a>" or nil`）：**没设 `DEEPSEEK_API_KEY` 时这些键根本不存在**。
+而 `<Leader>at` / `<Leader>af` / `<Leader>ac` 是无条件注册的。
 
 | 快捷键 | 说明 |
 | --- | --- |
@@ -64,36 +78,31 @@
 
 ## C++ Buffer
 
-| 快捷键 | 说明 |
-| --- | --- |
-| `<Leader>;` | 当前行末尾补分号 |
-| `<C-/>` | 行注释切换 `//`，等价于 `gcc` / Visual `gc` |
-| `<Leader>cc` | 行注释切换 `//`，等价于 `gcc` / Visual `gc` |
-| `<Leader>cb` | 块注释切换 `/* */`，等价于 `gbc` / Visual `gb` |
-| `gcc` | 当前行行注释切换 `//` |
-| `gc` + motion | 按 motion 行注释切换，例如 `gcap` |
-| Visual `gc` | 选区行注释切换 `//` |
-| `gbc` | 当前行块注释切换 `/* */` |
-| `gb` + motion | 按 motion 块注释切换 |
-| Visual `gb` | 选区块注释切换 `/* */` |
-
-## Python Buffer
+只有一个是真正 C++ 专属的键（实现在 `lua/local/cpp-settings/`）：
 
 | 快捷键 | 说明 |
 | --- | --- |
-| `<C-/>` | 行注释切换 `#`，等价于 `gcc` / Visual `gc` |
-| `<Leader>cc` | 行注释切换 `#` |
-| `<Leader>sf` | 当前 Python 文件符号 |
-| `<Leader>sD` | 当前 Python buffer 诊断 |
+| `<Leader>;` | 当前行末尾补分号（只在 C/C++ buffer 里存在） |
+
+注释类键（`<C-/>` / `gcc` / `gbc` / `gc` / `gb`）已移到上面的「通用编辑」，
+它们与语言无关，Python 里同样可用。
 
 ## LuaSnip 操作
 
 | 快捷键 | 说明 |
 | --- | --- |
 | `<C-K>` | 展开 snippet |
-| `<C-L>` / `<C-J>` | 跳到下/上一个 snippet 节点 |
-| `<C-E>` | 切换 choice 节点 |
-| `<C-n>` / `<C-p>` | 下/上一个 choice |
+| `<Tab>` | 跳到下一个节点 / 展开片段（补全菜单开着时优先选补全项） |
+| `<S-Tab>` | 补全菜单开着时选上一项，否则跳上一个节点 |
+| `<C-J>` | 跳到上一个节点 |
+| `<C-n>` / `<C-p>`（**select 模式**） | 下/上一个 choice |
+
+> 两个已知的键位冲突，**有意保留现状**（分析见 `docs/config-optimization.md` §1.2）：
+>
+> - `i <C-L>` 被 `lua/keymaps.lua` 覆盖成 `<C-o>$`（跳到行尾），所以 LuaSnip 原本绑在
+>   `<C-L>` 的**正向跳节点用不了**，正向跳请用 `<Tab>`。
+> - `i <C-E>` 被 nvim-cmp 的 `<C-e>`（关闭补全菜单）覆盖，所以**切 choice 用 select
+>   模式的 `<C-n>` / `<C-p>`**，不是 `<C-E>`。
 
 ## Snacks / Picker
 
@@ -143,10 +152,16 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `ints` | `a, b = map(int, input().split())` |
 | `listi` | `a = list(map(int, input().split()))` |
 | `strin` | `s = input().strip().decode()` |
-| `f` | `for i in range(n):` |
-| `fr` | `for i in range(left, right):`，半开区间 |
-| `fri` | `for i in range(left, right + 1):`，闭区间 |
-| `rf` | `for i in range(n - 1, -1, -1):` |
+| `f` | `for i in range(1, n + 1):`（与 C++ 的 `f` 一致） |
+| `lf` | 单行 `for i in range(1, n + 1):` |
+| `f n` | 上界来自输入（`range(1, n + 1)`） |
+| `f l r` | 指定闭区间（`range(1, 11)`，能算出数值就直接算） |
+| `fabc l r` | 自定义循环变量 + 区间 |
+| `fabc n` | 自定义循环变量 + 上界 |
+| `fabc` | 自定义循环变量的默认循环 |
+| `rf` | `for i in range(n, 0, -1):`（与 C++ 的 `rf` 一致） |
+| `rf n` | 倒序，起点来自输入 |
+| `rf l r` | 指定区间的倒序 |
 | `enum` | `for index, value in enumerate(items):` |
 | `tests` | 读取测试组数并重复调用 `solve()` |
 | `heap` | 导入 `heapq` 并初始化最小堆 |
@@ -158,6 +173,23 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 
 以下 snippet 触发词与 C++ 版保持一致，展开结果改成 Python 惯用写法，方便在两种语言间切换。
 没有 Python 对应物的 C++ snippet（`scanf` / `magic` / `linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有 Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本。
+
+for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、循环变量规则都对齐）：
+
+| C++ | Python | 展开 |
+| --- | --- | --- |
+| `f` | `f` | `for i in range(1, n + 1):` |
+| `f n` | `f n` | 上界来自输入 |
+| `f l r` | `f l r` | 指定闭区间 |
+| `fabc l r` | `fabc l r` | 自定义循环变量 + 区间 |
+| `fabc n` | `fabc n` | 自定义循环变量 + 上界 |
+| `fabc` | `fabc` | 自定义循环变量 |
+| `lf` | `lf` | 单行 |
+| `rf` / `rf n` / `rf l r` | 同 | 倒序版本 |
+
+> 原来的 `fr` / `fri` 已删：它们的触发词长度和 `f([%a_]+)` 完全相同，LuaSnip 取最长匹配、
+> 平局时先定义的赢，于是单打 `fr` 永远拿不到 `for r in ...`。`f l r` 已覆盖同功能。
+> `2f` 不迁移：C++ 版依赖模板里的 `FF` 宏，Python 无对应物。
 
 | 触发 | 展开结果 |
 | --- | --- |
@@ -219,20 +251,14 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 
 ## Python 调试
 
-> **注意**：DAP 已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui。以下快捷键当前无效，恢复方法见 readme.md。
+> **注意**：DAP 已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui。恢复方法见 readme.md。
+>
+> 原来的 `<F4>`–`<F9>`、`<Leader>dw`、`<Leader>dr` 共 8 个键**当前全部不存在**，
+> 所以这里不再列出来 —— 具体原因：`lua/plugins/dap.lua` 整块被注释，而
+> `lua/plugins/dap/keys.lua` 虽然是个 spec 文件，却没有任何地方 `import` 它
+> （`import = "plugins"` 只匹配顶层 `lua/plugins/*.lua`，不递归子目录）。
 
 调试前先保存当前文件。标准输入在 debugpy 打开的集成终端中输入。
-
-| 快捷键 | 说明 |
-| --- | --- |
-| `<F4>` | 结束调试 |
-| `<F5>` | 启动 / 继续 |
-| `<F6>` | 切换断点 |
-| `<F7>` | Step Into |
-| `<F8>` | Step Over |
-| `<F9>` | Run to Cursor |
-| `<Leader>dw` | 查看光标处变量 |
-| `<Leader>dr` | 切换 DAP REPL |
 
 ## STL / OJ Snippets
 

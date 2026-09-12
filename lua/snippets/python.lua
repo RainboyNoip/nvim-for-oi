@@ -2,9 +2,89 @@ local ls = require("luasnip")
 local s = ls.snippet
 local t = ls.text_node
 local i = ls.insert_node
+local f = ls.function_node
 local fmt = require("luasnip.extras.fmt").fmt
 local rep = require("luasnip.extras").rep
 local utils = require("snippets.utils")
+
+-- ===== for 循环的构造器（与 C++ 的 lua/snippets/for.lua 对齐）=====
+-- 触发词、正则捕获方式、循环变量规则都刻意和 C++ 版保持一致。
+--
+-- 为什么用 f() 拼字符串而不是 fmt()：这里的变量名 / 上下界都来自正则捕获
+-- （function_node），而 fmt() 的 "{name}" 占位符只认 insert_node，
+-- 塞 function_node 会被当成字面文本。
+--
+-- Python 与 C++ 的差别：Python 区间是闭区间，所以正序生成 range(a, b + 1)，
+-- 倒序生成 range(b, a - 1, -1)。
+
+-- 闭区间换算：能算出数值就直接算（range(1, 11)），
+-- 是变量（如 n）才保留表达式（range(1, n + 1)）。
+local function plus_one(v)
+  local n = tonumber(v)
+  return n and tostring(n + 1) or (v .. " + 1")
+end
+
+local function minus_one(v)
+  local n = tonumber(v)
+  return n and tostring(n - 1) or (v .. " - 1")
+end
+
+-- 把「捕获组序号」或「字面量」解析成实际值。
+local function for_header(var, first, second, mode)
+  return f(function(_, snip)
+    local c = snip.captures or {}
+    local function val(v)
+      if type(v) == "number" then
+        return c[v] or ""
+      end
+      return v
+    end
+    local var_s = val(var)
+    if mode == "forward" then
+      return string.format("for %s in range(%s, %s):", var_s, val(first), plus_one(val(second)))
+    end
+    return string.format("for %s in range(%s, %s, -1):", var_s, val(second), minus_one(val(first)))
+  end, {})
+end
+
+-- 把「字符串触发词」或「现成的 opts 表」统一成 s() 的第一个参数。
+-- 正则触发词必须直接传 {trig=..., regTrig=true, trigEngine="pattern"}，
+-- 不能再包一层 trig = ...，否则 trig 变成 table，LuaSnip 会在
+-- trig_engines.lua:53 报 "attempt to concatenate a table value"；
+-- 而且因为它是按定义顺序逐个试的，一个畻形 snippet 会把它后面所有 snippet 全部带崩。
+local function snippet_opts(trigger, opts)
+  if type(trigger) == "table" then
+    return trigger
+  end
+  return {
+    trig = trigger,
+    regTrig = opts.regTrig or false,
+    name = opts.name,
+    desc = opts.desc,
+  }
+end
+
+-- 正序：for {var} in range({start}, {stop} + 1)
+local function forward_for(trigger, var, start, stop, opts)
+  opts = opts or {}
+  -- 注意：s() 的签名是 s(trigger, nodes, opts)，nodes 必须是**一个表**；
+  -- 写成 s(opts, n1, n2, n3) 的话只有 n1 生效，后面会被当成 opts 丢掉。
+  return s(snippet_opts(trigger, opts), {
+    for_header(var, start, stop, "forward"),
+    t({ "", "    " }),
+    i(0, "pass"),
+  })
+end
+
+-- 倒序：for {var} in range({stop}, {start} - 1, -1)
+local function reverse_for(trigger, var, start, stop, opts)
+  opts = opts or {}
+  return s(snippet_opts(trigger, opts), {
+    for_header(var, start, stop, "reverse"),
+    t({ "", "    " }),
+    i(0, "pass"),
+  })
+end
 
 return {
   s(
@@ -67,67 +147,85 @@ return {
     fmt("{} = input().strip().decode()", { i(1, "s") })
   ),
 
-  s(
-    { trig = "f", desc = "for i in range(n)" },
-    fmt(
-      [[
-      for {var} in range({stop}):
-          {body}
-      ]],
-      {
-        var = i(1, "i"),
-        stop = i(2, "n"),
-        body = i(0, "pass"),
-      }
-    )
-  ),
+  -- ===== for 循环 =====
+  -- 与 C++ 版一一对应：
+  --   f            正序 i 从 1 到 n
+  --   f n          上界来自输入
+  --   f l r        指定区间
+  --   fabc l r     自定义循环变量 + 区间
+  --   fabc n       自定义循环变量 + 上界
+  --   fabc         自定义循环变量
+  --   lf           单行
+  --   rf / rf n / rf l r   倒序版本
+  --
+  -- 注意：原来这里有 fr / fri（半开 / 闭区间），已删。原因：它们的触发词长度
+  -- 和下面的 f([%a_]+) 完全相同，LuaSnip 取最长匹配、平局时先定义的赢，
+  -- 于是单打 fr 永远拿不到 for r in ...。C++ 版没有这两个，f l r 已覆盖同功能。
 
-  s(
-    { trig = "fr", desc = "Half-open range loop" },
-    fmt(
-      [[
-      for {var} in range({start}, {stop}):
-          {body}
-      ]],
-      {
-        var = i(1, "i"),
-        start = i(2, "left"),
-        stop = i(3, "right"),
-        body = i(0, "pass"),
-      }
-    )
-  ),
+  -- f -> 正序：i 从 1 到 n
+  forward_for("f", "i", "1", "n", { desc = "for i in range(1, n + 1)" }),
 
-  s(
-    { trig = "fri", desc = "Inclusive range loop" },
-    fmt(
-      [[
-      for {var} in range({start}, {stop} + 1):
-          {body}
-      ]],
-      {
-        var = i(1, "i"),
-        start = i(2, "left"),
-        stop = i(3, "right"),
-        body = i(0, "pass"),
-      }
-    )
-  ),
+  -- lf -> 单行版本
+  s("lf", fmt("for i in range(1, n + 1): {body}", { body = i(0, "pass") })),
 
-  s(
-    { trig = "rf", desc = "Reverse range loop" },
-    fmt(
-      [[
-      for {var} in range({stop} - 1, -1, -1):
-          {body}
-      ]],
-      {
-        var = i(1, "i"),
-        stop = i(2, "n"),
-        body = i(0, "pass"),
-      }
-    )
-  ),
+  -- f n -> i 从 1 到 n
+  forward_for({
+    trig = "f%s+(%S+)",
+    regTrig = true,
+    name = "for n",
+    desc = "指定循环几次",
+  }, "i", "1", 1),
+
+  -- f l r -> i 从 l 到 r
+  forward_for({
+    trig = "f%s+(%S+)%s+(%S+)",
+    regTrig = true,
+    name = "for range",
+    desc = "指定区间",
+  }, "i", 1, 2),
+
+  -- fabc l r -> 循环变量名来自 trigger
+  forward_for({
+    trig = "f([%a_]+)%s+(%S+)%s+(%S+)",
+    regTrig = true,
+    name = "for var range",
+    desc = "指定循环变量名和区间",
+  }, 1, 2, 3),
+
+  -- fabc n -> 循环变量名来自 trigger，i 从 1 到 n
+  forward_for({
+    trig = "f([%a_]+)%s+(%S+)",
+    regTrig = true,
+    name = "for var n",
+    desc = "指定循环变量名，循环 n 次",
+  }, 1, "1", 2),
+
+  -- fabc -> 循环变量名来自 trigger
+  forward_for({
+    trig = "f([%a_]+)",
+    regTrig = true,
+    name = "for var",
+    desc = "指定循环变量名的默认循环",
+  }, 1, "1", "n"),
+
+  -- rf -> 倒序：i 从 n 到 1
+  reverse_for("rf", "i", "1", "n", { desc = "for i in range(n, 0, -1)" }),
+
+  -- rf n -> i 从 n 到 1
+  reverse_for({
+    trig = "rf%s+(%S+)",
+    regTrig = true,
+    name = "reverse for n",
+    desc = "倒序循环",
+  }, "i", "1", 1),
+
+  -- rf l r -> i 从 r 到 l
+  reverse_for({
+    trig = "rf%s+(%S+)%s+(%S+)",
+    regTrig = true,
+    name = "reverse for range",
+    desc = "指定区间的倒序循环",
+  }, "i", 1, 2),
 
   s(
     { trig = "enum", desc = "enumerate loop" },
