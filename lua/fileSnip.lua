@@ -78,12 +78,15 @@ function M.setup(opts)
 		insert_snippet()
 	end, {})
 
-	vim.keymap.set('n', '<leader>os', ":OISnipChoose<CR>", { buffer = true, silent = true, desc = "oiSnippets" })
+	-- 这些键必须全局绑定：setup() 只在启动时执行一次，`buffer = true` 会把它
+	-- 绑到当时的 current buffer，导致打开第二个文件后键消失。
+	-- 插入目标由 insert_code_snippet() 里的 nvim_get_current_buf() 决定，安全。
+	vim.keymap.set('n', '<leader>os', "<cmd>OISnipChoose<cr>", { silent = true, desc = "oiSnippets" })
 
 	-- rbook.nvim 的代码模板入口。旧的 OICodeSnip 命令已经被 RbookCode/RbookCodeFiles 替代。
-	vim.keymap.set('n', '<leader>oe', ":RbookCodeFiles<CR>", { buffer = true, silent = true, desc = "Rbook 浏览全部代码文件" })
+	vim.keymap.set('n', '<leader>oe', "<cmd>RbookCodeFiles<cr>", { silent = true, desc = "Rbook 浏览全部代码文件" })
 
-	vim.keymap.set('n', '<leader>of', ":RbookCode<CR>", { buffer = true, silent = true, desc = "Rbook 正式代码模板" })
+	vim.keymap.set('n', '<leader>of', "<cmd>RbookCode<cr>", { silent = true, desc = "Rbook 正式代码模板" })
 end
 
 return M
