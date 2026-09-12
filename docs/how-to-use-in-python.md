@@ -35,7 +35,7 @@ Neovim 不负责：
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 加载 `lua/snippets/` |
-| `lua/snippets/python.lua` | 17 个 Python OJ snippets |
+| `lua/snippets/python.lua` | 36 个 Python OJ snippets（含从 C++ 迁移的对应版） |
 | `vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
 | `vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
@@ -194,6 +194,39 @@ if __name__ == "__main__":
 `strin` 包含 `.decode()`，因为 buffered input 返回 bytes。`dbg` 依赖已经
 导入 `sys`，使用完整模板或 `fastin` 时会满足这一条件。
 
+### C++ Snippet 对应版（19 个）
+
+这些 snippet 的触发词与 C++ 版保持一致，展开结果改成 Python 惯用写法，
+方便在两种语言间切换。没有 Python 对应物的 C++ snippet（`scanf` / `magic` /
+`linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有
+Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本。
+
+| Trigger | 默认展开结果 |
+| --- | --- |
+| `i0 a b c` | `a = b = c = 0` |
+| `ci a b` | `a, b = map(int, input().split())` |
+| `co a b c` | `print(a, b, c)` |
+| `lg a b` | `print(a, b, file=sys.stderr)` |
+| `so a` | `a.sort()` |
+| `rs a` | `a.reverse()` |
+| `uq a` | `a = sorted(set(a))` |
+| `pq q` | `q = []`（配合 `heapq`） |
+| `pqg q` | `q = []`（配合 `heapq`） |
+| `lb a x` | `bisect_left(a, x)` |
+| `ub a x` | `bisect_right(a, x)` |
+| `vi a n` | `a = [0] * (n + 1)` |
+| `vl a n` | `a = [0] * (n + 1)` |
+| `re x` | `return x` |
+| `ef u` | `for v, w in g[u]:` 遍历邻接表 |
+| `ee m` | 读 m 条有向无权边到 `g` |
+| `eew m` | 读 m 条有向带权边到 `g` |
+| `ee2 m` | 读 m 条无向无权边到 `g` |
+| `ee2w m` | 读 m 条无向带权边到 `g` |
+
+图相关 snippet 使用邻接表 `g`，与 C++ 的链式前向星接口不同：
+`ee` 系列把边读入 `g[u].append(v)`（带权时 append `(v, w)`），`ef u`
+遍历 `for v, w in g[u]:`。使用前需先建立 `g = [[] for _ in range(n + 1)]`。
+
 ### 通用 snippets（25 个）
 
 这些 snippets 来自 `vscode-snippets/python.json`，Neovim 和 VSCode 使用
@@ -236,7 +269,7 @@ if __name__ == "__main__":
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `42`：17 个 OJ snippets 加 25 个通用 snippets。
+应输出 `61`：36 个 OJ snippets（17 个原生 + 19 个 C++ 对应版）加 25 个通用 snippets。
 
 ## 调试
 

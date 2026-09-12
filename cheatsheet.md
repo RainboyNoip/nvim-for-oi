@@ -150,6 +150,37 @@ Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lu
 | `deque` | 导入并初始化 `deque` |
 | `dbg` | `print(value, file=sys.stderr)` |
 
+## Python: C++ Snippet 对应版
+
+以下 snippet 触发词与 C++ 版保持一致，展开结果改成 Python 惯用写法，方便在两种语言间切换。
+没有 Python 对应物的 C++ snippet（`scanf` / `magic` / `linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有 Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本。
+
+| 触发 | 展开结果 |
+| --- | --- |
+| `i0 a b c` | `a = b = c = 0` |
+| `ci a b` | `a, b = map(int, input().split())` |
+| `co a b c` | `print(a, b, c)` |
+| `lg a b` | `print(a, b, file=sys.stderr)` |
+| `so a` | `a.sort()` |
+| `rs a` | `a.reverse()` |
+| `uq a` | `a = sorted(set(a))` |
+| `pq q` | `q = []`（配合 `heapq`） |
+| `pqg q` | `q = []`（配合 `heapq`） |
+| `lb a x` | `bisect_left(a, x)` |
+| `ub a x` | `bisect_right(a, x)` |
+| `vi a n` | `a = [0] * (n + 1)` |
+| `vl a n` | `a = [0] * (n + 1)` |
+| `re x` | `return x` |
+| `ef u` | `for v, w in g[u]:` 遍历邻接表 |
+| `ee m` | 读 m 条有向无权边到 `g` |
+| `eew m` | 读 m 条有向带权边到 `g` |
+| `ee2 m` | 读 m 条无向无权边到 `g` |
+| `ee2w m` | 读 m 条无向带权边到 `g` |
+
+图相关 snippet 使用邻接表 `g`（与 C++ 的链式前向星 `e` 不同）：使用前先建
+`g = [[] for _ in range(n + 1)]`。`ee` 系列写入 `g[u].append(v)`（带权时 append `(v, w)`），
+`ef u` 展开为 `for v, w in g[u]:`。
+
 ## Python 通用 Snippets
 
 这些 snippets 同时由 Neovim 和 VSCode 从 `vscode-snippets/python.json` 加载。

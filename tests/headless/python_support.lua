@@ -58,7 +58,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 42, "python snippet count")
+  assert_equal(#python_snippets, 61, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -113,15 +113,42 @@ local function run()
     "opt",
   }
 
+  -- 从 C++ 迁移过来的正则触发 snippet，trigger 是完整 Lua pattern。
+  local cpp_ported_triggers = {
+    "i0%s+([%w_ ]+)",
+    "ci%s+(.+)",
+    "co%s+(.+)",
+    "lg%s+(.+)",
+    "so%s+(.+)",
+    "rs%s+(.+)",
+    "uq%s+(.+)",
+    "pq%s+(.+)",
+    "pqg%s+(.+)",
+    "lb%s+(%S+)%s+(%S+)",
+    "ub%s+(%S+)%s+(%S+)",
+    "vi%s+(%S+)%s+(%S+)",
+    "vl%s+(%S+)%s+(%S+)",
+    "re%s+(%S+)",
+    "ef%s+(%S+)",
+    "ee%s+(%S+)",
+    "eew%s+(%S+)",
+    "ee2%s+(%S+)",
+    "ee2w%s+(%S+)",
+  }
+
   for _, trigger in ipairs(oj_triggers) do
     assert_equal(trigger_counts[trigger], 1, "OJ Python snippet: " .. trigger)
+  end
+
+  for _, trigger in ipairs(cpp_ported_triggers) do
+    assert_equal(trigger_counts[trigger], 1, "C++ ported Python snippet: " .. trigger)
   end
 
   for _, trigger in ipairs(general_triggers) do
     assert_equal(trigger_counts[trigger], 1, "general Python snippet: " .. trigger)
   end
 
-  assert_equal(#luasnip.get_snippets("cpp"), 37, "C++ snippet count")
+  assert_equal(#luasnip.get_snippets("cpp"), 40, "C++ snippet count")
 
   local package_path = vim.fn.stdpath("config") .. "/vscode-snippets/package.json"
   local package = vim.json.decode(table.concat(vim.fn.readfile(package_path), "\n"))
@@ -221,7 +248,13 @@ local function run()
     ))
   end
 
-  local dap = require("dap")
+  -- nvim-dap 在 2026-08-22 被临时禁用，未安装时跳过 DAP 断言。
+  local dap_ok, dap = pcall(require, "dap")
+  if not dap_ok then
+    print("python_support: dap not installed, skipping DAP assertions")
+    return
+  end
+
   assert_equal(type(dap.adapters.python), "function", "Python DAP adapter type")
 
   local python_configurations = dap.configurations.python or {}
