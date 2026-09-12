@@ -5,7 +5,7 @@
 - [x] P0-1.1 `<leader>os` / `<leader>oe` / `<leader>of` / `<leader>;` 只在第一个 buffer 有效
 - [ ] P0-1.2 snippet 跳转键被 `keymaps.lua` 覆盖 —— **决定不修**（保留 `<C-l>` 行尾跳转）
 - [x] P0-1.3 删除 nvim-cmp 里未安装的 `lazydev` 源
-- [ ] P1-2.1 clangd 参数：删 `--background-index` / `--clang-tidy`，`iwyu` → `never`
+- [x] P1-2.1 clangd 参数：删 `--background-index` / `--clang-tidy`，`iwyu` → `never`，去 `root_markers` 的 `.git`
 - [ ] P1-2.2 clangd `filetypes = { 'cpp' }` 补齐 `.c/.h/.hpp/.cc/.cxx`
 - [x] P1-2.3 字典补全 → 内存 OI 词表源（方案 A：自定义 cmp source，20 词，cpp+py）
 - [ ] P1-2.4 去掉 `InsertLeave` 自动保存（保留 `FocusLost` / `BufLeave`）

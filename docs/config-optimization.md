@@ -20,7 +20,7 @@
 | 1.1 | `<leader>os/oe/of/;` 只在第一个 buffer 有效 | ✅ 已修 (`2026-09`) | `lua/fileSnip.lua`、`lua/local/cpp-settings/lua/cpp-settings.lua` |
 | 1.2 | snippet 跳转键被 `keymaps.lua` 覆盖 | ⏸ 不修（保留 `<C-l>` 行尾） | —（分析见 §1.2） |
 | 1.3 | nvim-cmp 引用未安装的 `lazydev` 源 | ✅ 已修 (`2026-09`) | `lua/plugins/nvim-cmp.lua` |
-| 2.1 | clangd 参数（`--background-index` / `--clang-tidy` / `iwyu`） | ⬜ 待修 | `lua/lsp/clangd.lua:4-11` |
+| 2.1 | clangd 参数（删 `--background-index`/`--clang-tidy`，`iwyu`→`never`，去 `.git`） | ✅ 已修 (`2026-09`) | `lua/lsp/clangd.lua` |
 | 2.2 | `filetypes = { 'cpp' }` 太窄 | ⬜ 待修 | `lua/lsp/clangd.lua:13` |
 | 2.3 | 字典补全源 → 内存 OI 词表源（方案 A） | ✅ 已重做 (`2026-09`) | `lua/plugins/nvim-cmp.lua`（自定义 cmp source） |
 | 2.4 | `InsertLeave` 自动保存 | ⬜ 待修 | `lua/options.lua:60-70` |
@@ -195,11 +195,11 @@ lazydev 的收益本来就是 0）。
 
 ---
 
-## 2. P1 — 对"只写 C++/Python OI"无用的开销（2.3 ✅、2.7 ✅，其余 ⬜ 待修）
+## 2. P1 — 对"只写 C++/Python OI"无用的开销（2.1 ✅、2.3 ✅、2.7 ✅，其余 ⬜ 待修）
 
-### 2.1 clangd 参数（`lua/lsp/clangd.lua:4-11`）⬜ 待修
+### 2.1 clangd 参数（`lua/lsp/clangd.lua:3-12`）✅ 已修
 
-当前：
+**原状**：
 
 ```lua
 cmd = { "clangd",
@@ -209,14 +209,14 @@ cmd = { "clangd",
 
 | 参数 | 判定 | 理由 |
 | --- | --- | --- |
-| `--background-index` | **删** | 没有 `compile_commands.json`；且 `root_markers` 含 `.git`（`lua/lsp/clangd.lua:17`），仓库根目录会成为索引作用域。`~/mycode` 下 5771 个 `.cpp`，一旦某个仓库真出现 `compile_commands.json`，就是整树索引 |
+| `--background-index` | **删** | 没有 `compile_commands.json`，跨文件索引用不到；且 `root_markers` 含 `.git` 时仓库根目录会成为索引作用域 |
 | `--clang-tidy` | **删** | 每次改动跑 readability/modernize，产生你不想看的诊断，且和 `oiSnippets/clangd_config` 里刻意关掉检查的思路矛盾 |
-| `--header-insertion=iwyu` | **改 `never`** | 你写 `bits/stdc++.h`；iwyu 模式会在接受补全时往文件头插 `#include <vector>` 之类，反而要手删 |
+| `--header-insertion=iwyu` | **改 `never`** | 会在接受补全时往文件头插 `#include <vector>` 之类，你写 OI 还得手删 |
 | `--completion-style=detailed` | 保留 | cmp 里签名可读性好 |
 | `--function-arg-placeholders` | 保留 | 配合 snippet/Tab 填参 |
 | `--fallback-style=llvm` | 保留 | 只影响格式化，而你没开 format-on-save |
 
-建议 cmd：
+**实际改动（✅ 已完成）**：cmd 变成
 
 ```lua
 cmd = { "clangd",
@@ -227,8 +227,36 @@ cmd = { "clangd",
 },
 ```
 
-顺带把 `root_markers` 里的 `.git` 去掉，让 root 落回当前目录（或 `.clangd` 所在目录），
-避免"一个仓库 = 一个 clangd 实例 + 一个巨大索引作用域"。跨仓库 `gd` 跳转本来就不需要。
+并把 `root_markers` 里的 `.git` 去掉。
+
+> ⚠ **原文档里关于 `.git` 的说法是错的，已纠正**。原文写“去掉 .git，让 root 落回当前目录
+> （或 `.clangd` 所在目录）”。实测不是这样：`vim.fs.root()` 返回的是 **`nil`**，客户端的
+> `config.root_dir` 也是 `nil`（不是 cwd，也不是文件所在目录）。
+>
+> 那为什么还是去掉？因为有另一个更实际的收益——**clangd 实例数**：
+>
+> | 场景（3 个文件：2 个 git 仓库 + 1 个 /tmp） | 客户端数 | root_dir |
+> | --- | --- | --- |
+> | 含 `.git` | **2** | 两个仓库根 |
+> | 去掉 `.git` | **1** | `nil` |
+>
+> 且不会丢工程配置：clangd 定位 `compile_commands.json` / `.clangd` 是从**文件所在目录**
+> 向上找，与 workspace root 无关。所以真正的工程标记（`.clangd` / `.clang-tidy` /
+> `compile_commands.json` / `compile_flags.txt` / `configure.ac`）全部保留，真实项目的
+> root 不变，只有“仅仅因为它在某个 git 仓库里”这一种情况会合并成一个实例。
+>
+> 另外原文“一个巨大索引作用域”这个理由也站不住：`--background-index` 已经删了，索引
+> 作用域无从谈起；而 §6 已经把当时的 clangd CPU 测量标为不可靠。所以删 `.git` 的正当
+> 理由是**少一个进程**，不是“避免索引”。
+
+**验收结果**
+
+| 检查 | 结果 |
+| --- | --- |
+| clangd 能否用新参数启动 | ✓（参数非法会让 clangd 直接退出、无客户端；实测 `clients=1`）|
+| 客户端实际 cmd | `{ "clangd", "--header-insertion=never", "--completion-style=detailed", "--function-arg-placeholders", "--fallback-style=llvm" }` ✓ |
+| 补全是否仍可用 | ✓ 打 `vec` 得到 `vector` / `pmr::vector` |
+| 实例数（3 文件跨 2 仓库） | 含 `.git` → 2 个；去掉 → **1 个** ✓ |
 
 ### 2.2 `filetypes = { 'cpp' }`（`lua/lsp/clangd.lua:13`）⬜ 待修
 
@@ -471,7 +499,7 @@ clangd 会直接报启动失败而不是给出安装提示。把 clangd 也包�
    - cmp 实际加载的 sources = `buffer, dictionary, luasnip, minuet, path, nvim_lsp`，
      `lazydev present = false`。（**注**：2.3 修复后 `dictionary` 已不在其中，见 §2.3）
    - 启动：空 45.7 / 47.5 / 53.2 ms，`nvim a.cpp` 72.3 ms（与 §0 基线同一量级）。
-2. **P1**：~~2.3~~✅（已改为内存 OI 词表源）、2.1 clangd cmd、2.2 clangd filetypes、
+2. **P1**：~~2.1~~✅、~~2.3~~✅（已改为内存 OI 词表源）、2.2 clangd filetypes、
    2.4 去 InsertLeave，其余见 §2。
 3. 每步后跑一次 §0 的 `--startuptime` 和 §1.1 的 `maparg` 验收；再开一个 `.cpp` 敲
    `:CmpStatus`，确认 unknown source 里没有 `lazydev`，且 `nvim_lsp` 出现在 ready 里。
