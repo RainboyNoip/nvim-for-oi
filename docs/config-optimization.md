@@ -421,7 +421,7 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 | marks.nvim | `lua/plugins/marks.lua` | 位置书签，OI 单文件用不上；`opts` 里只有从默认模板拄贝的 `bookmark_0`（`virt_text = "hello world"`），实际上从未被重新配置过 |
 | render-markdown.nvim | `lua/plugins/render-markdown.lua` | `enabled = false` + `file_types = { "markdown" }` —— 已完全禁用且与 cpp/python 无关，可直接删依赖 |
 | DAP 全套 | `lua/plugins/dap.lua`、`nvim-dap-ui.lua`、`lua/plugins/dap/` | 已在 `c65b475` 整块注释禁用，readme 改推终端 gdb。既然不启用就删文件，别让 `docs/how-to-use-in-python.md` 和 `tests/headless/python_dap.lua` 长期描述一个不存在的功能 |
-| 两套模板入口并存 | `lua/plugins/rbook.lua` + `lua/fileSnip.lua` | rbook.nvim 是带 SQLite 索引的本地插件，`<leader>of`/`<leader>oe` 与 `<leader>rf`/`<leader>rc` 功能重叠。留一套 |
+| 两套模板入口并存 | `lua/plugins/rbook.lua` + `lua/fileSnip.lua` | rbook.nvim 是带 SQLite 索引的本地插件，`<leader>of`/`<leader>oe` 与 `<leader>rf`/`<leader>rc` 功能重叠。留一套。<br>**2026-09 补充**：该插件目前处于**失效状态**，且是两层独立的故障：① `code_yaml_path` 写的是仓库移动前的旧路径（`~/mycode/rbook_nunjucks/...`，已修正为 `~/mycode/教程与书籍/rbook_nunjucks/...`）；② `lyaml` 与 `luarocks` 都未安装（`deps.lua:11` 要求 `luarocks install lyaml`）。选 P2 时请先想清：是花力气装依赖，还是直接删掉这个入口 |
 | 多余配色 | `lua/plugins/colortheme.lua:15-23` | tokyonight / kanagawa / kanagawa-paper / moonfly / everviolet **都没安装**（`lazy-lock.json` 里只有 `vim-nightfly-colors` 和 `themify.nvim`），因为它们在 `config` 表里而不是 `dependencies` —— 属失效配置。而 `loader` 的兜底 `vim.cmd.colorscheme("moonfly")`（`:30`）在 moonfly 未安装时会直接报错 —— 潜在 bug |
 | 空目录 | `after/ftplugin/`、`plugin/`、`tmp/` | 直接 `git rm -r --cached` + 删 |
 | `checker` 反复包裹 | `lua/config/lazy.lua:28` | 已 `checker = { enabled = false }`，lazy 自身有 `:CheckHealth`，不需要额外包一层 |
