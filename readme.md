@@ -89,6 +89,9 @@ brew install gum find fd
 
 ### 快捷键
 
+> `<Leader>` 菜单（which-key）的每个条目都带 Nerd Font 图标，图标字形名与码点逐个
+> 核对过本机字体，详见 `lua/plugins/which-key.lua` 的注释。
+
 - `<Leader>` 键设置为空格键
 - `<Leader>oh`: 打开 `cheatsheet.md` 浮动窗口，查看自定义快捷键和 snippet 触发
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
