@@ -1,0 +1,26 @@
+# rbook 的最小模板库（兜底用）。
+#
+# 用途：没有设置环境变量 RBOOK_CODE_YAML 时，插件就指向这个文件，
+# 保证在任何机器上克隆本仓库后 <leader>rc / <leader>rf 立刻可用。
+#
+# 想用完整的模板库（~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml）时：
+#   export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
+#
+# 字段说明（见 lua/local/rbook.nvim/lua/rbook/scanner.lua）：
+#   id          唯一标识
+#   path        相对路径，相对本文件同级的 code/ 目录
+#   description 在选择框里显示的标题
+#   language    语言标记（仅用于展示/过滤）
+#   tags        可选，字符串或列表
+codes:
+  - id: cpp-main
+    path: cpp/main.cpp
+    description: C++ OI 主程序骨架（快读 + log/fenc 调试宏）
+    language: cpp
+    tags: [template]
+
+  - id: python-main
+    path: python/main.py
+    description: Python OI 主程序骨架（buffer 快读 + 递归深度）
+    language: python
+    tags: [template]

@@ -15,16 +15,16 @@ return {
   },
 
   opts = {
-    -- 路径来源：环境变量 RBOOK_CODE_YAML 优先，没设时回退到默认位置。
-    -- 故意不写成“纯环境变量”：vim.env.X 未设置时是 nil，如果在 GUI / sudo /
-    -- 另一个 shell 起的 tmux / 新机器上启动 nvim，路径会静默变 nil，插件不报错
-    -- 但模板功能直接没了（只能靠 :RbookDoctor 发现）。
-    -- 末尾再走一次 expand()：这样环境变量里写 ~ 或 $HOME 也能展开。
+    -- 路径来源：环境变量 RBOOK_CODE_YAML 优先；没设时回退到**本仓库自带的 mini 模板库**
+    -- （rbook/code.yaml + rbook/code/，只有 cpp / python 各一个骨架）。
+    -- 这样在没有配环境变量的机器上（GUI/sudo/新机器）功能仍然可用，不会静默失效。
+    -- 要用完整的书籍模板库就设：
+    --   export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
     --
-    -- 保底路径请跟着仓库真实位置走：它之前是 ~/mycode/rbook_nunjucks/book/code.yaml，
-    -- 仓库被移进“教程与书籍/”之后那个路径就不存在了，而插件是不报错的。
+    -- 注：stdpath("config") 已经被解析成绝对路径，expand() 主要是为了处理
+    -- 环境变量里写 ~ 或 $HOME 的情况。
     code_yaml_path = vim.fn.expand(
-      vim.env.RBOOK_CODE_YAML or "~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml"
+      vim.env.RBOOK_CODE_YAML or (vim.fn.stdpath("config") .. "/rbook/code.yaml")
     ),
   },
 

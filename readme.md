@@ -94,6 +94,24 @@ brew install gum find fd
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
 - `<Leader>of`: 打开 rbook 正式代码模板
 - `<Leader>oe`: 浏览 rbook 全部代码文件
+- `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
+
+#### rbook 模板库的位置
+
+`code.yaml` 按这个顺序解析：
+
+1. 环境变量 `RBOOK_CODE_YAML`
+2. 本仓库自带的 mini 模板库 `rbook/code.yaml`（只有 C++ / Python 各一个骨架）
+
+所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去：
+
+```sh
+export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
+```
+
+解析规则：模板条目的 `path` 相对于 `code.yaml` 同级的 `code/` 目录。
+依赖：`lyaml`（用 `luarocks --lua-version=5.1 --lua-dir=/opt/homebrew/opt/luajit install lyaml`
+安装，必须针对 LuaJIT 的 5.1 ABI 编译）。
 - `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
