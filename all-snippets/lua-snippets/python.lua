@@ -7,7 +7,7 @@ local fmt = require("luasnip.extras.fmt").fmt
 local rep = require("luasnip.extras").rep
 local utils = require("utils")
 
--- ===== for 循环的构造器（与 C++ 的 lua_snippets/snippets/for.lua 对齐）=====
+-- ===== for 循环的构造器（与 C++ 的 all-snippets/lua-snippets/cpp/for.lua 对齐）=====
 -- 触发词、正则捕获方式、循环变量规则都刻意和 C++ 版保持一致。
 --
 -- 为什么用 f() 拼字符串而不是 fmt()：这里的变量名 / 上下界都来自正则捕获

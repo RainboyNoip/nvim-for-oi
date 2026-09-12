@@ -21,5 +21,5 @@ A complete code file indexed by `code.yaml`, selected through rbook and filtered
 _Avoid_: file snippet
 
 **Snippet collection**:
-The physical `all_snippets/` archive containing the independent Lua, VS Code, file, and rbook asset groups. It is an archive boundary, not a claim that the groups share one loading mechanism.
+The physical `all-snippets/` archive containing the independent Lua, VS Code, file, and rbook asset groups. It is an archive boundary, not a claim that the groups share one loading mechanism.
 _Avoid_: unified snippet format

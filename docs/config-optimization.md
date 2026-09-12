@@ -210,7 +210,7 @@ cmd = { "clangd",
 | 参数 | 判定 | 理由 |
 | --- | --- | --- |
 | `--background-index` | **删** | 没有 `compile_commands.json`，跨文件索引用不到；且 `root_markers` 含 `.git` 时仓库根目录会成为索引作用域 |
-| `--clang-tidy` | **删** | 每次改动跑 readability/modernize，产生你不想看的诊断，且和 `all_snippets/oi-snippets/files/config/clangd_config` 里刻意关掉检查的思路矛盾 |
+| `--clang-tidy` | **删** | 每次改动跑 readability/modernize，产生你不想看的诊断，且和 `all-snippets/oi-snippets/files/config/clangd_config` 里刻意关掉检查的思路矛盾 |
 | `--header-insertion=iwyu` | **改 `never`** | 会在接受补全时往文件头插 `#include <vector>` 之类，你写 OI 还得手删 |
 | `--completion-style=detailed` | 保留 | cmp 里签名可读性好 |
 | `--function-arg-placeholders` | 保留 | 配合 snippet/Tab 填参 |
@@ -261,7 +261,7 @@ cmd = { "clangd",
 ### 2.2 `filetypes = { 'cpp' }`（`lua/lsp/clangd.lua:13`）⬜ 待修
 
 这是功能缺口，不是性能问题：`.c` / `.h` / `.hpp` / `.cc` / `.cxx` 不挂 clangd，在
-`all_snippets/oi-snippets/files/utils/*.cpp` 里 include 的头文件里没有补全和跳转。
+`all-snippets/oi-snippets/files/utils/*.cpp` 里 include 的头文件里没有补全和跳转。
 
 ```lua
 filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "cc", "hh", "hpp", "hxx", "h" },
@@ -394,7 +394,7 @@ module = "luasnip",
 
 两个点与本文最初的建议不同，都是查证后才发现的：
 
-1. **原来的建议 `ft = { "cpp", "c", "python" }` 不完整。** `all_snippets/vscode-snippets/` 里除了
+1. **原来的建议 `ft = { "cpp", "c", "python" }` 不完整。** `all-snippets/vscode-snippets/` 里除了
    `c/`、`cpp/`、`python.json`，还有 `markdown.json` 和 `haskell.json`；只写三个 ft 会
    静默丢掉这两类 snippet（不报错，就是没了）。实测这三种 ft 确实各自有 1 个 snippet。
    另外 `lua-snippets/` 里除了入口 `cpp.lua` / `python.lua`，如果改用 `from_lua.load` 递归扫，`cpp/` 下的实现模块会按**文件名**
@@ -449,12 +449,12 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 | marks.nvim | `lua/plugins/marks.lua` | 位置书签，OI 单文件用不上；`opts` 里只有从默认模板拄贝的 `bookmark_0`（`virt_text = "hello world"`），实际上从未被重新配置过 |
 | render-markdown.nvim | `lua/plugins/render-markdown.lua` | `enabled = false` + `file_types = { "markdown" }` —— 已完全禁用且与 cpp/python 无关，可直接删依赖 |
 | DAP 全套 | `lua/plugins/dap.lua`、`nvim-dap-ui.lua`、`lua/plugins/dap/` | 已在 `c65b475` 整块注释禁用，readme 改推终端 gdb。既然不启用就删文件，别让 `docs/how-to-use-in-python.md` 和 `tests/headless/python_dap.lua` 长期描述一个不存在的功能 |
-| 两套模板入口并存 | `lua/plugins/rbook.lua` + `lua/fileSnip.lua` | rbook.nvim 是带索引的本地插件，`<leader>of`/`<leader>oe` 与 `<leader>rf`/`<leader>rc` 功能重叠。留一套。<br>**2026-09 更新**：已修好并可用。① 旧的硬编码路径（`~/mycode/rbook_nunjucks/...`）在仓库移进 `教程与书籍/` 后已失效，现改为“环境变量 `RBOOK_CODE_YAML` → 本仓库 mini 库”两级回退，且环境变量指向的文件不存在时会**自动退回 mini 库**而不是把插件搞坏；② 已装 `luarocks` + 针对 LuaJIT 5.1 ABI 编译的 `lyaml`；③ 仓库内新增 mini 模板库 `all_snippets/oi-snippets/rbook/{code.yaml,code/cpp/main.cpp,code/python/main.py}`。实测：无变量时扫出 2 个模板，设变量指向书库时扫出 157 个。<br>所以本行现在不再是一个“要删的东西”，而是一个**已解决**的重复：若仍想要单一入口，删 fileSnip 或删 rbook 都行，但两者现在都能用。<br>④ 2026-09 新增：`RbookCodeFiles` / `RbookCode` 按当前 buffer 的 filetype 过滤（`cpp`/`c`/`h`/`hpp` → `.cpp/.cc/.cxx`，`python` → `.py`；未登记的 filetype 不过滤），`:RbookCodeFiles!` / `:RbookCode!` 可强制看全部。实测书库：cpp buffer 148（共 158）/ py buffer 5 / markdown 不过滤 158 |
+| 两套模板入口并存 | `lua/plugins/rbook.lua` + `lua/fileSnip.lua` | rbook.nvim 是带索引的本地插件，`<leader>of`/`<leader>oe` 与 `<leader>rf`/`<leader>rc` 功能重叠。留一套。<br>**2026-09 更新**：已修好并可用。① 旧的硬编码路径（`~/mycode/rbook_nunjucks/...`）在仓库移进 `教程与书籍/` 后已失效，现改为“环境变量 `RBOOK_CODE_YAML` → 本仓库 mini 库”两级回退，且环境变量指向的文件不存在时会**自动退回 mini 库**而不是把插件搞坏；② 已装 `luarocks` + 针对 LuaJIT 5.1 ABI 编译的 `lyaml`；③ 仓库内新增 mini 模板库 `all-snippets/oi-snippets/rbook/{code.yaml,code/cpp/main.cpp,code/python/main.py}`。实测：无变量时扫出 2 个模板，设变量指向书库时扫出 157 个。<br>所以本行现在不再是一个“要删的东西”，而是一个**已解决**的重复：若仍想要单一入口，删 fileSnip 或删 rbook 都行，但两者现在都能用。<br>④ 2026-09 新增：`RbookCodeFiles` / `RbookCode` 按当前 buffer 的 filetype 过滤（`cpp`/`c`/`h`/`hpp` → `.cpp/.cc/.cxx`，`python` → `.py`；未登记的 filetype 不过滤），`:RbookCodeFiles!` / `:RbookCode!` 可强制看全部。实测书库：cpp buffer 148（共 158）/ py buffer 5 / markdown 不过滤 158 |
 | 多余配色 | `lua/plugins/colortheme.lua:15-23` | tokyonight / kanagawa / kanagawa-paper / moonfly / everviolet **都没安装**（`lazy-lock.json` 里只有 `vim-nightfly-colors` 和 `themify.nvim`），因为它们在 `config` 表里而不是 `dependencies` —— 属失效配置。而 `loader` 的兜底 `vim.cmd.colorscheme("moonfly")`（`:30`）在 moonfly 未安装时会直接报错 —— 潜在 bug |
 | 空目录 | `after/ftplugin/`、`plugin/`、`tmp/` | 直接 `git rm -r --cached` + 删 |
 | `checker` 反复包裹 | `lua/config/lazy.lua:28` | 已 `checker = { enabled = false }`，lazy 自身有 `:CheckHealth`，不需要额外包一层 |
 | 重复的 buffer 导航键 | `lua/plugins/buffline.lua:43-46` | `<S-h>`/`<S-l>` 与 `[b`/`]b` 指向同一个 `BufferLineCyclePrev/Next`（cheatsheet 里四条都列了）。留一组就够 |
-| `all_snippets/oi-snippets/files/config/clangd_config` | 同左 | 里面 `Add: [-std=c++17, -DDEBUG]` 与 `lua/lsp/clangd.lua` 的 `fallbackFlags = { '--std=c++17' }` 重复；而且首行写着 "rename file to .clangd" —— **它当前是个从未生效的模板**，不要误以为已经关掉了索引/诊断。真要用就拷到项目根目录改名 `.clangd`，并把 `-std` 交给 `fallbackFlags` 单边管理 |
+| `all-snippets/oi-snippets/files/config/clangd_config` | 同左 | 里面 `Add: [-std=c++17, -DDEBUG]` 与 `lua/lsp/clangd.lua` 的 `fallbackFlags = { '--std=c++17' }` 重复；而且首行写着 "rename file to .clangd" —— **它当前是个从未生效的模板**，不要误以为已经关掉了索引/诊断。真要用就拷到项目根目录改名 `.clangd`，并把 `-std` 交给 `fallbackFlags` 单边管理 |
 
 ---
 
@@ -478,7 +478,7 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
   `ft` 触发，不互相污染 buffer。结构是对的（只需按 1.1 改法 B 修绑定方式）。
 - `lua/config/lazy.lua:28` `checker = { enabled = false }` + lockfile：比赛机器上不会被
   突然的插件更新背刺。
-- `lua/fileSnip.lua:36-46` 对 `simaple_template.cpp` 的日期占位替换 + 光标定位 + `zM`
+- `lua/fileSnip.lua:36-46` 对 `simple_template.cpp` 的日期占位替换 + 光标定位 + `zM`
   折叠，是对 OI 模板工作流的有效优化，保留。
 
 ### 4.1 一处需要补的健壮性缺口（顺手）⬜ 待修
@@ -528,7 +528,7 @@ clangd 会直接报启动失败而不是给出安装提示。把 clangd 也包�
 - ~~配置里还有 hlslens / habamax / material 主题~~ —— **不存在**，`grep` 无匹配。真实的
   多余项是 `colortheme.lua:15-23` 里那几个**没进 `dependencies`、因此根本没装**的主题
   （见 §3）。
-- ~~`all_snippets/oi-snippets/files/config/clangd_config` 里写着 `Index: Background: Skip`，说明已经考虑过索引问题~~
+- ~~`all-snippets/oi-snippets/files/config/clangd_config` 里写着 `Index: Background: Skip`，说明已经考虑过索引问题~~
   —— **不存在**。`grep -rn "Background: Skip\|Index:"` 全仓只命中本文件。该配置实际只有
   `CompileFlags.Add` 和 `Diagnostics.UnusedIncludes`，且文件名意味着它未生效（见 §3）。
 - ~~`lua/lsp/basedpyright.lua` 里有 `enable = false`~~ —— **不存在**。真实的降噪手段是

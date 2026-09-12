@@ -7,6 +7,8 @@ local function assert_equal(actual, expected, label)
   ))
 end
 
+local assets = require("snippetAssets")
+
 local function run()
   assert(vim.lsp.config.clangd, "clangd config must remain registered")
 
@@ -151,7 +153,7 @@ local function run()
 
   assert_equal(#luasnip.get_snippets("cpp"), 40, "C++ snippet count")
 
-  local package_path = vim.fn.stdpath("config") .. "/all_snippets/vscode-snippets/package.json"
+  local package_path = assets.vscodeSnippets .. "/package.json"
   local package = vim.json.decode(table.concat(vim.fn.readfile(package_path), "\n"))
   local python_registered = false
   for _, contribution in ipairs(package.contributes.snippets) do
@@ -160,7 +162,7 @@ local function run()
       break
     end
   end
-  assert(python_registered, "all_snippets/vscode-snippets/package.json must register python.json")
+  assert(python_registered, "snippetAssets.vscodeSnippets/package.json must register python.json")
 
   local function expand_snippet(trigger)
     if luasnip.in_snippet() then

@@ -1,9 +1,10 @@
 local Snacks = require("snacks")
+local assets = require("snippetAssets")
 local M = {}
 
 -- file snippet（选一个文件、把内容插入当前 buffer）的默认目录。
 -- 可用 fileSnip.setup({ snippetPath = "..." }) 覆盖。
-M.snippetPath = vim.fn.stdpath('config') .. '/all_snippets/oi-snippets/files/'
+M.snippetPath = assets.fileSnippets .. "/"
 
 -- 读取 snippet 内容
 local function read_snippet_content(path)
@@ -11,16 +12,41 @@ local function read_snippet_content(path)
   return lines
 end
 
+-- 判断一个 snippet 文件是「模板」还是「工具」。
+--
+-- 约定：**直接放在 snippet 根目录下的 = 模板**（整份可直接用的骨架，插入时不加折叠标记）；
+-- **放在子目录里的 = 工具**（可复用代码块，插入时加 //oisnip 标记方便折叠）。
+--
+-- 为什么这样写（review P1）：
+--   旧代码用 `string.find(path, "template")`，那是 template/ 目录时代的写法；
+--   上一版改成硬编码匹配 `/files/`，一旦用户用
+--   fileSnip.setup({ snippetPath = ... }) 指向别的目录（ADR 明确要求保留的覆盖入口），
+--   所有文件都不匹配，模板就会被错误加上折叠标记。
+--   现在改为相对于**已配置的 snippetPath** 判断，与字面目录名无关，覆盖也照样生效。
+--
+-- 不用“文件里有没有 main”来判断：utils/random*.cpp 这些工具本身就是完整程序，
+-- 也有 int main，按内容判断会把它们误判成模板而丢掉折叠标记。
+local function is_template(snip_path)
+  local root = vim.fn.fnamemodify(M.snippetPath or "", ":p"):gsub("/+$", "")
+  local path = vim.fn.fnamemodify(snip_path or "", ":p"):gsub("/+$", "")
+  if root == "" or path == "" then
+    return false
+  end
+  local prefix = root .. "/"
+  if path:sub(1, #prefix) ~= prefix then
+    return false
+  end
+  local rel = path:sub(#prefix + 1)
+  if rel == "" then
+    return false
+  end
+  return not rel:find("/")
+end
+
 -- 插入代码片段
 local function insert_code_snippet(snip_path)
 	local lines = read_snippet_content(snip_path)
 	local filename = vim.fn.fnamemodify(snip_path, ":t")
-
-	-- 模板（直接放在 files/ 根下的整份骨架）不加折叠标记，只有 utils/ 下的工具才加。
-	-- 旧代码用 `string.find(snip_path, "template")` 判断，那是 template/ 目录时代的写法；
-	-- 新布局模板与工具同在 files/ 下，改用「是否在 files/ 的子目录里」判断。
-	local rel = snip_path:match("/files/(.+)$") or ""
-	local is_template_file = rel ~= "" and not rel:find("/")
 
 	local function add_fold_markers()
 		table.insert(lines, 1, "//oisnip_begin" .. filename)
@@ -32,7 +58,7 @@ local function insert_code_snippet(snip_path)
 		for i, line in ipairs(lines) do
 			lines[i] = line:gsub("2025%-10%-02 10:34:43", date)
 		end
-	elseif not is_template_file then
+	elseif not is_template(snip_path) then
 		add_fold_markers()
 	end
 
@@ -58,6 +84,8 @@ end
 local function insert_snippet()
 	Snacks.picker.pick("files",{
 		dirs = {M.snippetPath},
+		-- Python 的 file snippet 是指向 rbook canonical 模板的 symlink。
+		follow = true,
 		hidden = true,
 		cwd = M.snippetPath,
 		prompt = "Select Snippet:",

@@ -19,13 +19,14 @@ return {
     config = function ()
         local ls = require("luasnip")
 
-        -- 所有 snippet 资源都在 all_snippets/ 下，分成三组：
+        -- 所有 snippet 资源都在 all-snippets/ 下，分成三组：
         --   lua-snippets/     LuaSnip 的 Lua 片段（cpp.lua / python.lua 两个入口）
         --   vscode-snippets/  VSCode 格式 JSON（Neovim 与 VSCode 共用）
         --   oi-snippets/      file snippet（files/）与 rbook 模板（rbook/）
         -- 三组只是归档在一起，加载机制各不相同（见 docs/adr/0001）。
-        local assets = vim.fn.stdpath("config") .. "/all_snippets"
-        local lua_dir = assets .. "/lua-snippets"
+        -- 归档路径集中在 lua/snippetAssets.lua，避免多处硬编码（Shotgun Surgery）。
+        local assets = require("snippetAssets")
+        local lua_dir = assets.luaSnippets
 
         -- 入口模块用 require("cpp") / require("python") 引入，
         -- 所以要把 lua-snippets 加进 package.path。
@@ -33,7 +34,7 @@ return {
         -- 标准库重名（直接 require("io") 会拿到标准库），require("cpp.io") 才安全。
         package.path = package.path .. ";" .. lua_dir .. "/?.lua"
 
-        require("luasnip.loaders.from_vscode").lazy_load({ paths = { assets .. "/vscode-snippets" } })
+        require("luasnip.loaders.from_vscode").lazy_load({ paths = { assets.vscodeSnippets } })
 
         -- 入口模块 cpp.lua / python.lua 各自 list_extend 了实现目录里的片段，
         -- 所以只需注册这两个。

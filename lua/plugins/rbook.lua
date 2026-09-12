@@ -1,6 +1,6 @@
 -- 解析 code.yaml 的位置。两级：
 --   1. 环境变量 RBOOK_CODE_YAML（仅当文件确实存在时采用）
---   2. 本仓库自带的 mini 模板库 all_snippets/oi-snippets/rbook/code.yaml
+--   2. 本仓库自带的 mini 模板库 all-snippets/oi-snippets/rbook/code.yaml
 -- 放在 config() 里而不是 opts 里，有两个原因：
 --   ① opts 在启动期就会被求值，而告警只应该在真的用到 rbook 时才出现；
 --   ② 环境变量写了但文件不在（换了机器、书库又搬家）时能退到 mini 库，而不是
@@ -17,7 +17,7 @@ local function resolve_code_yaml_path()
       vim.log.levels.WARN
     )
   end
-  return vim.fn.stdpath("config") .. "/all_snippets/oi-snippets/rbook/code.yaml"
+  return require("snippetAssets").rbook .. "/code.yaml"
 end
 
 return {
