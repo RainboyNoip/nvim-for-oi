@@ -39,3 +39,7 @@ local_*.vim
 __pycache__
 
 codex_resume
+.opencode/
+
+# 学习工作区
+learn-snack/

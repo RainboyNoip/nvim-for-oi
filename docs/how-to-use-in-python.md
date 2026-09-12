@@ -101,7 +101,7 @@ python3 -c 'import debugpy; print(debugpy.__version__)'
 如果直连 GitHub 出现 TLS 下载错误，执行下面的代理安装命令：
 
 ```vim
-:lua vim.api.nvim_create_autocmd("User", { pattern = "TSUpdate", once = true, callback = function() require("nvim-treesitter.parsers").python.install_info.url = "https://gh-proxy.com/https://github.com/tree-sitter/tree-sitter-python" end }); require("nvim-treesitter").install({ "python" }):wait(300000)
+:lua vim.api.nvim_create_autocmd("User", { pattern = "TSUpdate", once = true, callback = function() require("nvim-treesitter.parsers").python.install_info.url = "https://github.com/tree-sitter/tree-sitter-python" end }); require("nvim-treesitter").install({ "python" }):wait(300000)
 ```
 
 验证：

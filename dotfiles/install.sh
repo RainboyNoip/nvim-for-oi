@@ -8,7 +8,6 @@ NC='\033[0m' # No Color
 # 获取脚本所在的目录的绝对路径
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 HOME_DIR=~
-GIT_PROXY="https://gh-proxy.com/"
 
 # 函数：创建符号链接，如果目标文件已存在则备份
 # 参数1: 源文件
@@ -39,7 +38,7 @@ echo "Starting dotfiles installation..."
 # 0. git clone 对应的仓库
 echo ""
 echo "Clone tmux plugin Manager.."
-git clone $GIT_PROXY"https://github.com/tmux-plugins/tpm" "$HOME_DIR/.tmux/plugins/tpm"
+git clone "https://github.com/tmux-plugins/tpm" "$HOME_DIR/.tmux/plugins/tpm"
 
 # 1. 安装 tmux.conf
 echo ""

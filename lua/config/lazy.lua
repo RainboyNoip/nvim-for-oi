@@ -1,9 +1,8 @@
 -- lazy.nvim bootstrap
--- 如果本机还没有安装 lazy.nvim，就通过 GitHub 代理自动 clone。
-local gitproxy = "https://gh-proxy.com/"
+-- 如果本机还没有安装 lazy.nvim，就自动 clone。
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = gitproxy .. "https://github.com/folke/lazy.nvim.git"
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
@@ -33,11 +32,10 @@ require("lazy").setup({
     { import = "plugins" },
   },
 
-  -- Git 相关设置：统一走代理，避免插件安装/更新时网络不稳定。
+  -- Git 相关设置。
   git = {
     log = { "-8" }, -- 显示最近8次提交
     timeout = 120,  -- 终止超过2分钟的进程
-    url_format = gitproxy .. "https://github.com/%s.git",
 
     -- lazy.nvim 需要 git >=2.19.0。如果你想在旧版本中使用 lazy，
     -- 可以将下面设置为 false。这样应该可以工作，但不被支持并且会
