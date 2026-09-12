@@ -397,7 +397,7 @@ module = "luasnip",
 1. **原来的建议 `ft = { "cpp", "c", "python" }` 不完整。** `vscode-snippets/` 里除了
    `c/`、`cpp/`、`python.json`，还有 `markdown.json` 和 `haskell.json`；只写三个 ft 会
    静默丢掉这两类 snippet（不报错，就是没了）。实测这三种 ft 确实各自有 1 个 snippet。
-   另外 `lua/snippets/` 里除了 `cpp.lua` / `python.lua`，还会被 `from_lua.load` 按**文件名**
+   另外 `lua_snippets/snippets/` 里除了 `cpp.lua` / `python.lua`，还会被 `from_lua.load` 按**文件名**
    额外注册成 `io` / `for` / `stl` / `graph` / `debug` / `algo` / `oth` 这些不存在的 filetype
    （副作用，无害）。真正生效的入口只有 cpp / python。
 2. **`module = "luasnip"` 是必需的保险，不是可选项。** `nvim-cmp` 的 config 在 InsertEnter

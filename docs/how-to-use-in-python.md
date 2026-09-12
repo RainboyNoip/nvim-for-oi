@@ -34,8 +34,8 @@ Neovim 不负责：
 | `lua/plugins/lang-python.lua` | 只在 Python buffer 加载本地设置 |
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
-| `lua/plugins/LuaSnip.lua` | 加载 `lua/snippets/` |
-| `lua/snippets/python.lua` | 36 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `lua/plugins/LuaSnip.lua` | 加载 `lua_snippets/snippets/` |
+| `lua_snippets/snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
 | `vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
 | `vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |

@@ -129,9 +129,13 @@ rainboyVim-for-oi/
 │   │       ├── catalog.lua      # 内存缓存
 │   │       ├── picker.lua       # snacks picker 组装
 │   │       ├── actions.lua      # 插入 / 打开 / 复制
-│   │       ├── paths.lua  deps.lua  doctor.lua
+│   │       └── paths.lua  deps.lua  doctor.lua
 │   │
-│   └── snippets/                # LuaSnip 短触发片段
+│   └── （lua/ 下只放 Neovim 配置代码；snippet 源文件见下面的 lua_snippets/）
+│
+├── lua_snippets/                # LuaSnip 短触发片段（特意放在根目录）
+│   └── snippets/                # 套这一层是为了保留 require("snippets.*") 命名空间，
+│       │                        # 否则 io.lua / debug.lua 会撞 Lua 标准库
 │       ├── cpp.lua              # C++ 总入口（require 下面各模块）
 │       ├── for.lua              # f / f n / f l r / fabc ... / rf / 2f
 │       ├── io.lua  stl.lua  graph.lua  debug.lua  algo.lua  oth.lua
@@ -199,6 +203,15 @@ init.lua
   └─ options              最后设 vim.opt
 ```
 
+两个 snippet 体系靠不同机制加载：
+
+```
+lua_snippets/snippets/*.lua   from_lua.load()          filetype 取自「直接子文件名」
+                              → 必须先把 lua_snippets 注入 package.path，
+                                因为 require("snippets.*") 不在 lua/ 里
+vscode-snippets/*.json        from_vscode.lazy_load()  按 filetype 懒加载
+```
+
 启动期只加载 8 个插件（实测 `lazy.core.config`）：`Comment.nvim`、`lazy.nvim`、
 `lualine.nvim`、`nvim-treesitter`、`nvim-web-devicons`、`snacks.nvim`、`themify.nvim`、
 `vim-nightfly-colors`。其余全部延迟：
@@ -217,7 +230,7 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 
 此配置包含一个专门为算法竞赛设计的代码片段系统。当前按职责分成三类:
 
-- `lua/snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
+- `lua_snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
 - `oiSnippets/`: 本地整块代码片段，例如模板、随机数据、log、图生成工具。
 - `vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
 
@@ -364,7 +377,8 @@ CompileFlags:
 - `fileSnip.lua`: `oiSnippets/` 选择器
 - `config/lazy.lua`: 插件管理配置
 - `plugins/`: 各个插件的详细配置
-- `snippets/`: LuaSnip 片段
+- `lua_snippets/`: LuaSnip 短触发片段（仓库根目录，与 `oiSnippets/`、`vscode-snippets/` 平级）。
+  因为不在 Neovim 的 `lua/` 搜索路径里，`lua/plugins/LuaSnip.lua` 会把该目录注入 `package.path`。
 - `local/`: 本地插件（cpp-settings / python-settings / rbook.nvim）
 
 ## 贡献

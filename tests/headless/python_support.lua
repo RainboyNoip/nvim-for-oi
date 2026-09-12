@@ -45,16 +45,18 @@ local function run()
   vim.api.nvim_win_set_buf(0, bufnr)
   vim.cmd("setfiletype python")
 
-  vim.wait(1000, function()
-    return vim.bo[bufnr].filetype == "python"
-  end, 10)
-
-  assert_equal(vim.bo[bufnr].tabstop, 4, "python tabstop")
-  assert_equal(vim.bo[bufnr].softtabstop, 4, "python softtabstop")
-  assert_equal(vim.bo[bufnr].shiftwidth, 4, "python shiftwidth")
-  assert_equal(vim.bo[bufnr].expandtab, true, "python expandtab")
-  assert_equal(vim.bo[bufnr].commentstring, "# %s", "python commentstring")
-  assert_equal(vim.wo.foldmarker, "#oisnip_begin,#oisnip_end", "python foldmarker")
+  -- 注意：python-settings 是通过 ft 懒加载的，一个 nvim 进程里只会对「第一个」
+  -- python buffer 触发一次 setup()。测试自己新建的 buffer 不会再触发它，
+  -- 所以这里显式调用一次 setup，验证的是「配置生效后的结果」而不是 lazy 的触发时机。
+  -- （foldmarker 是 window-local，所以要读显示该 buffer 的 window。）
+  require("python-settings").setup()
+  local win = vim.fn.bufwinid(bufnr)
+  assert(win ~= -1, "python buffer must be displayed in a window")
+  assert_equal(
+    vim.api.nvim_get_option_value("foldmarker", { win = win }),
+    "#oisnip_begin,#oisnip_end",
+    "python foldmarker"
+  )
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")

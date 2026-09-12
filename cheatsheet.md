@@ -126,7 +126,8 @@
 
 ## C++ Snippets
 
-Snippet 按用途拆在 `lua/snippets/` 下；公共捕获和转换工具在 `lua/snippets/utils.lua`。
+Snippet 按用途拆在 `lua_snippets/snippets/` 下（仓库根目录，与 `oiSnippets/`、`vscode-snippets/` 平级）；
+公共捕获和转换工具在 `lua_snippets/snippets/utils.lua`。
 
 | 触发 | 展开结果 |
 | --- | --- |
