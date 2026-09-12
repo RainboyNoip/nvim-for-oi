@@ -1,3 +1,75 @@
+-- ── OI 常用 token 词表（纯内存，不读任何文件） ─────────────────────────
+-- 只放「英文词典 / LSP 都给不了」的词：带下划线的标准库名、缩写标识符、大写宏。
+-- 想加词直接加一行。匹配是大小写敏感的（和 cmp 自身过滤一致），所以 INF 要打大写。
+local OI_WORDS = {
+  -- C++ 标准库（英文单词表里没有）
+  "priority_queue",
+  "unordered_map",
+  "unordered_set",
+  "lower_bound",
+  "upper_bound",
+  "push_back",
+  "emplace_back",
+  "memset",
+  "sizeof",
+  -- OI 惯用缩写 / 宏名（两种语言都常打）
+  "INF",
+  "dfs",
+  "bfs",
+  "lca",
+  "ans",
+  "cnt",
+  "vis",
+  "idx",
+  "nxt",
+  -- Python 竞赛常用（英文词典里没有的）
+  "defaultdict",
+  "popleft",
+}
+
+-- 在哪些 filetype 下启用。要扩展就改这一行（比如加 c = true, h = true）。
+local OI_FILETYPES = { cpp = true, python = true }
+
+local oi_source = {}
+
+function oi_source.new()
+  return setmetatable({}, { __index = oi_source })
+end
+
+local function oi_enabled(bufnr)
+  return OI_FILETYPES[vim.bo[bufnr or 0].filetype] == true
+end
+
+function oi_source:is_available()
+  return oi_enabled(0)
+end
+
+function oi_source:get_keyword_length()
+  return 2 -- 打满 2 个字符才开始提示
+end
+
+function oi_source:complete(params, callback)
+  local bufnr = params.context.bufnr
+  if not oi_enabled(bufnr) then
+    return callback({})
+  end
+
+  -- 取光标前面那一段标识符（字母/数字/下划线）
+  local keyword = params.context.cursor_before_line:match("[%w_]+$") or ""
+  if #keyword < 2 then
+    return callback({})
+  end
+
+  local kind = require("cmp").lsp.CompletionItemKind.Text
+  local items = {}
+  for _, word in ipairs(OI_WORDS) do
+    if word:sub(1, #keyword) == keyword then
+      items[#items + 1] = { label = word, kind = kind }
+    end
+  end
+  callback(items)
+end
+
 return {
   "hrsh7th/nvim-cmp",
   version = false, -- last release is way too old
@@ -8,7 +80,6 @@ return {
     "hrsh7th/cmp-path",
     "onsails/lspkind.nvim" , -- 用于显示图标
     "saadparwaiz1/cmp_luasnip", -- 
-    "uga-rosa/cmp-dictionary", -- 字典补全
   },
   -- Not all LSP servers add brackets when completing a function.
   -- To better deal with this, LazyVim adds a custom option to cmp,
@@ -30,12 +101,8 @@ return {
     local auto_select = true
     local luasnip = require("luasnip")
 
-    -- dictionary
-    require("cmp_dictionary").setup({
-      paths = { vim.fn.stdpath("config") .. '/dictionary/google-10000-english-no-swears.txt' },
-      exact_length = 2,
-    })
-
+    -- 注册内存版 OI 词表源（定义在文件顶部，零依赖、零文件 IO）
+    cmp.register_source("oi_words", oi_source.new())
 
     return {
       auto_brackets = {}, -- configure any filetype to auto add brackets
@@ -99,12 +166,11 @@ return {
       }),
       sources = cmp.config.sources({
         { name = 'luasnip' },
-        { name = "lazydev" },
         { name = "nvim_lsp" },
         { name = "path" },
-        { name = "dictionary", keyword_length = 2 }, -- 字典补全
+        { name = "oi_words" }, -- OI 常用 token（内存表，见文件顶部 OI_WORDS）
       }, {
-        { name = "buffer" ,keyword_length = 2},-- 缓冲区源的最小关键字长度
+        { name = "buffer", keyword_length = 3 }, -- 缓冲区源的最小关键字长度（2 太激进，OI 单文件重复率高）
       }),
       -- [[ 主要改动点 5: 格式化与图标 ]]
       -- 使用 lspkind 替代 LazyVim.config.icons
@@ -125,14 +191,14 @@ return {
             nvim_lsp = "[LSP]",
             luasnip = "[Snippet]",
             path = "[Path]",
-            dictionary = "[Dict]",
+            oi_words = "[OI]",
           },
           menu = {
             buffer = "[Buffer]",
             nvim_lsp = "[LSP]",
             luasnip = "[Snippet]",
             path = "[Path]",
-            dictionary = "[Dict]",
+            oi_words = "[OI]",
           }
         }),
       },
