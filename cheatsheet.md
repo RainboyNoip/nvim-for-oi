@@ -33,15 +33,19 @@
 | 快捷键 | 说明 |
 | --- | --- |
 | `<Leader>os` | 选择 `oiSnippets/` 代码片段 |
-| `<Leader>of` | Rbook 正式代码模板 |
-| `<Leader>oe` | Rbook 浏览全部代码文件 |
+| `<Leader>of` | Rbook 正式代码模板（按当前语言过滤） |
+| `<Leader>oe` | Rbook 浏览代码文件（按当前语言过滤） |
 | `<Leader>op` | 选择复制命令并复制当前 buffer |
 | `<Leader>r` | Rbook 题解 / 模板分组 |
-| `<Leader>rc` | Rbook 正式代码模板 |
-| `<Leader>rf` | Rbook 浏览全部代码文件 |
+| `<Leader>rc` | Rbook 正式代码模板（按当前语言过滤） |
+| `<Leader>rf` | Rbook 浏览代码文件（按当前语言过滤） |
 | `<Leader>ra` | Rbook 打开文章 |
 | `<Leader>rr` | Rbook 刷新索引 |
 | `<Leader>rd` | Rbook 检查模板索引 |
+
+> Rbook 的两个浏览命令会按当前 buffer 的 filetype 过滤：`.cpp`（及 `c`/`h`/`hpp`）
+> 只列 `.cpp/.cc/.cxx`，`.py` 只列 `.py`；`markdown`/`text`/无 filetype 不过滤。
+> 想强制看全部用 `:RbookCodeFiles!` / `:RbookCode!`。
 
 ## AI 补全（Minuet）
 

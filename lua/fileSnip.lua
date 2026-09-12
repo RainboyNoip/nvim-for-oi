@@ -84,9 +84,9 @@ function M.setup(opts)
 	vim.keymap.set('n', '<leader>os', "<cmd>OISnipChoose<cr>", { silent = true, desc = "oiSnippets" })
 
 	-- rbook.nvim 的代码模板入口。旧的 OICodeSnip 命令已经被 RbookCode/RbookCodeFiles 替代。
-	vim.keymap.set('n', '<leader>oe', "<cmd>RbookCodeFiles<cr>", { silent = true, desc = "Rbook 浏览全部代码文件" })
+	vim.keymap.set('n', '<leader>oe', "<cmd>RbookCodeFiles<cr>", { silent = true, desc = "Rbook 浏览代码文件（按当前语言）" })
 
-	vim.keymap.set('n', '<leader>of', "<cmd>RbookCode<cr>", { silent = true, desc = "Rbook 正式代码模板" })
+	vim.keymap.set('n', '<leader>of', "<cmd>RbookCode<cr>", { silent = true, desc = "Rbook 正式代码模板（按当前语言）" })
 end
 
 return M

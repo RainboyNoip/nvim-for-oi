@@ -65,8 +65,8 @@ return {
   end,
 
   keys = {
-    { "<leader>rc", "<cmd>RbookCode<cr>", desc = "Rbook 正式代码模板" },
-    { "<leader>rf", "<cmd>RbookCodeFiles<cr>", desc = "Rbook 浏览全部代码文件" },
+    { "<leader>rc", "<cmd>RbookCode<cr>", desc = "Rbook 正式代码模板（按当前语言）" },
+    { "<leader>rf", "<cmd>RbookCodeFiles<cr>", desc = "Rbook 浏览代码文件（按当前语言）" },
     { "<leader>rr", "<cmd>RbookCodeRefresh<cr>", desc = "Rbook 刷新索引" },
     { "<leader>rd", "<cmd>RbookDoctor<cr>", desc = "Rbook 检查模板索引" },
   },

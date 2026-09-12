@@ -92,18 +92,38 @@ brew install gum find fd
 - `<Leader>` 键设置为空格键
 - `<Leader>oh`: 打开 `cheatsheet.md` 浮动窗口，查看自定义快捷键和 snippet 触发
 - `<Leader>os`: 打开 `oiSnippets/` 代码片段选择器
-- `<Leader>of`: 打开 rbook 正式代码模板
-- `<Leader>oe`: 浏览 rbook 全部代码文件
+- `<Leader>of`: 打开 rbook 正式代码模板（按当前文件类型过滤）
+- `<Leader>oe`: 浏览 rbook 代码文件（按当前文件类型过滤）
 - `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
+- `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
+- `<C-h/j/k/l>`: 在窗口间切换
+- `<C-Up/Down/Left/Right>`: 调整窗口大小
+- `<C-s>`: 保存文件 (Normal 和 Insert 模式)
 
-#### rbook 模板库的位置
+#### rbook：按文件类型过滤
+
+在 `.cpp` buffer（含 `c` / `h` / `hpp`）里执行 `<Leader>of` / `<Leader>oe`，只列出
+`.cpp` / `.cc` / `.cxx`；在 `.py` buffer 里只列出 `.py`。`markdown` / `text` /
+没有 filetype 的 buffer（`:enew`）不做过滤，等于看全部。
+
+要在这类 buffer 里强制看全部，命令加 `!`：
+
+```vim
+:RbookCodeFiles!   " 不过滤
+:RbookCode!        " 不过滤
+```
+
+白名单在 `lua/local/rbook.nvim/lua/rbook/config.lua` 的 `files.filetype_extensions`，
+可以用 `lua/plugins/rbook.lua` 的 `opts` 覆盖。没有 `language` 字段的模板视为通用，始终显示。
+
+#### rbook：模板库位置
 
 `code.yaml` 按这个顺序解析：
 
-1. 环境变量 `RBOOK_CODE_YAML`
+1. 环境变量 `RBOOK_CODE_YAML`（仅当文件确实存在时采用）
 2. 本仓库自带的 mini 模板库 `mini_rbook_code_template/code.yaml`（只有 C++ / Python 各一个骨架）
 
-所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去：
+所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去（本仓库的 `alias v` 就是这么做的）：
 
 ```sh
 export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
@@ -112,10 +132,6 @@ export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
 解析规则：模板条目的 `path` 相对于 `code.yaml` 同级的 `code/` 目录。
 依赖：`lyaml`（用 `luarocks --lua-version=5.1 --lua-dir=/opt/homebrew/opt/luajit install lyaml`
 安装，必须针对 LuaJIT 的 5.1 ABI 编译）。
-- `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
-- `<C-h/j/k/l>`: 在窗口间切换
-- `<C-Up/Down/Left/Right>`: 调整窗口大小
-- `<C-s>`: 保存文件 (Normal 和 Insert 模式)
 
 ### Cheat Sheet
 

@@ -4,15 +4,15 @@ local M = {}
 
 local commands = {
   RbookCode = {
-    desc = "Rbook 正式代码模板",
-    run = function()
-      M.code()
+    desc = "Rbook 正式代码模板（按当前 filetype 过滤，! 显示全部）",
+    run = function(args)
+      M.code(args)
     end,
   },
   RbookCodeFiles = {
-    desc = "Rbook 浏览全部代码文件",
-    run = function()
-      M.code_files()
+    desc = "Rbook 浏览代码文件（按当前 filetype 过滤，! 显示全部）",
+    run = function(args)
+      M.code_files(args)
     end,
   },
   RbookCodeRefresh = {
@@ -34,6 +34,8 @@ local function register_commands()
     vim.api.nvim_create_user_command(name, command.run, {
       desc = command.desc,
       force = true,
+      -- 带 ! 时跳过 filetype 过滤（见 rbook.picker.allowed_extensions）
+      bang = true,
     })
   end
 end
@@ -44,12 +46,12 @@ function M.setup(opts)
   register_commands()
 end
 
-function M.code()
-  require("rbook.picker").code()
+function M.code(cmd_opts)
+  require("rbook.picker").code(cmd_opts)
 end
 
-function M.code_files()
-  require("rbook.picker").code_files()
+function M.code_files(cmd_opts)
+  require("rbook.picker").code_files(cmd_opts)
 end
 
 function M.refresh()
