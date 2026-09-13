@@ -89,6 +89,10 @@
 
 命令等同：`:RenderMarkdown toggle` / `enable` / `disable`。
 
+公式（`$...$` / `$$...$$`）会渲染成 **Unicode 文本近似**，不是 KaTeX，也不是
+LaTeX 排版。依赖外部转换器 `utftex`（优先）或 `latex2text`，详见
+`docs/how-to-render-math.md`。两者都没装时公式不显示，也不报错。
+
 ## C++ Buffer
 
 只有一个是真正 C++ 专属的键（实现在 `lua/local/cpp-settings/`）：

@@ -13,6 +13,7 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 - **主题**: 默认使用 nightfly 主题，并通过 themify 管理可切换主题
 - **状态栏**: 使用 lualine 状态栏
 - **文件浏览 / Picker**: 使用 snacks.nvim 的 explorer、picker 和 dashboard
+- **Markdown 渲染**: render-markdown.nvim 在 buffer 内渲染标题、表格与公式
 
 ## 安装
 
@@ -276,7 +277,8 @@ Python 模板同样不添加 marker。
 - `<Leader>oe`: 浏览 rbook 代码文件（按当前文件类型过滤）
 - `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
 - `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
-- `<Leader>mm` / `<Leader>me` / `<Leader>md`: 切换 / 开启 / 关闭 Markdown 渲染
+- `<Leader>mm` / `<Leader>me` / `<Leader>md`: 切换 / 开启 / 关闭 Markdown 渲染。
+  公式以 Unicode 近似显示（非 KaTeX），依赖见 [公式渲染指南](docs/how-to-render-math.md)
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
@@ -384,7 +386,8 @@ CompileFlags:
 - **LmanTW/themify.nvim**: 主题管理，使用 `:Themify`、`<I>` 安装主题
 - **milanglacier/minuet-ai.nvim**: AI 补全（需 `DEEPSEEK_API_KEY`）
 - **chentoast/marks.nvim**: 位置书签
-- **MeanderingProgrammer/render-markdown.nvim**: 在 buffer 内渲染 Markdown（`<Leader>mm` 切换）
+- **MeanderingProgrammer/render-markdown.nvim**: 在 buffer 内渲染 Markdown（`<Leader>mm` 切换）；
+  公式渲染需要额外的 `latex` parser 与 `utftex`/`latex2text`，见 [公式渲染指南](docs/how-to-render-math.md)
 
 已禁用但仍留在仓库（将来可能恢复）：
 
