@@ -21,31 +21,43 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
    git clone https://github.com/RainboyNoip/nvim-for-oi ~/.config/nvim
    ```
 
-或者
+或者作为独立配置安装:
 
    ```bash
    git clone https://github.com/RainboyNoip/nvim-for-oi ~/.config/nvim-for-oi
    ```
 
-   add to your .zshrc or .bashrc
+2. （可选）安装算法代码模板库 [rbook_nunjucks](https://github.com/rainboyOJ/rbook_nunjucks):
+   配置中的 `<Leader>of`（插入模板）与 `<Leader>oe`（浏览模板文件）支持 150+ 常用算法与数据结构模板，模板索引来自 `rbook_nunjucks` 仓库：
    ```bash
-   export NVIM_APPNAME=nvim-for-oi
-   alias oivim="NVIM_APPNAME=nvim-for-oi nvim"
-   alias oiv="NVIM_APPNAME=nvim-for-oi nvim"
-   alias voi="NVIM_APPNAME=nvim-for-oi nvim"
+   mkdir -p ~/mycode/教程与书籍
+   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/教程与书籍/rbook_nunjucks
+   ```
+   > **说明**：如果不克隆或未设置环境变量，nvim-for-oi 会自动回退到仓库自带的 mini 模板库（`all-snippets/oi-snippets/rbook/code.yaml`），开箱即用。
+
+3. 在你的 `~/.zshrc` 或 `~/.bashrc` 中添加别名或环境变量:
+   ```bash
+   alias vi="NVIM_APPNAME=nvim-for-oi RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml nvim"
+   # 或者全局导出环境变量：
+   # export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
    ```
 
-安装依赖的项目
-```bash
-brew install gum find fd
-```
+4. 安装系统依赖:
+   ```bash
+   # macOS:
+   brew install gum find fd luarocks
+   # rbook 插件解析 YAML 需依赖 lyaml（针对 LuaJIT 的 5.1 ABI 编译）：
+   luarocks --lua-version=5.1 --lua-dir=/opt/homebrew/opt/luajit install lyaml
+   ```
 
-2. 启动 Neovim，lazy.nvim 会自动安装所有插件:
+5. 启动 Neovim，lazy.nvim 会自动安装所有插件:
    ```bash
    nvim
+   # 或使用别名
+   vi
    ```
 
-3. 确保你已安装以下依赖:
+6. 确保你已安装以下依赖:
    - Neovim 0.12+
    - git
    - clangd (用于 C++ LSP 支持)
@@ -291,11 +303,19 @@ Python 模板同样不添加 marker。
 1. 环境变量 `RBOOK_CODE_YAML`（仅当文件确实存在时采用）
 2. 本仓库自带的模板库 `all-snippets/oi-snippets/rbook/code.yaml`（只有 C++ / Python 各一个骨架）
 
-所以克隆本仓库后开箱可用。要用完整书库就在 shell 配置里指过去（本仓库的 `alias v` 就是这么做的）：
+所以克隆本仓库后开箱可用。要使用包含 150+ 算法与数据结构代码模板的完整书库：
 
-```sh
-export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
-```
+1. 克隆 [rbook_nunjucks](https://github.com/rainboyOJ/rbook_nunjucks) 仓库：
+   ```bash
+   mkdir -p ~/mycode/教程与书籍
+   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/教程与书籍/rbook_nunjucks
+   ```
+2. 在 shell 配置里指向该索引（本仓库的 `alias vi` 就是这么做的）：
+   ```sh
+   export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
+   # 或通过别名传递：
+   # alias vi="NVIM_APPNAME=nvim-for-oi RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml nvim"
+   ```
 
 解析规则：模板条目的 `path` 相对于 `code.yaml` 同级的 `code/` 目录。
 依赖：`lyaml`（用 `luarocks --lua-version=5.1 --lua-dir=/opt/homebrew/opt/luajit install lyaml`
