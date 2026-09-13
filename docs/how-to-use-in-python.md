@@ -92,16 +92,18 @@ python3 -c 'import debugpy; print(debugpy.__version__)'
 
 ### Python Treesitter parser
 
-在 Neovim 中执行：
+Neovim **不自带** `python` parser，需要手动安装：
 
 ```vim
 :TSInstall python
 ```
 
-如果直连 GitHub 出现 TLS 下载错误，执行下面的代理安装命令：
+`:TSInstall` 是异步的，要等它打印 `Language installed` 才算装完。
+
+如果直连 GitHub 出现 TLS 下载错误，改用 API 并显式等待：
 
 ```vim
-:lua vim.api.nvim_create_autocmd("User", { pattern = "TSUpdate", once = true, callback = function() require("nvim-treesitter.parsers").python.install_info.url = "https://github.com/tree-sitter/tree-sitter-python" end }); require("nvim-treesitter").install({ "python" }):wait(300000)
+:lua require("nvim-treesitter.install").install({ "python" }, { summary = true })
 ```
 
 验证：
@@ -111,6 +113,11 @@ python3 -c 'import debugpy; print(debugpy.__version__)'
 ```
 
 第一项输出 `true` 表示 parser 可用。
+
+> `python` parser 缺失时不只是没有高亮：在 `.py` 里按 `gcc` 会报
+> `Comment.nvim/lua/Comment/ft.lua:280: attempt to index local 'tree' (a nil value)`。
+> 原因与其余 parser 的安装说明见
+> [Treesitter parser 安装指南](how-to-install-treesitter-parsers.md)。
 
 ## 开始写题
 

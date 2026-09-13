@@ -41,8 +41,25 @@ Neovim 自带 `markdown` 和 `markdown_inline`，但**不带** `latex`。而这�
   (#set! injection.language "latex"))
 ```
 
-`tree-sitter-latex` 仓库没有预生成的 `parser.c`，所以 `:TSInstall latex` 需要
-`tree-sitter` CLI 现场生成。直接手工构建更可靠：
+安装：
+
+```vim
+:TSInstall latex
+```
+
+`tree-sitter-latex` 仓库不含预生成的 `parser.c`，`:TSInstall` 会用
+`tree-sitter` CLI 现场生成再编译，日志里会出现
+`Generating parser.c from grammar.json...`，多花几十秒属于正常。
+`:TSInstall` 是**异步**的，要等它打印 `Language installed` 才算完成。
+
+Neovim 会把 `stdpath("data")/site` 自动加进 runtimepath，不需要改配置。
+其余 parser（`cpp` / `python`）的说明见
+[Treesitter parser 安装指南](how-to-install-treesitter-parsers.md)。
+
+<details>
+<summary>后备方案：手工构建</summary>
+
+仅在 `:TSInstall` 不可用（如网络受限）时使用：
 
 ```sh
 cd /tmp
@@ -55,7 +72,7 @@ tree-sitter build -o latex.so .
 cp latex.so ~/.local/share/rainboy-nvim-for-oi/site/parser/latex.so
 ```
 
-Neovim 会把 `stdpath("data")/site` 自动加进 runtimepath，不需要改配置。
+</details>
 
 验证：
 

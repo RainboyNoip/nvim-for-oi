@@ -85,8 +85,18 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
    sudo pacman -S --needed python-debugpy
    ```
 
-   在 Neovim 中执行 `:TSInstall python` 安装 Python parser。完整安装、使用和
-   排错说明见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
+   Treesitter parser 需要手动安装，Neovim 只自带 7 个（`c`、`lua`、
+   `markdown`、`markdown_inline`、`query`、`vim`、`vimdoc`），**不含 `cpp`
+   和 `python`**：
+
+   ```vim
+   :TSInstall cpp python latex
+   ```
+
+   `:TSInstall` 是异步的，要等它打印 `Language installed` 才算装完。
+   漏装是静默的（高亮消失但不报错），排查方法与原因见
+   [Treesitter parser 安装指南](docs/how-to-install-treesitter-parsers.md)。
+   Python 侧的完整使用说明见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
 
 4. 安装调试器(for nvim-dap) —— **当前已禁用，以下仅为将来恢复时的参考**
    - `vscode-cpptools` 扩展(linux): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
