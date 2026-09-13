@@ -10,6 +10,7 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 - **LSP 支持**: C++ 使用 clangd，Python 使用宽松诊断的 BasedPyright
 - **调试支持**: nvim-dap **已暂时禁用**（2026-08-22），改用终端 cgdb / gdbgui
 - **代码补全**: 使用 nvim-cmp 提供智能补全
+- **AI 补全**: minuet-ai.nvim 接 DeepSeek FIM，默认**关闭**（`OI_AI=0`），见 [AI 补全指南](docs/how-to-use-ai-completion.md)
 - **主题**: 默认使用 nightfly 主题，并通过 themify 管理可切换主题
 - **状态栏**: 使用 lualine 状态栏
 - **文件浏览 / Picker**: 使用 snacks.nvim 的 explorer、picker 和 dashboard
@@ -17,31 +18,43 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 
 ## 安装
 
-1. 克隆此仓库到你的 Neovim 配置目录:
+1. 克隆此仓库到你的 Neovim 配置目录。
+
+   作为**主配置**（替换默认的 `~/.config/nvim`，之后直接用 `nvim` / `vi`）：
    ```bash
    git clone https://github.com/RainboyNoip/nvim-for-oi ~/.config/nvim
    ```
 
-或者作为独立配置安装:
-
+   或者作为**独立配置**安装。这种方式通过 `NVIM_APPNAME` 与其它 Neovim 配置
+   隔离，**目录名必须与下面第 3 步的 appname 一致**：
    ```bash
-   git clone https://github.com/RainboyNoip/nvim-for-oi ~/.config/nvim-for-oi
+   git clone https://github.com/RainboyNoip/nvim-for-oi ~/.config/rainboy-nvim-for-oi
    ```
 
 2. （可选）安装算法代码模板库 [rbook_nunjucks](https://github.com/rainboyOJ/rbook_nunjucks):
    配置中的 `<Leader>of`（插入模板）与 `<Leader>oe`（浏览模板文件）支持 150+ 常用算法与数据结构模板，模板索引来自 `rbook_nunjucks` 仓库：
    ```bash
-   mkdir -p ~/mycode/教程与书籍
-   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/教程与书籍/rbook_nunjucks
+   mkdir -p ~/mycode
+   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/rbook_nunjucks
    ```
    > **说明**：如果不克隆或未设置环境变量，nvim-for-oi 会自动回退到仓库自带的 mini 模板库（`all-snippets/oi-snippets/rbook/code.yaml`），开箱即用。
 
-3. 在你的 `~/.zshrc` 或 `~/.bashrc` 中添加别名或环境变量:
+3. 在你的 `~/.zshrc` 或 `~/.bashrc` 中添加以下内容:
    ```bash
-   alias vi="NVIM_APPNAME=nvim-for-oi RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml nvim"
-   # 或者全局导出环境变量：
-   # export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
+   # 关闭 minuet AI 补全，避免在禁用 AI 的比赛中误发请求。
+   # 需要 AI 时临时覆盖：OI_AI=1 vi main.cpp
+   export OI_AI=0
+   # rbook 模板库索引，<Leader>of / <Leader>oe 的数据源
+   export RBOOK_CODE_YAML=~/mycode/rbook_nunjucks/book/code.yaml
+   # 用独立 appname 启动，避免与其他 Neovim 配置互相覆盖。
+   # 目录名必须与它一致，即上面第 1 步的独立安装方式。
+   # 若把仓库克隆成了主配置 ~/.config/nvim，请删掉这两行 alias。
+   alias vi="NVIM_APPNAME=rainboy-nvim-for-oi nvim"
+   alias vim=vi
    ```
+
+   > `OI_AI` 是**字符串比较**（`vim.env.OI_AI ~= "0"`），只有正好等于 `0` 才关闭；
+   > `false`、`no`、空串都不会生效。详见 [AI 补全指南](docs/how-to-use-ai-completion.md)。
 
 4. 安装系统依赖:
    ```bash
@@ -121,7 +134,7 @@ rainboyVim-for-oi/
 │   │   ├── autopairs.lua
 │   │   ├── colortheme.lua
 │   │   ├── marks.lua
-│   │   ├── minuet.lua           # AI 补全（需 DEEPSEEK_API_KEY）
+│   │   ├── minuet.lua           # AI 补全（需 DEEPSEEK_API_KEY；OI_AI=0 时整个不加载）
 │   │   ├── render-markdown.lua  # Markdown 渲染（<Leader>mm 切换）
 │   │   ├── lang-cpp.lua         # 挂载下面的本地插件
 │   │   ├── lang-python.lua
@@ -231,7 +244,7 @@ all-snippets/vscode-snippets/ from_vscode.lazy_load()  按 filetype 懒加载
 
 ```
 ft     → lua/local/*（cpp / python 设置）、LuaSnip、treesitter 的高亮
-keys   → bufferline、minuet、rbook
+keys   → bufferline、rbook
 cmd    → rbook.nvim
 module → luasnip（nvim-cmp 在 InsertEnter 会 require 它）
 event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
@@ -282,6 +295,7 @@ Python 模板同样不添加 marker。
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
+- AI 补全的 `<Leader>a*` 与 `<M-*>` 键默认**不存在**（`OI_AI=0`），需要时见 [AI 补全指南](docs/how-to-use-ai-completion.md)
 
 #### rbook：按文件类型过滤
 
@@ -310,14 +324,20 @@ Python 模板同样不添加 marker。
 
 1. 克隆 [rbook_nunjucks](https://github.com/rainboyOJ/rbook_nunjucks) 仓库：
    ```bash
-   mkdir -p ~/mycode/教程与书籍
-   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/教程与书籍/rbook_nunjucks
+   mkdir -p ~/mycode
+   git clone https://github.com/rainboyOJ/rbook_nunjucks.git ~/mycode/rbook_nunjucks
    ```
-2. 在 shell 配置里指向该索引（本仓库的 `alias vi` 就是这么做的）：
+2. 在 shell 配置里指向该索引：
    ```sh
-   export RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml
-   # 或通过别名传递：
-   # alias vi="NVIM_APPNAME=nvim-for-oi RBOOK_CODE_YAML=~/mycode/教程与书籍/rbook_nunjucks/book/code.yaml nvim"
+   export RBOOK_CODE_YAML=~/mycode/rbook_nunjucks/book/code.yaml
+   ```
+
+   该仓库还自带 `dotfiles/`，提供对拍、随机数据生成、画图等 OI 脚本
+   （`duipai.py`、`one-duipai.py`、`randint.py`、`dot2png.py`、`luogu.py` 等）。
+   运行 `./install.sh` 会把 `dotfiles/scripts` 加入 shell 的 `PATH` 并安装 tmux 配置；
+   也可以只手动加一行：
+   ```sh
+   export PATH="$PATH:$HOME/mycode/rbook_nunjucks/dotfiles/scripts"
    ```
 
 解析规则：模板条目的 `path` 相对于 `code.yaml` 同级的 `code/` 目录。
@@ -384,7 +404,7 @@ CompileFlags:
 - **akinsho/bufferline.nvim**: buffer 标签栏
 - **bluz71/vim-nightfly-colors**: 默认主题
 - **LmanTW/themify.nvim**: 主题管理，使用 `:Themify`、`<I>` 安装主题
-- **milanglacier/minuet-ai.nvim**: AI 补全（需 `DEEPSEEK_API_KEY`）
+- **milanglacier/minuet-ai.nvim**: AI 补全（需 `DEEPSEEK_API_KEY`）；`OI_AI=0` 时整个插件不加载
 - **chentoast/marks.nvim**: 位置书签
 - **MeanderingProgrammer/render-markdown.nvim**: 在 buffer 内渲染 Markdown（`<Leader>mm` 切换）；
   公式渲染需要额外的 `latex` parser 与 `utftex`/`latex2text`，见 [公式渲染指南](docs/how-to-render-math.md)
