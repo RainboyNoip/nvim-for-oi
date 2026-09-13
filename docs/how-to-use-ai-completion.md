@@ -69,13 +69,59 @@ Fast 只有一个候选，因此 `<M-[>` / `<M-]>` 不会切换到其他内容�
 参加不允许 AI 的比赛时，在启动 Neovim 前设置 `OI_AI=0`，插件将完全不加载：
 
 ```zsh
-OI_AI=0 NVIM_APPNAME=rainboyNvim nvim main.cpp
+OI_AI=0 vi main.cpp
 ```
 
 恢复普通启动即可重新启用：
 
 ```zsh
-NVIM_APPNAME=rainboyNvim nvim main.cpp
+vi main.cpp
+```
+
+判断逻辑在 `lua/plugins/minuet.lua:6`：
+
+```lua
+enabled = vim.env.OI_AI ~= "0",
+```
+
+即环境变量**正好等于字符串 `0`** 时才关闭。`vim.env` 读到的永远是字符串，
+未设置时是 `nil`，`nil ~= "0"` 成立，所以默认开启。
+
+### 三个容易踩的坑
+
+**必须 `export`。** 裸写只设当前 shell 的变量，nvim 的进程环境里看不到：
+
+```zsh
+export OI_AI=0    # 正确
+OI_AI=0           # 错误：nvim 读不到
+```
+
+**必须是 `0`。** 判断是字符串比较，下列写法都会保持开启：
+
+| 写法 | nvim 读到的值 | 结果 |
+| --- | --- | --- |
+| `OI_AI=0` | `"0"` | 关闭 |
+| `OI_AI=false` | `"false"` | 仍然开启 |
+| `OI_AI=no` | `"no"` | 仍然开启 |
+| `OI_AI=` | `""` | 仍然开启 |
+| `OI_AI=00` | `"00"` | 仍然开启 |
+| 未设置 | `nil` | 仍然开启 |
+
+**`.zshrc` 只对交互式 zsh 生效。** 从脚本、编辑器任务、agent 或非交互 shell
+启动 nvim 时 `.zshrc` 不会被读取，需要用 `~/.zshenv` 才能覆盖所有场景。
+
+### 想永久关闭
+
+在 shell 启动配置里加一行：
+
+```zsh
+export OI_AI=0
+```
+
+代价是 AI 一直关着。比赛之外想用回来，临时覆盖即可：
+
+```zsh
+OI_AI=1 vi main.cpp
 ```
 
 ## 请求范围
