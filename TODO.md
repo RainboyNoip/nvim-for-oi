@@ -13,5 +13,5 @@
 - [ ] P1-2.6 cmp `<Tab>` 判定顺序改成「补全优先」
 - [x] P1-2.7 LuaSnip 加 `ft` + `module` 懒加载（空启动 42→23 ms）
 - [ ] P1-2.8 `completeopt` 只让 cmp 一处设
-- [ ] P2 删 marks.nvim / render-markdown.nvim / DAP 全套 / 多余配色 / 空目录等
+- [ ] P2 删 marks.nvim / DAP 全套 / 多余配色 / 空目录等
 - [ ] P2-4.1 `lua/lsp.lua` 给 clangd 补 `executable()` 保护

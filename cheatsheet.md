@@ -76,6 +76,19 @@
 | `<Leader>af` | 切换到 Fast 模式 |
 | `<Leader>ac` | 切换到 Choice 模式 |
 
+## Markdown 渲染
+
+仅在 `markdown` filetype 下自动启用（`lua/plugins/render-markdown.lua`）。
+关掉渲染即可看到源码，`q` 行为不受影响。
+
+| 快捷键 | 说明 |
+| --- | --- |
+| `<Leader>mm` | 切换当前 buffer 的 Markdown 渲染 |
+| `<Leader>me` | 开启 Markdown 渲染 |
+| `<Leader>md` | 关闭 Markdown 渲染 |
+
+命令等同：`:RenderMarkdown toggle` / `enable` / `disable`。
+
 ## C++ Buffer
 
 只有一个是真正 C++ 专属的键（实现在 `lua/local/cpp-settings/`）：

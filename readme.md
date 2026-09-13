@@ -121,7 +121,7 @@ rainboyVim-for-oi/
 │   │   ├── colortheme.lua
 │   │   ├── marks.lua
 │   │   ├── minuet.lua           # AI 补全（需 DEEPSEEK_API_KEY）
-│   │   ├── render-markdown.lua  # 已禁用
+│   │   ├── render-markdown.lua  # Markdown 渲染（<Leader>mm 切换）
 │   │   ├── lang-cpp.lua         # 挂载下面的本地插件
 │   │   ├── lang-python.lua
 │   │   ├── rbook.lua
@@ -276,6 +276,7 @@ Python 模板同样不添加 marker。
 - `<Leader>oe`: 浏览 rbook 代码文件（按当前文件类型过滤）
 - `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
 - `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
+- `<Leader>mm` / `<Leader>me` / `<Leader>md`: 切换 / 开启 / 关闭 Markdown 渲染
 - `<C-h/j/k/l>`: 在窗口间切换
 - `<C-Up/Down/Left/Right>`: 调整窗口大小
 - `<C-s>`: 保存文件 (Normal 和 Insert 模式)
@@ -383,12 +384,12 @@ CompileFlags:
 - **LmanTW/themify.nvim**: 主题管理，使用 `:Themify`、`<I>` 安装主题
 - **milanglacier/minuet-ai.nvim**: AI 补全（需 `DEEPSEEK_API_KEY`）
 - **chentoast/marks.nvim**: 位置书签
+- **MeanderingProgrammer/render-markdown.nvim**: 在 buffer 内渲染 Markdown（`<Leader>mm` 切换）
 
 已禁用但仍留在仓库（将来可能恢复）：
 
 - **mfussenegger/nvim-dap**、**rcarriga/nvim-dap-ui**：`lua/plugins/dap.lua` 与
   `lua/plugins/nvim-dap-ui.lua` 整块被注释；`lua/plugins/dap/` 目录也没有被 import
-- **MeanderingProgrammer/render-markdown.nvim**：`enabled = false`
 - **bluz71/vim-moonfly-colors**: 已不在 `lazy-lock.json`（`colortheme.lua` 里作为兜底主题名引用，但未安装）
 
 > 这份列表以 `lazy-lock.json`（共 21 个插件）为准逐个核对过；`nvim-lspconfig` 与
