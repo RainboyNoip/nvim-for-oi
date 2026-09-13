@@ -12,7 +12,7 @@
 - 沿用现有 lazy.nvim、nvim-cmp、LuaSnip 和 nvim-dap，不引入 Mason 或 Python 专用封装插件。
 - 每个阶段先增加一个会失败的可重复检查，再写最小配置使其通过。
 - 每个阶段单独提交，便于定位回归。
-- 所有 headless 命令显式设置 `NVIM_APPNAME=rainboyNvim`。
+- 所有 headless 命令显式设置 `NVIM_APPNAME=rainboy-nvim-for-oi`。
 - 外部工具缺失不能阻止普通 Python buffer 编辑。
 
 ## 当前基线
@@ -34,7 +34,7 @@ C++ DAP configuration 数量为 1
 基线检查命令：
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua assert(vim.lsp.config.clangd)' \
   '+lua assert(#require("luasnip").get_snippets("cpp") == 37)' \
   '+lua assert(#(require("dap").configurations.cpp or {}) == 1)' \
@@ -116,7 +116,7 @@ python3 -c 'import debugpy; print(debugpy.__version__)'
 ### Step 2：运行结构检查并确认失败
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -149,7 +149,7 @@ NVIM_APPNAME=rainboyNvim nvim --headless \
 ### Step 5：运行结构检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -171,7 +171,7 @@ NVIM_APPNAME=rainboyNvim nvim --headless \
 ```bash
 fixture="$(mktemp --tmpdir="$PWD" .python-lsp-XXXXXX.py)"
 printf 'import os\nprint(not_defined)\n' > "$fixture"
-NVIM_APPNAME=rainboyNvim nvim --headless "$fixture" \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless "$fixture" \
   '+lua dofile("tests/headless/python_lsp.lua")' \
   '+qa'
 status=$?
@@ -240,7 +240,7 @@ git commit -m "feat: add Python LSP support"
 ### Step 5：运行检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -248,7 +248,7 @@ NVIM_APPNAME=rainboyNvim nvim --headless \
 再验证 C++ buffer 没有继承 Python fold marker：
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless sample.cpp \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless sample.cpp \
   '+lua assert(vim.bo.filetype == "cpp")' \
   '+lua assert(vim.wo.foldmarker == "//oisnip_begin,//oisnip_end")' \
   '+qa'
@@ -325,7 +325,7 @@ git commit -m "feat: add Python buffer settings"
 ### Step 5：运行检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -445,7 +445,7 @@ require("plugins.dap.python").setup(dap)
 ### Step 5：运行结构和回归检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -562,7 +562,7 @@ git status --short
 ### Step 2：运行 headless 总检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua dofile("tests/headless/python_support.lua")' \
   '+qa'
 ```
@@ -574,7 +574,7 @@ NVIM_APPNAME=rainboyNvim nvim --headless \
 ```bash
 fixture="$(mktemp --tmpdir="$PWD" .python-lsp-XXXXXX.py)"
 printf 'import os\nprint(not_defined)\n' > "$fixture"
-NVIM_APPNAME=rainboyNvim nvim --headless "$fixture" \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless "$fixture" \
   '+lua dofile("tests/headless/python_lsp.lua")' \
   '+qa'
 status=$?
@@ -596,7 +596,7 @@ exit "$status"
 ### Step 5：运行 C++ 回归检查
 
 ```bash
-NVIM_APPNAME=rainboyNvim nvim --headless \
+NVIM_APPNAME=rainboy-nvim-for-oi nvim --headless \
   '+lua assert(vim.lsp.config.clangd)' \
   '+lua assert(#require("luasnip").get_snippets("cpp") == 37)' \
   '+lua assert(#(require("dap").configurations.cpp or {}) == 1)' \
