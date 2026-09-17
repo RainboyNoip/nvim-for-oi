@@ -40,8 +40,6 @@ return {
         { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "关闭未固定 buffer" },
         { "<leader>br", "<Cmd>BufferLineCloseRight<CR>",           desc = "关闭右侧 buffer" },
         { "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>",            desc = "关闭左侧 buffer" },
-        { "<S-h>",      "<cmd>BufferLineCyclePrev<cr>",            desc = "上一个 buffer" },
-        { "<S-l>",      "<cmd>BufferLineCycleNext<cr>",            desc = "下一个 buffer" },
         { "[b",         "<cmd>BufferLineCyclePrev<cr>",            desc = "上一个 buffer" },
         { "]b",         "<cmd>BufferLineCycleNext<cr>",            desc = "下一个 buffer" },
         { "[B",         "<cmd>BufferLineMovePrev<cr>",             desc = "向左移动 buffer" },
