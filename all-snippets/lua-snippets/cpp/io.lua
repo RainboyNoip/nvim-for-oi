@@ -63,7 +63,9 @@ return {
     -- 触发词包含左括号，右括号会保留在 buffer 中。
     s(
         {
-            trig = "%((i%s+([%w_ ]+))",
+            -- LuaSnip 的 pattern trigger 从整段行前缀开头匹配；捕获左括号前的
+            -- 内容后再原样插回，因而可用于 `int f(i a b c)`，不只限行首。
+            trig = "(.*%()i%s+([%w_ ]+)",
             regTrig = true,
             hidden = true,
             priority = 2000, -- 比通用的 i a b c 规则优先，确保括号内走形参展开。
@@ -72,7 +74,7 @@ return {
             desc = "(i a b c) -> (int a,int b,int c)",
         },
         f(function(_, snip)
-            return "(" .. typed_parameters(utils.capture_words(snip, 2))
+            return snip.captures[1] .. typed_parameters(utils.capture_words(snip, 2))
         end, {})
     ),
 
