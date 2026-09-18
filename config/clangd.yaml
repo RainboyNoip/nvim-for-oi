@@ -1,0 +1,4 @@
+# 适用于竞赛单文件的用户级 clangd 配置。
+Diagnostics:
+  # <bits/stdc++.h> 等聚合头在 OI 中很常见，不报告其“未使用”诊断。
+  UnusedIncludes: None

@@ -392,6 +392,16 @@ ln -s "$(pwd)/config/clang-format" "$HOME/.clang-format"
 `~/.clang-format` 是 clang-format 的用户级配置；它会应用到主目录下所有未被项目
 `.clang-format` 覆盖的 C++ 文件。规则更新后无需重新链接，重启 Neovim 后保存文件即可。
 
+仓库也提供 [clangd.yaml](config/clangd.yaml)，关闭 OI 常见的“未使用头文件”诊断。
+安装为 clangd 用户配置：
+
+```bash
+mkdir -p "$HOME/.config/clangd"
+ln -s "$(pwd)/config/clangd.yaml" "$HOME/.config/clangd/config.yaml"
+```
+
+重启 Neovim 后生效。项目目录中的 `.clangd` 可以覆盖这项用户级设置。
+
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 
 Python LSP 由 BasedPyright 提供，使用适合 OJ 的宽松诊断。Python 的模板、

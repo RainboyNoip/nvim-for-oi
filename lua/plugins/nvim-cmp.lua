@@ -109,6 +109,13 @@ return {
       completion = {
         completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect"),
       },
+      -- clangd 的函数参数补全使用 LSP snippet；交给 LuaSnip 展开后，
+      -- 下面的 <Tab>/<S-Tab> 映射才能在各参数占位符之间跳转。
+      snippet = {
+        expand = function(args)
+          luasnip.lsp_expand(args.body)
+        end,
+      },
       preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
       mapping = cmp.mapping.preset.insert({
         ["<C-b>"] = cmp.mapping.scroll_docs(-4),

@@ -24,16 +24,8 @@ return {
     -- 真正的工程标记（.clangd / compile_commands.json 等）保留，真实项目的 root 不变。
     root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "compile_flags.txt", "configure.ac" },
 
---     Diagnostics:
---   IncludeCleaner:
---     Check: Never
-
     init_options = {
         fallbackFlags = { '--std=c++17' },
-        Diagnostics = {
-            -- Suppress = { "unused-includes" },
-            UnusedIncludes = "None"
-        },
     },
 
     capabilities = {
