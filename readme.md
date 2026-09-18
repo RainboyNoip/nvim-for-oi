@@ -74,7 +74,7 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 6. 确保你已安装以下依赖:
    - Neovim 0.12+
    - git
-   - clangd (用于 C++ LSP 支持)
+   - clang（提供 C++ LSP 所需的 clangd，以及自动格式化所需的 clang-format；Arch Linux：`sudo pacman -S --needed clang`）
    - ruff（Python 自动格式化；Arch Linux：`sudo pacman -S ruff`，或 `pip install ruff`）
    - nodejs (某些插件可能需要)
 
@@ -378,6 +378,19 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 
 C++ 文件在保存前也会自动用 clangd 格式化（`.cpp`、`.hpp`、`.h`、`.cc`、`.cxx`）；
 clangd 尚未附着时会跳过本次格式化，不影响保存。
+
+#### 安装全局 C++ 格式规则
+
+仓库提供 [clang-format](config/clang-format)，用于 OI 单文件：
+短 `if`（无 `else`）、`for` 和 `while` 会在一行内保留，例如
+`if (l == r) return tree[p].sum;`。在仓库根目录执行一次：
+
+```bash
+ln -s "$(pwd)/config/clang-format" "$HOME/.clang-format"
+```
+
+`~/.clang-format` 是 clang-format 的用户级配置；它会应用到主目录下所有未被项目
+`.clang-format` 覆盖的 C++ 文件。规则更新后无需重新链接，重启 Neovim 后保存文件即可。
 
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 

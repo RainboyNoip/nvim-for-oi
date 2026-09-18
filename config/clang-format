@@ -1,0 +1,9 @@
+# 竞赛单文件的全局 C++ 格式规则。
+BasedOnStyle: LLVM
+IndentWidth: 2
+
+# if 没有 else 时，将短语句压缩为一行。
+AllowShortIfStatementsOnASingleLine: WithoutElse
+
+# 将短 for / while 循环压缩为一行。
+AllowShortLoopsOnASingleLine: true
