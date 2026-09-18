@@ -135,23 +135,24 @@ return {
         -- end,
 
         -- [[ 主要改动点 4: 智能的 Tab 键 ]]
-          -- 1. 如果光标在代码片段的可跳转节点上，跳转到下一节点
-          -- 2. 如果补全菜单可见，选择下一项
-          -- 3. 否则，执行 fallback (插入 Tab 字符)
+        -- tip: 不要动改动下面的顺序: 因为local jumpable and expand maybe both are acitve, so now expand
+        -- 1. 如果可以补全_补全菜单可见，选择下一项
+        -- 2. 如果光标在代码片段的可跳转节点上，跳转到下一节点
+        -- 3. 否则，执行 fallback (插入 Tab 字符)
           ["<Tab>"] = cmp.mapping(function(fallback)
-            if luasnip.locally_jumpable(1) then
-              luasnip.jump(1)
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            elseif cmp.visible() then
-              cmp.select_next_item()
-            -- elseif luasnip.expand_or_jumpable() then
-            --   luasnip.expand_or_jump()
-            -- elseif has_words_before() then
-            --   cmp.complete()
-            else
-              fallback()
-            end
+              if luasnip.expand_or_jumpable() then
+                  luasnip.expand_or_jump()
+              elseif luasnip.locally_jumpable(1) then
+                  luasnip.jump(1)
+              elseif cmp.visible() then
+                  cmp.select_next_item()
+                  -- elseif luasnip.expand_or_jumpable() then
+                  --   luasnip.expand_or_jump()
+                  -- elseif has_words_before() then
+                  --   cmp.complete()
+              else
+                  fallback()
+              end
           end, { "i", "s" }), -- i: 插入模式, s: 选择模式
 
           ["<S-Tab>"] = cmp.mapping(function(fallback)
