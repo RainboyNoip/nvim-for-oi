@@ -13,6 +13,19 @@ end
 local M = {}
 local did_create_fold_autocmd = false
 local did_create_keymap_autocmd = false
+local did_create_format_autocmd = false
+
+local function format_cpp_buffer(bufnr)
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
+  local formatting = vim.lsp.protocol.Methods.textDocument_formatting
+  for _, client in ipairs(clients) do
+    if client:supports_method(formatting, { bufnr = bufnr }) then
+      vim.lsp.buf.format({ bufnr = bufnr, async = false, timeout_ms = 3000 })
+      return true
+    end
+  end
+  return false
+end
 
 -- 给单个 buffer 绑定 `<leader>;`：必须逐 buffer 绑，这个键只对 C/C++ 有意义。
 local function map_leader_semicolon(bufnr)
@@ -20,6 +33,14 @@ local function map_leader_semicolon(bufnr)
     buffer = bufnr or true,
     silent = true,
     desc = "在行尾添加分号",
+  })
+
+  vim.keymap.set('n', '<leader>cf', function()
+    format_cpp_buffer(vim.api.nvim_get_current_buf())
+  end, {
+    buffer = bufnr or true,
+    silent = true,
+    desc = "格式化 C++ 代码",
   })
 end
 
@@ -45,6 +66,23 @@ local function create_cpp_fold_autocmd()
       end, 10)
     end,
     desc = "打开C++文件后自动折叠所有代码"
+  })
+end
+
+local function create_cpp_format_autocmd()
+  if did_create_format_autocmd then
+    return
+  end
+  did_create_format_autocmd = true
+
+  local group = vim.api.nvim_create_augroup("RainboyCppFormat", { clear = true })
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = group,
+    pattern = { "*.cpp", "*.hpp", "*.h", "*.cc", "*.cxx" },
+    desc = "保存前用 clangd 格式化 C++ 代码",
+    callback = function(args)
+      format_cpp_buffer(args.buf)
+    end,
   })
 end
 
@@ -84,6 +122,7 @@ function M.setup()
   map_leader_semicolon()
   create_cpp_keymap_autocmd()
   create_cpp_fold_autocmd()
+  create_cpp_format_autocmd()
 end
 
 -- 返回这个模块，这样其他文件才能 require 它

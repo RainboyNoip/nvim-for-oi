@@ -75,6 +75,7 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
    - Neovim 0.12+
    - git
    - clangd (用于 C++ LSP 支持)
+   - ruff（Python 自动格式化；Arch Linux：`sudo pacman -S ruff`，或 `pip install ruff`）
    - nodejs (某些插件可能需要)
 
    Arch Linux 上的 Python OJ 依赖:
@@ -300,6 +301,7 @@ Python 模板同样不添加 marker。
 - `<Leader>oe`: 浏览 rbook 代码文件（按当前文件类型过滤）
 - `<Leader>rr` / `<Leader>rd`: 刷新 rbook 索引 / 检查模板索引（`RbookDoctor`）
 - `<Leader>sf`: 查看当前文件 LSP 符号，支持 C++ 和 Python
+- `<Leader>cf`: 用 clangd 格式化当前 C++ 文件
 - `<Leader>mm` / `<Leader>me` / `<Leader>md`: 切换 / 开启 / 关闭 Markdown 渲染。
   公式以 Unicode 近似显示（非 KaTeX），依赖见 [公式渲染指南](docs/how-to-render-math.md)
 - `<C-h/j/k/l>`: 在窗口间切换
@@ -373,6 +375,9 @@ C++ LSP 支持通过 clangd 提供，支持以下功能:
 - 重命名符号
 - 代码诊断
 - 当前文件符号列表 (`<Leader>sf`)
+
+C++ 文件在保存前也会自动用 clangd 格式化（`.cpp`、`.hpp`、`.h`、`.cc`、`.cxx`）；
+clangd 尚未附着时会跳过本次格式化，不影响保存。
 
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 

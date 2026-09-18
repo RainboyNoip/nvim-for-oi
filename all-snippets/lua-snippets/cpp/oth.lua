@@ -10,8 +10,8 @@ local f = ls.function_node
 local fmt = require("luasnip.extras.fmt").fmt
 
 return {
-    -- 输入 re 时补全 return，并可继续填写返回值。
-    s("return", fmt("return {};", { i(1, "0") })),
+    -- 输入 re 时补全 return;，需要返回值时可在分号前填写。
+    s("return", { t("return"), i(1), t(";") }),
 
     -- re x -> return x;
     s(

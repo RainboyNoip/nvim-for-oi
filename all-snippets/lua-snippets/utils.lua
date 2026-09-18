@@ -27,15 +27,16 @@ end
 
 -- 构造“第一个捕获组的变量列表 -> 转换成代码”的 snippet。
 -- 适合 ci/co/all/so 这类后面跟一串 token 的触发方式。
-function M.token_transform(trigger, name, desc, transform)
+function M.token_transform(trigger, name, desc, transform, opts)
+    opts = opts or {}
     return s(
-        {
+        vim.tbl_extend("force", {
             trig = trigger,
             regTrig = true,
             trigEngine = "pattern",
             name = name,
             desc = desc,
-        },
+        }, opts),
         f(function(_, snip)
             return transform(M.capture_words(snip, 1), snip)
         end, {})

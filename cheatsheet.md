@@ -322,6 +322,7 @@ for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、
 | --- | --- |
 | `ln` | `out.ln();` |
 | `i a b c` | `int a,b,c;` |
+| `(i a b c)` | `(int a,int b,int c)`（函数参数） |
 | `i0 a b c` | `int a=0,b=0,c=0;` |
 | `ci a b c` | `std::cin >> a >> b >> c;` |
 | `ci a[1] a[2]` | `std::cin >> a[1] >> a[2];` |

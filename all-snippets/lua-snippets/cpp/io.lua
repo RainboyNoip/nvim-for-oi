@@ -34,6 +34,11 @@ local function join_initialized(values, init_value)
     return table.concat(result, ",")
 end
 
+-- 每个变量单独声明，便于在 OI 代码中逐行增删或加注释。
+local function typed_parameters(values)
+    return "int " .. table.concat(values, ",int ")
+end
+
 return {
     -- ln -> fast output 的换行。
     s({ trig = "ln", desc = "out.ln()" }, t("out.ln();", "")),
@@ -45,7 +50,30 @@ return {
         "int a,b,c",
         function(vars)
             return string.format("int %s;", join_csv(vars))
-        end
+        end,
+        {
+            -- 左括号后的 i 由下面的函数参数 snippet 处理。
+            condition = function(line_to_cursor)
+                return not line_to_cursor:match("%(i%s+[%w_ ]+$")
+            end,
+        }
+    ),
+
+    -- (i a b c) -> (int a,int b,int c)，用于函数形参列表。
+    -- 触发词包含左括号，右括号会保留在 buffer 中。
+    s(
+        {
+            trig = "%((i%s+([%w_ ]+))",
+            regTrig = true,
+            hidden = true,
+            priority = 2000, -- 比通用的 i a b c 规则优先，确保括号内走形参展开。
+            trigEngine = "pattern",
+            name = "int parameters",
+            desc = "(i a b c) -> (int a,int b,int c)",
+        },
+        f(function(_, snip)
+            return "(" .. typed_parameters(utils.capture_words(snip, 2))
+        end, {})
     ),
 
     -- i0 a b c -> int a=0,b=0,c=0;
