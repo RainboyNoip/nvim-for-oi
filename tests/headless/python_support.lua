@@ -151,7 +151,7 @@ local function run()
     assert_equal(trigger_counts[trigger], 1, "general Python snippet: " .. trigger)
   end
 
-  assert_equal(#luasnip.get_snippets("cpp"), 40, "C++ snippet count")
+  assert_equal(#luasnip.get_snippets("cpp"), 41, "C++ snippet count")
 
   local package_path = assets.vscodeSnippets .. "/package.json"
   local package = vim.json.decode(table.concat(vim.fn.readfile(package_path), "\n"))
