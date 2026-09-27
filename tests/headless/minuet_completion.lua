@@ -49,12 +49,12 @@ local function run()
   assert_equal(virtualtext.auto_trigger_ft, { "c", "cpp", "python" }, "auto-trigger filetypes")
   assert_equal(virtualtext.show_on_completion_menu, false, "completion menu visibility")
   assert_equal(virtualtext.keymap.accept, "<M-a>", "whole-completion keymap")
-  assert_equal(virtualtext.keymap.accept_line, "<M-l>", "line keymap")
+  assert_equal(virtualtext.keymap.accept_line, "<M-n>", "line keymap")
   assert_equal(virtualtext.keymap.next, "<M-]>", "next keymap")
   assert_equal(virtualtext.keymap.prev, "<M-[>", "previous keymap")
   assert_equal(virtualtext.keymap.dismiss, "<M-e>", "dismiss keymap")
 
-  for _, lhs in ipairs({ "<M-a>", "<M-l>", "<M-[>", "<M-]>", "<M-e>" }) do
+  for _, lhs in ipairs({ "<M-a>", "<M-n>", "<M-[>", "<M-]>", "<M-e>" }) do
     local mapping = vim.fn.maparg(lhs, "i", false, true)
     assert(not vim.tbl_isempty(mapping), "missing Minuet insert mapping: " .. lhs)
   end

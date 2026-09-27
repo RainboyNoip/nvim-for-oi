@@ -56,7 +56,7 @@ return {
         show_on_completion_menu = false,
         keymap = {
           accept = has_deepseek_key and "<M-a>" or nil,
-          accept_line = has_deepseek_key and "<M-l>" or nil,
+          accept_line = has_deepseek_key and "<M-n>" or nil,
           accept_n_lines = nil,
           prev = has_deepseek_key and "<M-[>" or nil,
           next = has_deepseek_key and "<M-]>" or nil,
