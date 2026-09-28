@@ -35,8 +35,8 @@ Neovim 不负责：
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 显式注册 `all-snippets/lua-snippets/` 的 cpp / python 入口 |
-| `all-snippets/lua-snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
-| `all-snippets/vscode-snippets/python.json` | 25 个 Neovim / VSCode 共用的通用 Python snippets |
+| `all-snippets/lua-snippets/python.lua` | 41 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `all-snippets/vscode-snippets/python.json` | 27 个 Neovim / VSCode 共用的通用 Python snippets |
 | `all-snippets/vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
 | `all-snippets/oi-snippets/files/simple_template.py` | Python 完整 OJ 模板 |
@@ -175,11 +175,10 @@ if __name__ == "__main__":
 输入 trigger 后按 `<C-K>` 展开。使用 `<C-L>` / `<C-J>` 跳到下一个或
 上一个字段，`<C-E>` 切换 choice node。
 
-### OJ snippets（17 个）
+### OJ snippets（16 个）
 
 | Trigger | 默认展开结果 |
 | --- | --- |
-| `main` | buffered input、`solve()` 和 main guard |
 | `solve` | `def solve():` |
 | `fastin` | 导入 `sys` 并设置 `input = sys.stdin.buffer.readline` |
 | `ii` | `n = int(input())` |
@@ -234,13 +233,16 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 `ee` 系列把边读入 `g[u].append(v)`（带权时 append `(v, w)`），`ef u`
 遍历 `for v, w in g[u]:`。使用前需先建立 `g = [[] for _ in range(n + 1)]`。
 
-### 通用 snippets（25 个）
+### 通用 snippets（27 个）
 
 这些 snippets 来自 `all-snippets/vscode-snippets/python.json`，Neovim 和 VSCode 使用
-相同的 trigger 和 placeholder。
+相同的 trigger 和 placeholder。`main`（buffered input、`solve()` 和 main guard）
+原先定义在 `all-snippets/lua-snippets/python.lua`，现已迁移到这里，触发词不变。
 
 | Trigger | 默认展开结果 |
 | --- | --- |
+| `main` | buffered input、`solve()` 和 main guard |
+| `input` | 用迭代器一次性读完 `sys.stdin.buffer`，构造 `tokens` / `n` / `a` |
 | `df` | 无类型注解的 `def function_name(...):` |
 | `dft` | 带参数和返回值类型注解的函数 |
 | `adf` | 无类型注解的 `async def` |
@@ -276,7 +278,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `61`：36 个 OJ snippets（17 个原生 + 19 个 C++ 对应版）加 25 个通用 snippets。
+应输出 `68`：41 个 OJ snippets 加 27 个通用 snippets。
 
 ## 调试
 

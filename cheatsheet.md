@@ -162,9 +162,11 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 
 ## Python OJ Snippets
 
+这些定义在 `all-snippets/lua-snippets/python.lua`；`main` 已迁到
+`all-snippets/vscode-snippets/python.json`（见下面的「Python 通用 Snippets」）。
+
 | 触发 | 展开结果 |
 | --- | --- |
-| `main` | buffered input、`solve()` 和 main guard |
 | `solve` | `def solve():` |
 | `fastin` | `input = sys.stdin.buffer.readline` |
 | `ii` | `n = int(input())` |
@@ -191,7 +193,7 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 ## Python: C++ Snippet 对应版
 
 以下 snippet 触发词与 C++ 版保持一致，展开结果改成 Python 惯用写法，方便在两种语言间切换。
-没有 Python 对应物的 C++ snippet（`scanf` / `magic` / `linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有 Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本。
+没有 Python 对应物的 C++ snippet（`scanf` / `magic` / `linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有 Python snippet 冲突的 `f` / `rf` / `sc` / `dbg` 保留既有版本（`main` 原本也在这一列，现已随 `main` 迁到 `python.json`）。
 
 for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、循环变量规则都对齐）：
 
@@ -242,6 +244,8 @@ for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、
 
 | 触发 | 展开结果 |
 | --- | --- |
+| `main` | buffered input、`solve()` 和 main guard |
+| `input` | 迭代器式整块读入 `tokens` / `n` / `a` |
 | `df` | 定义无类型注解函数 |
 | `dft` | 定义带类型注解函数 |
 | `adf` | 定义异步函数 |

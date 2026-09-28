@@ -1,4 +1,21 @@
 {
+    "OJ主程序模板": {
+        "prefix": "main",
+        "body": [
+            "import sys",
+            "",
+            "input = sys.stdin.buffer.readline",
+            "",
+            "",
+            "def ${1:solve}():",
+            "    ${0:pass}",
+            "",
+            "",
+            "if __name__ == \"__main__\":",
+            "    ${1:solve}()"
+        ],
+        "description": "Python OJ main skeleton"
+    },
     "定义函数": {
         "prefix": "df",
         "body": [
@@ -6,6 +23,17 @@
             "    ${0:pass}"
         ],
         "description": "定义无类型注解的函数"
+    },
+    "输入模板1":{
+        "prefix": "input",
+        "body" : [
+            "import sys",
+            "",
+            "tokens = iter(map(int, sys.stdin.buffer.read().split()))",
+            "n = next(tokens)",
+            "a = [next(tokens) for _ in range(n)]"
+        ]
+
     },
     "定义带类型函数": {
         "prefix": "dft",

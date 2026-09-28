@@ -87,30 +87,8 @@ local function reverse_for(trigger, var, start, stop, opts)
 end
 
 return {
-  s(
-    { trig = "main", desc = "Python OJ main skeleton" },
-    fmt(
-      [[
-      import sys
-
-      input = sys.stdin.buffer.readline
-
-
-      def {name}():
-          {body}
-
-
-      if __name__ == "__main__":
-          {name_call}()
-      ]],
-      {
-        name = i(1, "solve"),
-        body = i(0, "pass"),
-        name_call = rep(1),
-      }
-    )
-  ),
-
+  -- main 骨架已迁移到 all-snippets/vscode-snippets/python.json（trigger 仍是 main），
+  -- 由 LuaSnip 的 from_vscode 加载器注册到 python filetype，Neovim / VSCode 共用。
   s(
     { trig = "solve", desc = "solve() function" },
     fmt(
@@ -290,7 +268,8 @@ return {
 
   -- ===== C++ OJ snippet 的 Python 对应版本 =====
   -- 触发词与 C++ 保持一致，展开结果改成 Python 惯用写法。
-  -- 与既有 Python snippet 冲突的触发词（f / rf / sc / main / dbg）保留既有版本，不在这里重复定义。
+  -- 与既有 Python snippet 冲突的触发词（f / rf / sc / dbg，以及已迁到 python.json 的 main）
+  -- 保留既有版本，不在这里重复定义。
   -- 没有 Python 对应物的 C++ snippet（scanf / magic / linklist / logdef / pii / all / in / ln / 2f 等）不迁移。
 
   -- i0 a b c -> a = b = c = 0

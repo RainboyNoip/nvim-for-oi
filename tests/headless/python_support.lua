@@ -62,7 +62,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 67, "python snippet count")
+  assert_equal(#python_snippets, 68, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do

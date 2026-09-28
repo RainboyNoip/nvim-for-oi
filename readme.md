@@ -267,7 +267,7 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 
 此配置包含一个专门为算法竞赛设计的代码片段系统。当前按职责分成三类:
 
-- `all-snippets/lua-snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、main、return。
+- `all-snippets/lua-snippets/`: LuaSnip 短触发片段，例如 for 循环、输入输出、C++ 的 `main`、return。Python 的 `main` 骨架在 `vscode-snippets/python.json`。
 - `all-snippets/oi-snippets/files/`: file snippet，例如模板、随机数据、log、图生成工具。
 - `all-snippets/vscode-snippets/`: VSCode snippet 格式的通用片段，同时供 LuaSnip 加载。
 
