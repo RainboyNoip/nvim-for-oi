@@ -62,7 +62,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 68, "python snippet count")
+  assert_equal(#python_snippets, 69, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -137,6 +137,7 @@ local function run()
     "eew%s+(%S+)",
     "ee2%s+(%S+)",
     "ee2w%s+(%S+)",
+    "next%s+(.+)",
   }
 
   for _, trigger in ipairs(oj_triggers) do
@@ -181,6 +182,22 @@ local function run()
     error("cannot expand missing snippet: " .. trigger)
   end
 
+  -- 正则触发 snippet 必须走真实匹配路径：直接 snip_expand 拿不到 captures，
+  -- 而 dynamic_node 里的名字就是从 captures 取。
+  -- 末尾补一个空格，让光标落在空格上、等价于“刚打完最后一个 token”。
+  local function expand_regex_snippet(line_before_cursor)
+    if luasnip.in_snippet() then
+      luasnip.unlink_current()
+    end
+    local padded = line_before_cursor .. " "
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { padded })
+    vim.api.nvim_win_set_cursor(0, { 1, #padded - 1 })
+    luasnip.expand()
+    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    lines[#lines] = lines[#lines]:gsub(" $", "")
+    return table.concat(lines, "\n")
+  end
+
   local main_expansion = expand_snippet("main")
   assert(main_expansion:find("def solve():", 1, true), "main snippet must define solve()")
   assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
@@ -195,6 +212,45 @@ local function run()
 
   local line_for = expand_snippet("lf")
   assert(line_for:find("for i in range(1, n + 1):", 1, true), "lf must be a single-line loop")
+
+  -- next a b c：名字从正则捕获取，data 是唯一的可改字段（三处 mirror）
+  local next_three = expand_regex_snippet("next a b c")
+  assert_equal(
+    next_three,
+    "a, b, c = next(data), next(data), next(data)",
+    "next a b c expansion"
+  )
+
+  -- next() 的个数跟名字个数走
+  local next_two = expand_regex_snippet("next a b")
+  assert_equal(next_two, "a, b = next(data), next(data)", "next a b expansion")
+
+  local next_one = expand_regex_snippet("next n")
+  assert_equal(next_one, "n = next(data)", "next n expansion")
+
+  -- data 必须是可跳转的 insert_node，不是死文本；三处 next() 共用一个 jump index。
+  -- 前面的 next n 只有一处 next()，所以这里重新展开一次 next a b c。
+  expand_regex_snippet("next a b c")
+  local node_types = require("luasnip.util.types")
+  assert(luasnip.in_snippet(), "next a b c 展开后必须处于 snippet session 中")
+  local active = luasnip.session.current_nodes[bufnr]
+  assert(active, "展开后应该有 current_node")
+  local inner = active.parent.snippet.insert_nodes[1].snip
+  local insert_nodes, mirror_nodes = {}, {}
+  for _, node in ipairs(inner.nodes) do
+    if node.type == node_types.insertNode then
+      table.insert(insert_nodes, node)
+    elseif node.type == node_types.functionNode then
+      table.insert(mirror_nodes, node)
+    end
+  end
+  assert_equal(#insert_nodes, 1, "next 只应有一个可改字段 data")
+  assert_equal(insert_nodes[1]:get_static_text()[1], "data", "可改字段默认值是 data")
+  assert_equal(#mirror_nodes, 2, "剩下两个 next() 应该是 mirror")
+  for _, node in ipairs(mirror_nodes) do
+    assert_equal(node.args, { 1 }, "mirror 必须指向 jump index 1")
+  end
+  luasnip.unlink_current()
 
   local property = expand_snippet("prop")
   assert(property:find("@property", 1, true), "prop snippet must define a property")

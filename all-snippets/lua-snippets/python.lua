@@ -1,5 +1,7 @@
 local ls = require("luasnip")
 local s = ls.snippet
+local sn = ls.snippet_node
+local d = ls.dynamic_node
 local t = ls.text_node
 local i = ls.insert_node
 local f = ls.function_node
@@ -123,6 +125,36 @@ return {
   s(
     { trig = "strin", desc = "Read and decode a string" },
     fmt("{} = input().strip().decode()", { i(1, "s") })
+  ),
+
+  -- next a b c -> a, b, c = next(data), next(data), next(data)
+  --
+  -- 为什么不用 utils.token_transform：它生成的是 function_node（纯静态文本），
+  -- 展开后不能跳转也不能改。这里要把 data 做成可改且三处同步的字段，
+  -- 所以用 dynamic_node 手写：names 从正则捕获取（不占跳转槽位），
+  -- data 是内层 snippet 的 i(1) 加 rep(1) mirror。
+  -- next() 的个数跟名字个数走：`next a b` -> `a, b = next(data), next(data)`。
+  s(
+    {
+      trig = "next%s+(.+)",
+      regTrig = true,
+      trigEngine = "pattern",
+      name = "a, b, c = next(data), next(data), next(data)",
+      desc = "逐个 next() 读入多个变量",
+    },
+    d(1, function(_, parent_snip)
+      local names = utils.words(parent_snip.captures[1])
+      local nodes = { t(table.concat(names, ", ") .. " = ") }
+      for index in ipairs(names) do
+        if index > 1 then
+          table.insert(nodes, t(", "))
+        end
+        table.insert(nodes, t("next("))
+        table.insert(nodes, index == 1 and i(1, "data") or rep(1))
+        table.insert(nodes, t(")"))
+      end
+      return sn(nil, nodes)
+    end)
   ),
 
   -- ===== for 循环 =====

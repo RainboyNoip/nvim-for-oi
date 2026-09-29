@@ -35,7 +35,7 @@ Neovim 不负责：
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 显式注册 `all-snippets/lua-snippets/` 的 cpp / python 入口 |
-| `all-snippets/lua-snippets/python.lua` | 41 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `all-snippets/lua-snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
 | `all-snippets/vscode-snippets/python.json` | 27 个 Neovim / VSCode 共用的通用 Python snippets |
 | `all-snippets/vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 输入 trigger 后按 `<C-K>` 展开。使用 `<C-L>` / `<C-J>` 跳到下一个或
 上一个字段，`<C-E>` 切换 choice node。
 
-### OJ snippets（16 个）
+### OJ snippets（17 个）
 
 | Trigger | 默认展开结果 |
 | --- | --- |
@@ -185,6 +185,7 @@ if __name__ == "__main__":
 | `ints` | `a, b = map(int, input().split())` |
 | `listi` | `a = list(map(int, input().split()))` |
 | `strin` | `s = input().strip().decode()` |
+| `next a b c` | `a, b, c = next(data), next(data), next(data)`，`data` 展开后直接选中、三处同步 |
 | `f` | `for i in range(n):` |
 | `fr` | 半开区间 `for i in range(left, right):` |
 | `fri` | 闭区间 `for i in range(left, right + 1):` |
@@ -278,7 +279,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `68`：41 个 OJ snippets 加 27 个通用 snippets。
+应输出 `69`：42 个 OJ snippets 加 27 个通用 snippets。
 
 ## 调试
 

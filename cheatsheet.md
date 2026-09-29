@@ -173,6 +173,7 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 | `ints` | `a, b = map(int, input().split())` |
 | `listi` | `a = list(map(int, input().split()))` |
 | `strin` | `s = input().strip().decode()` |
+| `next a b c` | `a, b, c = next(data), next(data), next(data)`，`data` 展开后直接选中、三处同步 |
 | `f` | `for i in range(1, n + 1):`（与 C++ 的 `f` 一致） |
 | `lf` | 单行 `for i in range(1, n + 1):` |
 | `f n` | 上界来自输入（`range(1, n + 1)`） |
