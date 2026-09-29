@@ -25,7 +25,7 @@
 | 2.3 | 字典补全源 → 内存 OI 词表源（方案 A） | ✅ 已重做 (`2026-09`) | `lua/plugins/nvim-cmp.lua`（自定义 cmp source） |
 | 2.4 | `InsertLeave` 自动保存 | ⬜ 待修 | `lua/options.lua:60-70` |
 | 2.5 | Minuet AI 默认自动触发 | ⬜ 待修 | `lua/plugins/minuet.lua` |
-| 2.6 | cmp `<Tab>` 判定顺序 | ⬜ 待修 | `lua/plugins/nvim-cmp.lua:74-96` |
+| 2.6 | cmp `<Tab>` / `<S-Tab>` 优先跳片段节点 | ✅ 已修 (`2026-09`) | `lua/plugins/nvim-cmp.lua`、`lua/plugins/LuaSnip.lua` |
 | 2.7 | LuaSnip 启动期 eager 加载 | ✅ 已修 (`2026-09`) | `lua/plugins/LuaSnip.lua` |
 | 2.8 | `completeopt` 被设置两次 | ⬜ 待修 | `lua/options.lua:3` |
 | 3 | P2 可删项（9 项，含两套模板入口） | ⬜ 待修 | 见 §3 表 |
@@ -158,8 +158,8 @@ nvim --headless a.cpp -c 'e b.cpp' \
 | i `<C-e>` | `:17` `ls.change_choice(1)` | `lua/plugins/nvim-cmp.lua:52` → `cmp.mapping.abort()` | cmp（InsertEnter 时注册，更晚） |
 
 Ctrl 模式下 `L`/`l`、`E`/`e` 是同一个键码，所以这是真冲突，不是"优先级选择"。
-实测 i `<C-l>` 的 rhs 为 `<C-o>$`。现在片段前进只剩 `<Tab>`（且被补全菜单抢，见 2.6），
-片段内正向跳转实际不可用。
+实测 i `<C-l>` 的 rhs 为 `<C-o>$`。正向跳转使用 `<Tab>`，反向跳转使用 `<S-Tab>`
+或 i `<C-j>`；§2.6 已确保 `<Tab>` / `<S-Tab>` 在补全菜单可见时也优先跳片段节点。
 
 `change_choice` 目前另有两条通道，所以不算完全丢失：`lua/keymaps.lua:46-47` 在 **select
 模式**（LuaSnip 激活 choice 节点时的模式）绑了 `<C-n>`/`<C-p>` → `<Plug>luasnip-next-choice`。
@@ -359,27 +359,34 @@ vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, { ... })
 看起来不是有效的 DeepSeek 模型名，请核对（FIM beta 端点通常不是这个名字）。模型名错误
 会让所有请求静默失败，白付一次 round-trip。
 
-### 2.6 cmp `<Tab>` 判定顺序（`lua/plugins/nvim-cmp.lua:74-96`）⬜ 待修
+### 2.6 cmp `<Tab>` 判定顺序（`lua/plugins/nvim-cmp.lua`）✅ 已修
 
-顺序是 `locally_jumpable(1)` → `expand_or_jumpable()` → `cmp.visible()`。
-后果：**光标在活跃 snippet 的 tabstop 里、同时补全菜单开着**时，`<Tab>` 永远跳片段节点，
-选不到下一个补全项；`expand_or_jumpable()` 排在 `visible()` 前面还会让"在 trigger 上
-按 Tab"意外展开片段而不是选菜单项。
+原映射先调用 `expand_or_jump()`，该函数优先展开再跳转。输入 `enum<Tab>` 后，
+把 `index` 改为 `f` 再按 `<Tab>`，就会展开 `f` 的循环片段，无法按预期跳到 `value`。
 
-对 OI 来说补全优先级更高，建议：
+采用占位符跳转优先的规则，展开和跳转分别调用：
 
 ```lua
 ["<Tab>"] = cmp.mapping(function(fallback)
-  if cmp.visible() then
+  if luasnip.locally_jumpable(1) then
+    luasnip.jump(1)
+  elseif luasnip.expandable() then
+    luasnip.expand()
+  elseif cmp.visible() then
     cmp.select_next_item()
-  elseif luasnip.expand_or_locally_jumpable() then
-    luasnip.expand_or_jump()
   else
     fallback()
   end
 end, { "i", "s" }),
 ```
-`<S-Tab>` 对称改成 `select_prev_item()` 优先。展开动作由 `<C-K>`（1.2 保留）负责。
+
+`<S-Tab>` 优先 `locally_jumpable(-1)` / `jump(-1)`，否则选择上一补全项或执行默认按键。
+`<C-K>` 在 Insert / Select 模式主动调用 `expand()`，需要嵌套展开时明确使用这个键。
+补全菜单可见时仍优先跳节点；在 Insert 模式可用 `<C-n>` / `<C-p>` 选择补全项。
+整个过程不弹出动作选择窗口。
+
+已通过 headless 检查：`enum` 展开后将 `index` 改为 `f`，`<Tab>` 跳到 `value`，
+`<S-Tab>` 返回 `index`，`<C-K>` 可主动展开嵌套的 `f`；同时检查了补全导航和默认按键回退。
 
 ### 2.7 LuaSnip 在启动期 eager 加载（`lua/plugins/LuaSnip.lua`）✅ 已修
 

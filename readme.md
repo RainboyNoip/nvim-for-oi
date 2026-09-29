@@ -275,6 +275,12 @@ event  → which-key(VeryLazy)、marks(VeryLazy)、cmp(InsertEnter)
 picker 选文件插入 / rbook 索引），归档只是目录组织，不代表统一格式。术语与边界见
 [CONTEXT.md](CONTEXT.md) 与 [ADR 0001](docs/adr/0001-snippet-asset-layout.md)。
 
+LuaSnip 片段输入触发词后可按 `<Tab>` 或 `<C-K>` 展开。填写占位符时，
+`<Tab>` / `<S-Tab>` 优先跳到下一个 / 上一个字段，即使补全菜单可见也一样。
+例如 `enum<Tab>` 展开后把 `index` 改为 `f`，再按 `<Tab>` 会跳到 `value`。
+需要在占位符内主动展开嵌套片段时按 `<C-K>`（Insert / Select 模式均可），不弹窗。
+完整按键规则见 [cheatsheet.md](cheatsheet.md#luasnip-操作)。
+
 在 Neovim 中按 `<Leader>os` 打开 file snippet 选择器，选择后会插入到当前光标位置。
 
 `all-snippets/oi-snippets/files/` 目前包含以下实用工具:
