@@ -174,14 +174,14 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 | `listi` | `a = list(map(int, input().split()))` |
 | `strin` | `s = input().strip().decode()` |
 | `next a b c` | `a, b, c = next(data), next(data), next(data)`，`data` 展开后直接选中、三处同步 |
-| `f` | `for i in range(1, n + 1):`（与 C++ 的 `f` 一致） |
-| `lf` | 单行 `for i in range(1, n + 1):` |
-| `f n` | 上界来自输入（`range(1, n + 1)`） |
-| `f l r` | 指定闭区间（`range(1, 11)`，能算出数值就直接算） |
-| `fabc l r` | 自定义循环变量 + 区间 |
-| `fabc n` | 自定义循环变量 + 上界 |
-| `fabc` | 自定义循环变量的默认循环 |
-| `rf` | `for i in range(n, 0, -1):`（与 C++ 的 `rf` 一致） |
+| `f` | `for i in range(n):`（0-based 半开，Python 习惯） |
+| `lf` | 单行 `for i in range(n):` |
+| `f n` | 循环 n 次（`range(n)`，0..n-1） |
+| `f l r` | 指定闭区间（`range(l, r + 1)`，能算出数值就直接算，如 `range(1, 11)`） |
+| `fabc l r` | 自定义循环变量 + 区间（闭区间） |
+| `fabc n` | 自定义循环变量 + 循环次数（`range(n)`） |
+| `fabc` | 自定义循环变量的默认循环（`range(n)`） |
+| `rf` | `for i in range(n, 0, -1):`（仍 1-based 含端点，与 C++ 的 `rf` 一致） |
 | `rf n` | 倒序，起点来自输入 |
 | `rf l r` | 指定区间的倒序 |
 | `enum` | `for index, value in enumerate(items):` |
@@ -196,18 +196,18 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 以下 snippet 触发词与 C++ 版保持一致，展开结果改成 Python 惯用写法，方便在两种语言间切换。
 没有 Python 对应物的 C++ snippet（`scanf` / `magic` / `linklist` / `logdef` / `pii` / `all` / `in` / `ln` / `2f` 等）不迁移；与既有 Python snippet 冲突的 `f` / `rf` / `sc` / `dbg` 保留既有版本（`main` 原本也在这一列，现已随 `main` 迁到 `python.json`）。
 
-for 循环现在与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、循环变量规则都对齐）：
+for 循环的**触发词**与 C++ 的 `for.lua` 一一对应（触发词、正则捕获、循环变量规则都对齐），但**展开结果从本轮起 Python 版改成 0-based 半开**，不再是 1-based：
 
 | C++ | Python | 展开 |
 | --- | --- | --- |
-| `f` | `f` | `for i in range(1, n + 1):` |
-| `f n` | `f n` | 上界来自输入 |
-| `f l r` | `f l r` | 指定闭区间 |
-| `fabc l r` | `fabc l r` | 自定义循环变量 + 区间 |
-| `fabc n` | `fabc n` | 自定义循环变量 + 上界 |
-| `fabc` | `fabc` | 自定义循环变量 |
-| `lf` | `lf` | 单行 |
-| `rf` / `rf n` / `rf l r` | 同 | 倒序版本 |
+| `f` | `f` | `for i in range(n):`（0-based 半开，**不再与 C++ 的 `i <= n` 一致**） |
+| `f n` | `f n` | `range(n)` 循环 n 次 |
+| `f l r` | `f l r` | `range(l, r + 1)`（保留闭区间，仍与 C++ 的 `i <= r` 一致） |
+| `fabc l r` | `fabc l r` | 自定义循环变量 + 闭区间 |
+| `fabc n` | `fabc n` | 自定义循环变量 + `range(n)` |
+| `fabc` | `fabc` | 自定义循环变量 + `range(n)` |
+| `lf` | `lf` | 单行 `range(n)` |
+| `rf` / `rf n` / `rf l r` | 同 | 倒序，仍 1-based 含端点（与 C++ 一致） |
 
 > 原来的 `fr` / `fri` 已删：它们的触发词长度和 `f([%a_]+)` 完全相同，LuaSnip 取最长匹配、
 > 平局时先定义的赢，于是单打 `fr` 永远拿不到 `for r in ...`。`f l r` 已覆盖同功能。

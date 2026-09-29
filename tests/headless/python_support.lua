@@ -203,15 +203,32 @@ local function run()
   assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
   assert(main_expansion:find("    solve()", 1, true), "main snippet must call solve()")
 
-  -- for 家族与 C++ 的 for.lua 对齐后的行为
+  -- for 家族：
+  --   不带显式下界的默认形态是 0-based 半开 range(n)（Python 习惯，不再是 1-based）；
+  --   显式给 l r 的仍保留闭区间 range(l, r + 1)；倒序 rf 仍 1-based 含端点。
   local plain_for = expand_snippet("f")
-  assert(plain_for:find("for i in range(1, n + 1):", 1, true), "f must be inclusive from 1 to n")
+  assert(plain_for:find("for i in range(n):", 1, true), "f must be half-open range(n)")
+  assert(not plain_for:find("+ 1", 1, true), "f must not add +1 to the bound")
 
   local reverse_for = expand_snippet("rf")
   assert(reverse_for:find("for i in range(n, 0, -1):", 1, true), "rf must count down to 0")
 
   local line_for = expand_snippet("lf")
-  assert(line_for:find("for i in range(1, n + 1):", 1, true), "lf must be a single-line loop")
+  assert(line_for:find("for i in range(n):", 1, true), "lf must mirror f's half-open range")
+
+  -- f 10 -> range(10)（循环 10 次，不写死 +1）
+  local for_count = expand_regex_snippet("f 10")
+  assert(
+    for_count:find("for i in range(10):", 1, true),
+    "f 10 must expand to range(10), not range(1, 10 + 1)"
+  )
+
+  -- f l r 仍是闭区间：显式给下界时 “到 r” 含 r
+  local for_bounds = expand_regex_snippet("f l r")
+  assert(
+    for_bounds:find("for i in range(l, r + 1):", 1, true),
+    "f l r must stay inclusive range(l, r + 1)"
+  )
 
   -- next a b c：名字从正则捕获取，data 是唯一的可改字段（三处 mirror）
   local next_three = expand_regex_snippet("next a b c")

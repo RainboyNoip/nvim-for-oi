@@ -175,7 +175,7 @@ if __name__ == "__main__":
 输入 trigger 后按 `<C-K>` 展开。使用 `<C-L>` / `<C-J>` 跳到下一个或
 上一个字段，`<C-E>` 切换 choice node。
 
-### OJ snippets（17 个）
+### OJ snippets（18 个）
 
 | Trigger | 默认展开结果 |
 | --- | --- |
@@ -186,10 +186,11 @@ if __name__ == "__main__":
 | `listi` | `a = list(map(int, input().split()))` |
 | `strin` | `s = input().strip().decode()` |
 | `next a b c` | `a, b, c = next(data), next(data), next(data)`，`data` 展开后直接选中、三处同步 |
-| `f` | `for i in range(n):` |
-| `fr` | 半开区间 `for i in range(left, right):` |
-| `fri` | 闭区间 `for i in range(left, right + 1):` |
-| `rf` | `for i in range(n - 1, -1, -1):` |
+| `f` | `for i in range(n):`（0-based 半开） |
+| `lf` | 单行 `for i in range(n):` |
+| `f n` | `for i in range(n):`，循环 n 次（0..n-1） |
+| `f l r` | `for i in range(l, r + 1):`（保留闭区间，能算出数值就直接算） |
+| `rf` | `for i in range(n, 0, -1):`（仍 1-based 含端点） |
 | `enum` | `for index, value in enumerate(items):` |
 | `tests` | 读取测试组数并重复调用 `solve()` |
 | `heap` | 导入 `heapq` 并创建 `heap = []` |
@@ -197,7 +198,10 @@ if __name__ == "__main__":
 | `deque` | 导入 `deque` 并创建 `queue = deque()` |
 | `dbg` | `print(value, file=sys.stderr)` |
 
-`fr` 遵循 Python 的半开区间语义；需要包含右端点时使用 `fri`。
+`f` / `lf` / `f n` / `fabc` 现在是 0-based 半开（`range(n)`），不再从 1 开始；
+需要指定上下界时用 `f l r`，它仍保留闭区间 `range(l, r + 1)`。原来的 `fr` /
+`fri` 已删：它们和 `f([%a_]+)` 触发词长度相同，LuaSnip 取最长匹配、平局先定义的
+赢，单打 `fr` 永远拿不到；`f l r` 已覆盖同功能。
 `strin` 包含 `.decode()`，因为 buffered input 返回 bytes。`dbg` 依赖已经
 导入 `sys`，使用完整模板或 `fastin` 时会满足这一条件。
 

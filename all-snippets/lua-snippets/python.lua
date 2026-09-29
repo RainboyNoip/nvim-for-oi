@@ -16,8 +16,12 @@ local utils = require("utils")
 -- （function_node），而 fmt() 的 "{name}" 占位符只认 insert_node，
 -- 塞 function_node 会被当成字面文本。
 --
--- Python 与 C++ 的差别：Python 区间是闭区间，所以正序生成 range(a, b + 1)，
--- 倒序生成 range(b, a - 1, -1)。
+-- Python 与 C++ 的差别：
+--   正序：C++ 是闭区间 range(a, b + 1)；但不带显式下界的默认形态（f / lf /
+--   f n / fabc）改成 range(stop)——半开、从 0 开始，符合 Python 习惯。
+--   带显式下界的（f l r / fabc l r）仍保留闭区间 range(l, r + 1)，
+--   因为 “从 l 到 r” 的直觉是含 r，也和 C++ 的 for i = l..r 对齐。
+--   倒序：仍是 range(b, a - 1, -1)（含 a），保持与 C++ 的 i >= 1 对齐。
 
 -- 闭区间换算：能算出数值就直接算（range(1, 11)），
 -- 是变量（如 n）才保留表达式（range(1, n + 1)）。
@@ -32,7 +36,8 @@ local function minus_one(v)
 end
 
 -- 把「捕获组序号」或「字面量」解析成实际值。
-local function for_header(var, first, second, mode)
+-- open_start 仅正序生效：true 时省略下界，渲染成 range(stop)（半开、0-based）。
+local function for_header(var, first, second, mode, open_start)
   return f(function(_, snip)
     local c = snip.captures or {}
     local function val(v)
@@ -43,6 +48,9 @@ local function for_header(var, first, second, mode)
     end
     local var_s = val(var)
     if mode == "forward" then
+      if open_start then
+        return string.format("for %s in range(%s):", var_s, val(second))
+      end
       return string.format("for %s in range(%s, %s):", var_s, val(first), plus_one(val(second)))
     end
     return string.format("for %s in range(%s, %s, -1):", var_s, val(second), minus_one(val(first)))
@@ -56,7 +64,15 @@ end
 -- 而且因为它是按定义顺序逐个试的，一个畻形 snippet 会把它后面所有 snippet 全部带崩。
 local function snippet_opts(trigger, opts)
   if type(trigger) == "table" then
-    return trigger
+    -- open_start 是 forward_for 的渲染选项，不是 LuaSnip 的 snippet context
+    -- 字段；透传给 s() 只会多一个未知键，先摘掉。
+    local ctx = {}
+    for k, v in pairs(trigger) do
+      if k ~= "open_start" then
+        ctx[k] = v
+      end
+    end
+    return ctx
   end
   return {
     trig = trigger,
@@ -66,13 +82,24 @@ local function snippet_opts(trigger, opts)
   }
 end
 
--- 正序：for {var} in range({start}, {stop} + 1)
+-- 正序：opts.open_start = true 时 for {var} in range({stop})（0-based 半开），
+-- 否则 for {var} in range({start}, {stop} + 1)（闭区间）。
+--
+-- 触发词有两种传法，open_start 必须都能读到：
+--   forward_for("f", "i", "1", "n", { open_start = true })  -- 字符串触发词，读第 5 参
+--   forward_for({ trig = "f%s+(%S+)", ..., open_start = true }, "i", "1", 1)
+--                                 -- 正则触发词，表就是 opts（此时第 5 参不存在）
 local function forward_for(trigger, var, start, stop, opts)
-  opts = opts or {}
+  -- 正则触发时 opts 是 nil，真正的选项在 trigger 表里；两种情况统一到 opts 上。
+  if type(trigger) == "table" then
+    opts = vim.tbl_extend("keep", opts or {}, trigger)
+  else
+    opts = opts or {}
+  end
   -- 注意：s() 的签名是 s(trigger, nodes, opts)，nodes 必须是**一个表**；
   -- 写成 s(opts, n1, n2, n3) 的话只有 n1 生效，后面会被当成 opts 丢掉。
   return s(snippet_opts(trigger, opts), {
-    for_header(var, start, stop, "forward"),
+    for_header(var, start, stop, "forward", opts.open_start),
     t({ "", "    " }),
     i(0, "pass"),
   })
@@ -158,35 +185,37 @@ return {
   ),
 
   -- ===== for 循环 =====
-  -- 与 C++ 版一一对应：
-  --   f            正序 i 从 1 到 n
-  --   f n          上界来自输入
-  --   f l r        指定区间
-  --   fabc l r     自定义循环变量 + 区间
-  --   fabc n       自定义循环变量 + 上界
-  --   fabc         自定义循环变量
-  --   lf           单行
-  --   rf / rf n / rf l r   倒序版本
+  -- 触发词与 C++ 版一一对应，但**展开结果从本轮起不再是 1-based**：
+  --   f            range(n)（0-based 半开，Python 习惯）
+  --   f n          range(n)（循环 n 次）
+  --   f l r        range(l, r + 1)（保留闭区间，仍与 C++ 的 i <= r 一致）
+  --   fabc l r     自定义循环变量 + 区间（同上，闭区间）
+  --   fabc n       自定义循环变量 + 次数（0-based 半开）
+  --   fabc         自定义循环变量（0-based 半开）
+  --   lf           单行，与 f 同为 0-based 半开
+  --   rf / rf n / rf l r   倒序，仍 1-based（含端点），与 C++ 的 i >= 1 一致
   --
   -- 注意：原来这里有 fr / fri（半开 / 闭区间），已删。原因：它们的触发词长度
   -- 和下面的 f([%a_]+) 完全相同，LuaSnip 取最长匹配、平局时先定义的赢，
   -- 于是单打 fr 永远拿不到 for r in ...。C++ 版没有这两个，f l r 已覆盖同功能。
 
-  -- f -> 正序：i 从 1 到 n
-  forward_for("f", "i", "1", "n", { desc = "for i in range(1, n + 1)" }),
+  -- f -> 正序默认：0-based 半开，range(n) 从 0 数到 n-1
+  forward_for("f", "i", "1", "n", { desc = "for i in range(n)", open_start = true }),
 
-  -- lf -> 单行版本
-  s("lf", fmt("for i in range(1, n + 1): {body}", { body = i(0, "pass") })),
+  -- lf -> 单行版本（与 f 同为 0-based 半开）
+  s("lf", fmt("for i in range(n): {body}", { body = i(0, "pass") })),
 
-  -- f n -> i 从 1 到 n
+  -- f n -> 循环 n 次，0-based：range(10) 就是 0..9
   forward_for({
     trig = "f%s+(%S+)",
     regTrig = true,
     name = "for n",
     desc = "指定循环几次",
+    open_start = true,
   }, "i", "1", 1),
 
-  -- f l r -> i 从 l 到 r
+  -- f l r -> i 从 l 到 r：**保留闭区间** range(l, r + 1)
+  -- （显式给下界时 “到 r” 是含 r，也和 C++ 的 for i = l..r 一致）
   forward_for({
     trig = "f%s+(%S+)%s+(%S+)",
     regTrig = true,
@@ -194,7 +223,7 @@ return {
     desc = "指定区间",
   }, "i", 1, 2),
 
-  -- fabc l r -> 循环变量名来自 trigger
+  -- fabc l r -> 循环变量名来自 trigger：**保留闭区间** range(l, r + 1)
   forward_for({
     trig = "f([%a_]+)%s+(%S+)%s+(%S+)",
     regTrig = true,
@@ -202,20 +231,22 @@ return {
     desc = "指定循环变量名和区间",
   }, 1, 2, 3),
 
-  -- fabc n -> 循环变量名来自 trigger，i 从 1 到 n
+  -- fabc n -> 循环变量名来自 trigger，循环 n 次，0-based 半开
   forward_for({
     trig = "f([%a_]+)%s+(%S+)",
     regTrig = true,
     name = "for var n",
     desc = "指定循环变量名，循环 n 次",
+    open_start = true,
   }, 1, "1", 2),
 
-  -- fabc -> 循环变量名来自 trigger
+  -- fabc -> 循环变量名来自 trigger，0-based 半开
   forward_for({
     trig = "f([%a_]+)",
     regTrig = true,
     name = "for var",
     desc = "指定循环变量名的默认循环",
+    open_start = true,
   }, 1, "1", "n"),
 
   -- rf -> 倒序：i 从 n 到 1
