@@ -9,9 +9,12 @@ return {
     local dap = require("dap")
     local dapui = require("dapui")
 
+    -- 布局：右侧是 DAP（REPL）窗口，由 nvim-dap 自己打开（见 dap.lua，<leader>dr 切换）；
+    -- dapui 只负责底部的 disp（Watches）窗口。
     dapui.setup({
       controls = {
-        element = "repl",
+        -- 控制条挂在 watches 窗口顶部（原来挂 repl 元素，现 repl 已不归 dapui 管）
+        element = "watches",
         enabled = true,
       },
       floating = {
@@ -23,13 +26,6 @@ return {
         {
           elements = {
             { id = "watches", size = 1 },
-          },
-          position = "right",
-          size = 36,
-        },
-        {
-          elements = {
-            { id = "repl", size = 1 },
           },
           position = "bottom",
           size = 10,
