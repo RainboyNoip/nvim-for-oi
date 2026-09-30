@@ -279,18 +279,26 @@ for 循环的**触发词**与 C++ 的 `for.lua` 一一对应（触发词、正�
 | `dictc` | 字典推导式，可选过滤条件 |
 | `gen` | 生成器表达式，可选过滤条件 |
 | `ta` | Python 3.10 类型别名 |
+| `type` | Python 3.12+ `type` 类型别名 |
 | `opt` | 可选变量声明 |
 
 ## Python 调试
 
-> **注意**：DAP 已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui。恢复方法见 readme.md。
->
-> 原来的 `<F4>`–`<F9>`、`<Leader>dw`、`<Leader>dr` 共 8 个键**当前全部不存在**，
-> 所以这里不再列出来 —— 具体原因：`lua/plugins/dap.lua` 整块被注释，而
-> `lua/plugins/dap/keys.lua` 虽然是个 spec 文件，却没有任何地方 `import` 它
-> （`import = "plugins"` 只匹配顶层 `lua/plugins/*.lua`，不递归子目录）。
+Python DAP 已启用，C/C++ DAP 保持关闭。调试前先保存当前文件。
 
-调试前先保存当前文件。标准输入在 debugpy 打开的集成终端中输入。
+| 快捷键 | 说明 |
+| --- | --- |
+| `<F4>` | 结束调试 |
+| `<F5>` | 启动 / 继续 |
+| `<F6>` | 切换断点 |
+| `<F7>` / `<F8>` | Step Into / Step Over |
+| `<F9>` | 运行到光标 |
+| `<Leader>dw` | 将光标处变量加入 disp（Watches） |
+| `<Leader>de` | 添加持续监视的表达式 |
+| `<Leader>dr` | 切换右侧 DAP（REPL）窗口 |
+
+F5 启动时弹窗选择 `in` / `*.in` / `*.txt` 等输入文件，Esc 取消。
+界面只有右侧 DAP（REPL）和底部 disp；程序输出也显示在 REPL，无需手动发送 EOF。
 
 ## STL / OJ Snippets
 

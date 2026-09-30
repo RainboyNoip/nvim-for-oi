@@ -1,8 +1,6 @@
 # 在本配置中使用 Python 写 OJ
 
-> **注意**：DAP/debugpy 调试已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui。
-> 文中调试相关章节保留作为将来恢复的参考（恢复方法：解开 `lua/plugins/dap.lua`
-> 和 `lua/plugins/nvim-dap-ui.lua` 中的块注释）。
+Python 的 DAP/debugpy 调试已启用；C/C++ DAP 仍然关闭。
 
 这份文档是 Python OJ 配置的长期使用入口。忘记依赖、模板、snippet、
 LSP 或调试方法时，从这里开始检查。
@@ -18,7 +16,7 @@ Neovim 负责：
 
 Neovim 不负责：
 
-- 一键运行和输入文件重定向。
+- 普通运行的一键入口（调试支持选择输入文件）。
 - Codeforces、洛谷样例下载。
 - 样例评测、输出 diff 和对拍。
 - 虚拟环境、第三方依赖、自动格式化和 import 排序。
@@ -30,18 +28,18 @@ Neovim 不负责：
 | 文件 | 职责 |
 | --- | --- |
 | `lua/lsp.lua` | 注册并启用 clangd 与 BasedPyright；LSP 缺失时提示安装 |
-| `lua/lsp/basedpyright.lua` | Python LSP root、宽松诊断和分析范围 |
+| `lua/lsp/basedpyright.lua` | Python 3.15 目标版本、LSP root、宽松诊断和分析范围 |
 | `lua/plugins/lang-python.lua` | 只在 Python buffer 加载本地设置 |
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 显式注册 `all-snippets/lua-snippets/` 的 cpp / python 入口 |
-| `all-snippets/lua-snippets/python.lua` | 44 个 Python OJ snippets（含从 C++ 迁移的对应版） |
-| `all-snippets/vscode-snippets/python.json` | 27 个 Neovim / VSCode 共用的通用 Python snippets |
+| `all-snippets/lua-snippets/python.lua` | 45 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `all-snippets/vscode-snippets/python.json` | 29 个 Neovim / VSCode 共用的通用 Python snippets |
 | `all-snippets/vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
-| `all-snippets/oi-snippets/files/simple_template.py` | Python 完整 OJ 模板 |
+| `all-snippets/oi-snippets/files/mainline.py` | 逐行读取的完整 OJ 模板 |
+| `all-snippets/oi-snippets/files/mainread.py` | 一次性读取整数的完整 OJ 模板 |
 | `lua/plugins/dap/python.lua` | debugpy adapter、launch 配置和启动前检查 |
-| `lua/plugins/dap/linux.lua` | 在 Linux DAP 中接入 C++ 与 Python |
 | `tests/headless/python_support.lua` | LSP、buffer、snippet 和 DAP 结构检查 |
 | `tests/headless/python_lsp.lua` | BasedPyright 真实诊断检查 |
 | `tests/headless/python_dap.lua` | debugpy 真实断点和变量求值检查 |
@@ -146,10 +144,13 @@ oiv solution.py
 输出中应出现 `basedpyright`。`<Leader>sf` 打开当前文件符号；
 `<Leader>sD` 打开当前 buffer 诊断。
 
+BasedPyright 按 Python 3.15 检查语法和标准库。它只控制静态分析；实际运行
+仍使用 PATH 中的 `python3`，提交前还要确认 OJ 的解释器版本。
+
 ### 插入完整模板
 
 1. 按 `<Leader>os`，或执行 `:OISnipChoose`。
-2. 搜索 `simple_template.py`。
+2. 搜索 `mainline.py`（逐行输入）或 `mainread.py`（一次性读取整数）。
 3. 确认后模板插入当前光标位置。
 
 模板默认使用：
@@ -168,7 +169,9 @@ if __name__ == "__main__":
     solve()
 ```
 
-模板不默认加入多测。需要多测时在合适位置展开 `tests`。
+也可以直接输入 `main` 或 `mainread` 后按 `<Tab>`。`main` 与 `ii`、`ints`、
+`listi`、`tests` 配套；`mainread` 与 `next a b c`、`testsdata` 配套。不要在同一份
+程序里混用 `input()` 和已经消耗 stdin 的 `data` 迭代器。
 
 ## Python snippets
 
@@ -183,6 +186,8 @@ if __name__ == "__main__":
 `<S-Tab>` 则选择上一补全项或执行默认 Shift-Tab。
 在 Insert 模式用 `<C-n>` / `<C-p>` 选择补全项，在 Select 模式用这两个键切换 choice node。
 `<C-J>` 也可返回上一个字段；`<C-L>` 用于跳到行尾，`<C-E>` 用于关闭补全菜单。
+补全菜单默认不预选：`Enter` 只接受你已选中的项目，否则正常换行；`<C-Y>`
+明确接受当前候选（尚未选择时接受第一项）。
 
 ### OJ snippets
 
@@ -203,6 +208,7 @@ if __name__ == "__main__":
 | `enum` / `enum a` | `for idx, val in enumerate(a):` |
 | `enum2 a` | `for idx, val in enumerate(a, 2):`；数字后缀指定起始索引，如 `enum10 a` |
 | `tests` | 读取测试组数并重复调用 `solve()` |
+| `testsdata` | 从 `data` 读取测试组数并重复调用 `solve(data)` |
 | `heap` | 导入 `heapq` 并创建 `heap = []` |
 | `bisect` | 导入 `bisect_left`、`bisect_right` |
 | `deque` | 导入 `deque` 并创建 `queue = deque()` |
@@ -253,7 +259,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 `ee` 系列把边读入 `g[u].append(v)`（带权时 append `(v, w)`），`ef u`
 遍历 `for v, w in g[u]:`。使用前需先建立 `g = [[] for _ in range(n + 1)]`。
 
-### 通用 snippets（27 个）
+### 通用 snippets（29 个）
 
 这些 snippets 来自 `all-snippets/vscode-snippets/python.json`，Neovim 和 VSCode 使用
 相同的 trigger 和 placeholder。`main`（buffered input、`solve()` 和 main guard）
@@ -261,7 +267,8 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 
 | Trigger | 默认展开结果 |
 | --- | --- |
-| `main` | buffered input、`solve()` 和 main guard |
+| `main` | `readline` 输入、`solve()` 和 main guard |
+| `mainread` | 一次性读取整数、`solve(data)` 和 main guard |
 | `input` | 用迭代器一次性读完 `sys.stdin.buffer`，构造 `tokens` / `n` / `a` |
 | `df` | 无类型注解的 `def function_name(...):` |
 | `dft` | 带参数和返回值类型注解的函数 |
@@ -286,7 +293,8 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 | `sc` | 带可选过滤条件的集合推导式 |
 | `dictc` | 带可选过滤条件的字典推导式 |
 | `gen` | 带可选过滤条件的生成器表达式 |
-| `ta` | Python 3.10 `TypeAlias` |
+| `ta` | Python 3.10 `TypeAlias`（旧式写法） |
+| `type` | PEP 695 `type` 语句定义类型别名（Python 3.12+，如 `type PrevMap = dict[int, int]`；泛型把 `Name` 写成 `Name[T]`） |
 | `opt` | `name: Type | None = None` |
 
 `lc`、`sc`、`dictc` 和 `gen` 默认不带过滤条件；展开后按 `<C-E>` 可
@@ -298,7 +306,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `71`：44 个 OJ snippets 加 27 个通用 snippets。
+应输出 `74`：45 个 OJ snippets 加 29 个通用 snippets。
 
 ## 调试
 
@@ -315,28 +323,31 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 | `<F9>` | Run to Cursor |
 | `<Leader>dB` | 条件断点 |
 | `<Leader>do` | Step Out |
-| `<Leader>dw` | 查看光标处变量 |
-| `<Leader>dr` | 切换 DAP REPL |
+| `<Leader>dw` | 将光标处变量加入 disp（Watches）窗口 |
+| `<Leader>de` | 输入要持续监视的表达式 |
+| `<Leader>dr` | 切换右侧 DAP（REPL）窗口 |
 | `<Leader>dt` | 结束调试 |
 
 典型流程：
 
 1. 把光标放在目标行，按 `<F6>` 设置断点。
-2. 按 `<F5>`，选择或直接启动 `Launch current Python file`。
+2. 按 `<F5>`，在弹出的窗口中选择输入文件，回车启动；Esc 取消。
 3. 程序停下后使用 `<F7>`、`<F8>`、`<F9>`。
-4. 用 DAP UI 查看 scopes、watches 和调用栈。
+4. 右侧是 DAP（REPL）窗口，底部是 disp（Watches）窗口；`<Leader>dr` 切换
+   右侧 DAP 窗口。光标放在变量上按 `<Leader>dw`
+   添加持续监视；用 `<Leader>de` 添加 `len(prev)`、`people[0]` 等表达式。
 5. 按 `<F4>` 结束。
 
 ### 调试时输入数据
 
-debugpy 使用 integrated terminal。程序执行到 `input()` 时，在新打开的终端
-中输入数据并回车。当前 DAP 配置不把 `in` 文件自动重定向到 stdin。
+启动选择器查找源码目录及三层子目录中的 `in`、`*.in`、`*.txt`、`in1` 等文件。
+输入名称可过滤，回车选择；无需输入的程序选“空输入”。输入文件通过启动辅助脚本
+接到标准输入，兼容 `input()`、`readline()` 和 `sys.stdin.buffer.read()`，不修改题解源码，
+也不需要手动发送 EOF。调试工作目录为源码所在目录。
 
-需要输入文件时，在普通终端运行：
-
-```bash
-python3 solution.py < in
-```
+stdout/stderr 显示在 REPL 中。暂停后可在 REPL 输入 Python 表达式求值。
+disp 中的表达式会在暂停、单步时刷新；在 Watches 窗口按 `i` 可新增表达式，
+`d` 删除当前监视项，`e` 编辑，回车展开字典、列表等对象。
 
 ## 故障排查
 
@@ -368,7 +379,7 @@ basedpyright --version
 ### Snippet 不展开
 
 1. 用 `:set filetype?` 确认是 `python`。
-2. 用前面的 Lua 命令确认数量是 71。
+2. 用前面的 Lua 命令确认数量是 74。
 3. 在 Insert 模式输入完整 trigger，再按 `<C-K>`。
 4. 执行 `:Lazy`，确认 LuaSnip 已加载。
 
