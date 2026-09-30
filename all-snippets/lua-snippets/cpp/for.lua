@@ -107,6 +107,7 @@ return {
     -- f n -> i 从 1 到 n。
     forward_for({
         trig = "f%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -115,6 +116,7 @@ return {
     -- f l r -> i 从 l 到 r。
     forward_for({
         trig = "f%s+(%S+)%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "for n",
         desc = "指定循环几次",
@@ -123,6 +125,7 @@ return {
     -- f{var} l r -> 循环变量名来自 trigger，从 l 到 r。
     forward_for_var({
         trig = "f([%a_]+)%s+(%S+)%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "for var range",
         desc = "指定循环变量名和区间",
@@ -131,6 +134,7 @@ return {
     -- f{var} n -> 循环变量名来自 trigger，i 从 1 到 n。
     forward_for_var({
         trig = "f([%a_]+)%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "for var n",
         desc = "指定循环变量名，循环 n 次",
@@ -139,6 +143,7 @@ return {
     -- f{var} -> 循环变量名来自 trigger，i 从 1 到 n。
     forward_for_var({
         trig = "f([%a_]+)",
+        hidden = true,
         regTrig = true,
         name = "for var",
         desc = "指定循环变量名的默认循环",
@@ -150,6 +155,7 @@ return {
     -- rf n -> i 从 n 到 1。
     reverse_for({
         trig = "rf%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "reverse for n",
         desc = "倒序循环",
@@ -158,6 +164,7 @@ return {
     -- rf l r -> i 从 r 到 l。
     reverse_for({
         trig = "rf%s+(%S+)%s+(%S+)",
+        hidden = true,
         regTrig = true,
         name = "reverse for range",
         desc = "指定区间的倒序循环",

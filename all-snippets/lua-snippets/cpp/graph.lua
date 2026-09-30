@@ -12,6 +12,7 @@ return {
     s(
         {
             trig = "ef%s+(%S+)",
+            hidden = true,
             regTrig = true,
             trigEngine = "pattern",
             name = "for linklist edge",
@@ -35,6 +36,7 @@ return {
     s(
         {
             trig = "ee%s+(%S+)",
+            hidden = true,
             regTrig = true,
             trigEngine = "pattern",
             name = "read directed edges",
@@ -60,6 +62,7 @@ return {
     s(
         {
             trig = "eew%s+(%S+)",
+            hidden = true,
             regTrig = true,
             trigEngine = "pattern",
             name = "read weighted directed edges",
@@ -85,6 +88,7 @@ return {
     s(
         {
             trig = "ee2%s+(%S+)",
+            hidden = true,
             regTrig = true,
             trigEngine = "pattern",
             name = "read undirected edges",
@@ -110,6 +114,7 @@ return {
     s(
         {
             trig = "ee2w%s+(%S+)",
+            hidden = true,
             regTrig = true,
             trigEngine = "pattern",
             name = "read weighted undirected edges",

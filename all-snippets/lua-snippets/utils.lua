@@ -27,6 +27,8 @@ end
 
 -- 构造“第一个捕获组的变量列表 -> 转换成代码”的 snippet。
 -- 适合 ci/co/all/so 这类后面跟一串 token 的触发方式。
+-- 正则触发片段的 cmp 候选 label 是原始 pattern，纯噪音，默认 hidden = true
+-- 让 cmp_luasnip 不再列出（展开不受影响）；需要时可用 opts.hidden 覆盖。
 function M.token_transform(trigger, name, desc, transform, opts)
     opts = opts or {}
     return s(
@@ -34,6 +36,7 @@ function M.token_transform(trigger, name, desc, transform, opts)
             trig = trigger,
             regTrig = true,
             trigEngine = "pattern",
+            hidden = true,
             name = name,
             desc = desc,
         }, opts),
@@ -51,6 +54,7 @@ function M.capture_transform(trigger, name, desc, transform)
             trig = trigger,
             regTrig = true,
             trigEngine = "pattern",
+            hidden = true,
             name = name,
             desc = desc,
         },

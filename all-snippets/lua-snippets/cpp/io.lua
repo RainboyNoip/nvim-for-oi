@@ -126,6 +126,7 @@ return {
         {
             trig = "sc([cl]?)%s+([%w_%.%[%] ]+)",
             regTrig = true,
+            hidden = true,
             trigEngine = "pattern",
             name = "scanf_smart",
             desc = "sc->%d, scc->%c, scl->%lld"
