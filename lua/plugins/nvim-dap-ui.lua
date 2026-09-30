@@ -1,36 +1,35 @@
---[==[
 return {
   "rcarriga/nvim-dap-ui",
-  dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-  lazy = true,
+  ft = { "python" },
+  dependencies = {
+    "mfussenegger/nvim-dap",
+    "nvim-neotest/nvim-nio",
+  },
   config = function()
-    require("dapui").setup({
+    local dap = require("dap")
+    local dapui = require("dapui")
+
+    dapui.setup({
       controls = {
         element = "repl",
         enabled = true,
       },
       floating = {
         border = "single",
-        mappings = {
-          close = { "q", "<Esc>" },
-        },
+        mappings = { close = { "q", "<Esc>" } },
       },
       icons = { collapsed = "", expanded = "", current_frame = "" },
       layouts = {
         {
           elements = {
-            { id = "stacks", size = 0.25 },
-            { id = "scopes", size = 0.25 },
-            { id = "breakpoints", size = 0.25 },
-            { id = "watches", size = 0.25 },
+            { id = "watches", size = 1 },
           },
-          position = "left",
-          size = 60,
+          position = "right",
+          size = 36,
         },
         {
           elements = {
-            { id = "repl", size = 0.35 },
-            { id = "console", size = 0.65 },
+            { id = "repl", size = 1 },
           },
           position = "bottom",
           size = 10,
@@ -38,19 +37,14 @@ return {
       },
     })
 
-    local dap, dapui = require("dap"), require("dapui")
-
-    dap.listeners.after.event_initialized["dapui_config"] = function()
+    dap.listeners.after.event_initialized["rainboy_dapui"] = function()
       dapui.open()
     end
-    dap.listeners.before.event_terminated["dapui_config"] = function()
+    dap.listeners.before.event_terminated["rainboy_dapui"] = function()
       dapui.close()
     end
-    dap.listeners.before.event_exited["dapui_config"] = function()
+    dap.listeners.before.event_exited["rainboy_dapui"] = function()
       dapui.close()
     end
   end,
-}]==]
-
--- DAP UI 已暂时禁用 (2026-08-22)：改用终端 cgdb/gdbgui。恢复调试时解开上面的块注释即可。
-return {}
+}

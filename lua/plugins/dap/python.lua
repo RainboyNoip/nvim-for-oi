@@ -25,12 +25,55 @@ local function resolve_program(dap)
   return program
 end
 
+-- 在启动 adapter 前完成异步选择；Esc 取消时不启动调试进程。
+function M.select_input(directory, callback)
+  local files = vim.fs.find(function(name)
+    return name == "in" or name:match("%.in$") or name:match("%.txt$")
+      or name:match("^in%d+$")
+  end, { path = directory, type = "file", limit = math.huge, depth = 3 })
+  table.sort(files)
+  local items = {}
+  for _, path in ipairs(files) do
+    items[#items + 1] = { path = path, text = vim.fs.relpath(directory, path) or path }
+  end
+  items[#items + 1] = { path = "/dev/null", text = "空输入（不读取样例）" }
+  require("snacks").picker.select(items, {
+    prompt = "Python 调试：选择标准输入文件",
+    format_item = function(item) return item.text end,
+  }, function(item)
+    if item then callback(item.path) end
+  end)
+end
+
+local function enrich_config(config, on_config)
+  local launcher = vim.fn.stdpath("config") .. "/scripts/python_dap_launch.py"
+  local source = config.program
+  local arguments = config.args or {}
+  -- 不支持原地 restart 的 adapter 会把已处理的配置再次交回来。
+  if source == launcher then
+    source = arguments[1]
+    arguments = vim.list_slice(arguments, 3)
+  end
+  M.select_input(vim.fs.dirname(source), function(input)
+    if vim.fn.filereadable(input) ~= 1 and input ~= "/dev/null" then
+      vim.notify("无法读取输入文件：" .. input, vim.log.levels.ERROR)
+      return
+    end
+    local launch = vim.deepcopy(config)
+    launch.program = launcher
+    launch.args = { source, input }
+    vim.list_extend(launch.args, arguments)
+    on_config(launch)
+  end)
+end
+
 function M.setup(dap)
   dap.adapters.python = function(callback)
     callback({
       type = "executable",
       command = "python3",
       args = { "-m", "debugpy.adapter" },
+      enrich_config = enrich_config,
     })
   end
 
@@ -43,9 +86,10 @@ function M.setup(dap)
         return resolve_program(dap)
       end,
       cwd = function()
-        return vim.fn.getcwd()
+        return vim.fn.expand("%:p:h")
       end,
-      console = "integratedTerminal",
+      console = "internalConsole",
+      redirectOutput = true,
       justMyCode = true,
     },
   }

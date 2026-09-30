@@ -398,12 +398,14 @@ local function run()
     ))
   end
 
-  -- nvim-dap 在 2026-08-22 被临时禁用，未安装时跳过 DAP 断言。
-  local dap_ok, dap = pcall(require, "dap")
-  if not dap_ok then
-    print("python_support: dap not installed, skipping DAP assertions")
-    return
-  end
+  -- 第二个 Python buffer 也必须自动恢复 Python 的 window-local foldmarker。
+  local second = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_win_set_buf(0, second)
+  vim.wo.foldmarker = "//oisnip_begin,//oisnip_end"
+  vim.bo[second].filetype = "python"
+  assert_equal(vim.wo.foldmarker, "#oisnip_begin,#oisnip_end", "second Python buffer foldmarker")
+
+  local dap = require("dap")
 
   assert_equal(type(dap.adapters.python), "function", "Python DAP adapter type")
 
@@ -414,9 +416,9 @@ local function run()
   assert_equal(python_configuration.name, "Launch current Python file", "Python DAP name")
   assert_equal(python_configuration.type, "python", "Python DAP type")
   assert_equal(python_configuration.request, "launch", "Python DAP request")
-  assert_equal(python_configuration.console, "integratedTerminal", "Python DAP console")
+  assert_equal(python_configuration.console, "internalConsole", "Python DAP console")
   assert_equal(python_configuration.justMyCode, true, "Python DAP justMyCode")
-  assert_equal(#(dap.configurations.cpp or {}), 1, "C++ DAP configuration count")
+  assert_equal(#(dap.configurations.cpp or {}), 0, "C++ DAP must remain disabled")
 end
 
 local ok, err = xpcall(run, debug.traceback)

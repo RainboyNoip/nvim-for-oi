@@ -7,8 +7,8 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
 
 - **插件管理**: 使用 lazy.nvim 管理插件
 - **代码片段**: 自定义代码片段系统，特别为算法竞赛设计
-- **LSP 支持**: C++ 使用 clangd，Python 使用宽松诊断的 BasedPyright
-- **调试支持**: nvim-dap **已暂时禁用**（2026-08-22），改用终端 cgdb / gdbgui
+- **LSP 支持**: C++ 使用 clangd，Python 使用以 3.15 为目标版本的 BasedPyright
+- **调试支持**: Python 使用 nvim-dap + debugpy；C/C++ 使用终端 cgdb / gdbgui
 - **代码补全**: 使用 nvim-cmp 提供智能补全
 - **AI 补全**: minuet-ai.nvim 接 DeepSeek FIM，默认**关闭**（`OI_AI=0`），见 [AI 补全指南](docs/how-to-use-ai-completion.md)
 - **主题**: 默认使用 nightfly 主题，并通过 themify 管理可切换主题
@@ -99,7 +99,7 @@ Neovim 在这个配置里只负责写代码体验：编辑、补全、LSP、snip
    [Treesitter parser 安装指南](docs/how-to-install-treesitter-parsers.md)。
    Python 侧的完整使用说明见 [Python OJ 使用指南](docs/how-to-use-in-python.md)。
 
-4. 安装调试器(for nvim-dap) —— **当前已禁用，以下仅为将来恢复时的参考**
+4. C/C++ 终端调试器（Python 调试只需前面安装的 debugpy）
    - `vscode-cpptools` 扩展(linux): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(gdb-via--vscode-cpptools)
    - `CodeLLDB` 扩展 (macos): https://codeberg.org/mfussenegger/nvim-dap/wiki/C-C---Rust-(via--codelldb)
 
@@ -288,7 +288,7 @@ LuaSnip 片段输入触发词后可按 `<Tab>` 或 `<C-K>` 展开。填写占位
 - `utils/random.cpp`: 随机数生成工具
 - `utils/random_dag1.cpp`, `utils/random_dag2.cpp`: DAG 生成工具
 - `utils/random_graph.cpp`: 随机图生成工具
-- `simple_template.cpp` / `simple_template.py` / `rnd_tree.cpp`: 完整模板（直接放在 `files/` 根下）
+- `simple_template.cpp` / `mainline.py` / `mainread.py` / `rnd_tree.cpp`: 完整模板（直接放在 `files/` 根下）
 - `config/clangd_config`: 需手动改名 `.clangd` 才生效
 
 `all-snippets/oi-snippets/files/` 中的工具（在 `utils/` 等子目录里）会自动包装在
@@ -424,7 +424,7 @@ CompileFlags:
 
 ### 调试
 
-> **注意**：nvim-dap 已暂时禁用 (2026-08-22)，改用终端 cgdb/gdbgui [gdb-frontend](https://github.com/rohanrhu/gdb-frontend)。恢复方法：解开 `lua/plugins/dap.lua` 和 `lua/plugins/nvim-dap-ui.lua` 中的块注释。
+Python 使用 nvim-dap + debugpy；C/C++ 继续使用终端 cgdb/gdbgui [gdb-frontend](https://github.com/rohanrhu/gdb-frontend)。
 
 使用 nvim-dap 进行调试，支持:
 - 断点设置
