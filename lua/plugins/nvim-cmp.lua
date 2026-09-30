@@ -1,18 +1,8 @@
 -- ── OI 常用 token 词表（纯内存，不读任何文件） ─────────────────────────
 -- 只放「英文词典 / LSP 都给不了」的词：带下划线的标准库名、缩写标识符、大写宏。
 -- 想加词直接加一行。匹配是大小写敏感的（和 cmp 自身过滤一致），所以 INF 要打大写。
-local OI_WORDS = {
-  -- C++ 标准库（英文单词表里没有）
-  "priority_queue",
-  "unordered_map",
-  "unordered_set",
-  "lower_bound",
-  "upper_bound",
-  "push_back",
-  "emplace_back",
-  "memset",
-  "sizeof",
-  -- OI 惯用缩写 / 宏名（两种语言都常打）
+local OI_COMMON_WORDS = {
+  -- 两种语言都常用的 OI 缩写
   "INF",
   "dfs",
   "bfs",
@@ -22,9 +12,24 @@ local OI_WORDS = {
   "vis",
   "idx",
   "nxt",
-  -- Python 竞赛常用（英文词典里没有的）
-  "defaultdict",
-  "popleft",
+}
+
+local OI_LANGUAGE_WORDS = {
+  cpp = {
+    "priority_queue",
+    "unordered_map",
+    "unordered_set",
+    "lower_bound",
+    "upper_bound",
+    "push_back",
+    "emplace_back",
+    "memset",
+    "sizeof",
+  },
+  python = {
+    "defaultdict",
+    "popleft",
+  },
 }
 
 -- 在哪些 filetype 下启用。要扩展就改这一行（比如加 c = true, h = true）。
@@ -62,9 +67,11 @@ function oi_source:complete(params, callback)
 
   local kind = require("cmp").lsp.CompletionItemKind.Text
   local items = {}
-  for _, word in ipairs(OI_WORDS) do
-    if word:sub(1, #keyword) == keyword then
-      items[#items + 1] = { label = word, kind = kind }
+  for _, words in ipairs({ OI_COMMON_WORDS, OI_LANGUAGE_WORDS[vim.bo[bufnr].filetype] or {} }) do
+    for _, word in ipairs(words) do
+      if word:sub(1, #keyword) == keyword then
+        items[#items + 1] = { label = word, kind = kind }
+      end
     end
   end
   callback(items)
@@ -91,14 +98,11 @@ return {
   -- }
   -- ```
   opts = function()
-    -- Register nvim-cmp lsp capabilities
-    vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
-
     vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
     local cmp = require("cmp")
     local lspkind = require("lspkind")
     local defaults = require("cmp.config.default")()
-    local auto_select = true
+    local auto_select = false
     local luasnip = require("luasnip")
 
     -- 注册内存版 OI 词表源（定义在文件顶部，零依赖、零文件 IO）
@@ -124,11 +128,10 @@ return {
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-Space>"] = cmp.mapping.complete(),
         ["<C-e>"] = cmp.mapping.abort(),           -- 使用 Ctrl+E 关闭补全
-        -- [[ 主要改动点 3: 智能的 Enter 键 ]]
-        -- 如果有选中项，则确认。否则，执行默认回车行为（换行）
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
-        -- ["<CR>"] = LazyVim.cmp.confirm({ select = auto_select }),
-        -- ["<C-y>"] = LazyVim.cmp.confirm({ select = true }),
+        -- Enter 只确认手动选中的候选；未选择时仍然正常换行。
+        ["<CR>"] = cmp.mapping.confirm({ select = false }),
+        -- Ctrl-Y 明确接受候选；即使尚未用 Ctrl-N/Tab 选择，也接受第一项。
+        ["<C-y>"] = cmp.mapping.confirm({ select = true }),
 
         -- ["<S-CR>"] = LazyVim.cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 

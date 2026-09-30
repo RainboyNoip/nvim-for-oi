@@ -1,4 +1,11 @@
 -- help: https://neovim.io/doc/user/lsp.html
+-- LSP client capabilities 必须在 server 启动前注册。nvim-cmp 本身在 InsertEnter
+-- 才加载，如果把这段留在 cmp 的 config 里，已经启动的 LSP 收不到完整能力。
+local cmp_lsp_ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+if cmp_lsp_ok then
+  vim.lsp.config("*", { capabilities = cmp_lsp.default_capabilities() })
+end
+
 vim.lsp.config['clangd'] = require('lsp.clangd')
 vim.lsp.enable("clangd")
 
