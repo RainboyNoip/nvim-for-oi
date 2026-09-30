@@ -385,8 +385,8 @@ end, { "i", "s" }),
 补全菜单可见时仍优先跳节点；在 Insert 模式可用 `<C-n>` / `<C-p>` 选择补全项。
 整个过程不弹出动作选择窗口。
 
-已通过 headless 检查：`enum` 展开后将 `index` 改为 `f`，`<Tab>` 跳到 `value`，
-`<S-Tab>` 返回 `index`，`<C-K>` 可主动展开嵌套的 `f`；同时检查了补全导航和默认按键回退。
+已通过 headless 检查：`enum` 展开后将索引字段改为 `f`，`<Tab>` 跳到值字段，
+`<S-Tab>` 返回索引字段，`<C-K>` 可主动展开嵌套的 `f`；同时检查了补全导航和默认按键回退。
 
 ### 2.7 LuaSnip 在启动期 eager 加载（`lua/plugins/LuaSnip.lua`）✅ 已修
 

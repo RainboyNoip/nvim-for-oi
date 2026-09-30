@@ -115,6 +115,32 @@ local function reverse_for(trigger, var, start, stop, opts)
   })
 end
 
+-- enum a / enum2 a：遍历对象和起始索引来自触发词捕获、展开后不可改；
+-- 索引、值和循环体可逐字段修改。
+local function enumerate_loop(trigger, items_capture, start_capture)
+  return s(trigger, {
+    d(1, function(_, parent)
+      local captures = parent.captures or {}
+      local nodes = {
+        t("for "), i(1, "idx"), t(", "), i(2, "val"),
+        t(" in enumerate("), t(captures[items_capture] or "a"),
+      }
+      if start_capture then
+        -- 去掉前导零，避免 enum002 a 生成 Python 不接受的整数字面量 002。
+        local start = (captures[start_capture] or "0"):gsub("^0+", "")
+        vim.list_extend(nodes, { t(", "), t(start ~= "" and start or "0") })
+      end
+      -- sn 内的跳转编号必须从 1 连续递增，且在 snippetNode 内部局部编号；
+      -- 起始值是静态 t() 文本、不占跳转槽位，所以无论有没有 start，
+      -- 可跳转节点都是 idx/val/pass 三个，pass 恒为 i(3)。
+      -- （写成 start_capture and 3 or 2 会在无 start 时与 i(2, "val") 撞号，
+      -- 后注册的 pass 覆盖跳转表，val 永远跳不到。）最终的 i(0) 由外层片段提供。
+      vim.list_extend(nodes, { t({ "):", "    " }), i(3, "pass") })
+      return sn(nil, nodes)
+    end, {}),
+  })
+end
+
 return {
   -- main 骨架已迁移到 all-snippets/vscode-snippets/python.json（trigger 仍是 main），
   -- 由 LuaSnip 的 from_vscode 加载器注册到 python filetype，Neovim / VSCode 共用。
@@ -166,6 +192,9 @@ return {
       trig = "next%s+(.+)",
       regTrig = true,
       trigEngine = "pattern",
+      -- 正则触发片段的 cmp 候选 label 是原始 pattern（如 next%s+(.+)），
+      -- 纯噪音；hidden = true 让 cmp_luasnip 不再列出它（展开不受影响）。
+      hidden = true,
       name = "a, b, c = next(data), next(data), next(data)",
       desc = "逐个 next() 读入多个变量",
     },
@@ -209,6 +238,7 @@ return {
   forward_for({
     trig = "f%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "for n",
     desc = "指定循环几次",
     open_start = true,
@@ -219,6 +249,7 @@ return {
   forward_for({
     trig = "f%s+(%S+)%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "for range",
     desc = "指定区间",
   }, "i", 1, 2),
@@ -227,6 +258,7 @@ return {
   forward_for({
     trig = "f([%a_]+)%s+(%S+)%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "for var range",
     desc = "指定循环变量名和区间",
   }, 1, 2, 3),
@@ -235,6 +267,7 @@ return {
   forward_for({
     trig = "f([%a_]+)%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "for var n",
     desc = "指定循环变量名，循环 n 次",
     open_start = true,
@@ -244,6 +277,7 @@ return {
   forward_for({
     trig = "f([%a_]+)",
     regTrig = true,
+    hidden = true,
     name = "for var",
     desc = "指定循环变量名的默认循环",
     open_start = true,
@@ -256,6 +290,7 @@ return {
   reverse_for({
     trig = "rf%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "reverse for n",
     desc = "倒序循环",
   }, "i", "1", 1),
@@ -264,25 +299,24 @@ return {
   reverse_for({
     trig = "rf%s+(%S+)%s+(%S+)",
     regTrig = true,
+    hidden = true,
     name = "reverse for range",
     desc = "指定区间的倒序循环",
   }, "i", 1, 2),
 
-  s(
-    { trig = "enum", desc = "enumerate loop" },
-    fmt(
-      [[
-      for {index}, {value} in enumerate({items}):
-          {body}
-      ]],
-      {
-        index = i(1, "index"),
-        value = i(2, "value"),
-        items = i(3, "items"),
-        body = i(0, "pass"),
-      }
-    )
-  ),
+  enumerate_loop({ trig = "enum", desc = "enumerate loop" }),
+  enumerate_loop({
+    trig = "enum%s+(%S+)",
+    regTrig = true,
+    hidden = true,
+    desc = "enumerate 指定遍历对象",
+  }, 1),
+  enumerate_loop({
+    trig = "enum(%d+)%s+(%S+)",
+    regTrig = true,
+    hidden = true,
+    desc = "enumerate 指定起始索引和遍历对象",
+  }, 2, 1),
 
   s(
     { trig = "tests", desc = "Multiple test cases" },
@@ -481,6 +515,7 @@ return {
       trig = "ef%s+(%S+)",
       regTrig = true,
       trigEngine = "pattern",
+      hidden = true,
       name = "for adjacency list",
       desc = "遍历邻接表出边",
     },
@@ -502,6 +537,7 @@ return {
       trig = "ee%s+(%S+)",
       regTrig = true,
       trigEngine = "pattern",
+      hidden = true,
       name = "read directed edges",
       desc = "读取有向无权边",
     },
@@ -525,6 +561,7 @@ return {
       trig = "eew%s+(%S+)",
       regTrig = true,
       trigEngine = "pattern",
+      hidden = true,
       name = "read weighted directed edges",
       desc = "读取有向带权边",
     },
@@ -548,6 +585,7 @@ return {
       trig = "ee2%s+(%S+)",
       regTrig = true,
       trigEngine = "pattern",
+      hidden = true,
       name = "read undirected edges",
       desc = "读取无向无权边",
     },
@@ -572,6 +610,7 @@ return {
       trig = "ee2w%s+(%S+)",
       regTrig = true,
       trigEngine = "pattern",
+      hidden = true,
       name = "read weighted undirected edges",
       desc = "读取无向带权边",
     },

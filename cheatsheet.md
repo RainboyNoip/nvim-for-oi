@@ -114,7 +114,7 @@ LaTeX 排版。依赖外部转换器 `utftex`（优先）或 `latex2text`，详�
 | `<C-J>` | 跳到上一个节点 |
 | `<C-n>` / `<C-p>`（**select 模式**） | 下/上一个 choice |
 
-例如输入 `enum<Tab>`，把 `index` 改为 `f` 后，按 `<Tab>` 会跳到 `value`，
+例如输入 `enum a<Tab>`，把 `idx` 改为 `f` 后，按 `<Tab>` 会跳到 `val`，
 不会展开 `f`。需要主动展开 `f` 时按 `<C-K>`；整个过程不弹出选择窗口。
 补全菜单可见时仍优先跳片段节点；在 Insert 模式用 `<C-n>` / `<C-p>` 选择补全项。
 
@@ -188,12 +188,16 @@ Snippet 按用途拆在 `all-snippets/lua-snippets/` 下（C++ 入口 `cpp.lua`�
 | `rf` | `for i in range(n, 0, -1):`（仍 1-based 含端点，与 C++ 的 `rf` 一致） |
 | `rf n` | 倒序，起点来自输入 |
 | `rf l r` | 指定区间的倒序 |
-| `enum` | `for index, value in enumerate(items):` |
+| `enum` / `enum a` | `for idx, val in enumerate(a):` |
+| `enum2 a` | `for idx, val in enumerate(a, 2):`；数字后缀指定起始索引，如 `enum10 a` |
 | `tests` | 读取测试组数并重复调用 `solve()` |
 | `heap` | 导入 `heapq` 并初始化最小堆 |
 | `bisect` | 导入 `bisect_left` / `bisect_right` |
 | `deque` | 导入并初始化 `deque` |
 | `dbg` | `print(value, file=sys.stderr)` |
+
+`enum a` / `enum2 a` 中的 `a` 可以换成其他遍历对象，如 `values` 或 `a[1:]`（不含空格）。
+遍历对象作为固定文本插入；展开后依次修改 `idx`、`val`、起始索引（如有），最后跳到循环体。
 
 ## Python: C++ Snippet 对应版
 

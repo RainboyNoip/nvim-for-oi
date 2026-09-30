@@ -277,7 +277,7 @@ picker 选文件插入 / rbook 索引），归档只是目录组织，不代表�
 
 LuaSnip 片段输入触发词后可按 `<Tab>` 或 `<C-K>` 展开。填写占位符时，
 `<Tab>` / `<S-Tab>` 优先跳到下一个 / 上一个字段，即使补全菜单可见也一样。
-例如 `enum<Tab>` 展开后把 `index` 改为 `f`，再按 `<Tab>` 会跳到 `value`。
+例如 `enum a<Tab>` 展开后把 `idx` 改为 `f`，再按 `<Tab>` 会跳到 `val`。
 需要在占位符内主动展开嵌套片段时按 `<C-K>`（Insert / Select 模式均可），不弹窗。
 完整按键规则见 [cheatsheet.md](cheatsheet.md#luasnip-操作)。
 

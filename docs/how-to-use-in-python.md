@@ -35,7 +35,7 @@ Neovim 不负责：
 | `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 显式注册 `all-snippets/lua-snippets/` 的 cpp / python 入口 |
-| `all-snippets/lua-snippets/python.lua` | 42 个 Python OJ snippets（含从 C++ 迁移的对应版） |
+| `all-snippets/lua-snippets/python.lua` | 44 个 Python OJ snippets（含从 C++ 迁移的对应版） |
 | `all-snippets/vscode-snippets/python.json` | 27 个 Neovim / VSCode 共用的通用 Python snippets |
 | `all-snippets/vscode-snippets/package.json` | 向 VSCode 和 LuaSnip 注册 `python.json` |
 | `lua/fileSnip.lua` | `<Leader>os` / `:OISnipChoose` 模板选择器 |
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 用 `<S-Tab>` 返回上一个字段；这两个键在补全菜单可见时也优先跳字段。
 `<C-K>` 在 Insert / Select 模式都可主动展开片段，包括占位符内的嵌套片段。
 
-例如输入 `enum<Tab>`，把 `index` 改为 `f` 后，再按 `<Tab>` 会跳到 `value`，
+例如输入 `enum a<Tab>`，把 `idx` 改为 `f` 后，再按 `<Tab>` 会跳到 `val`，
 不会触发 `f` 的循环片段。确实需要展开 `f` 时按 `<C-K>`，不弹出选择窗口。
 
 没有可跳转字段时，`<Tab>` 依次尝试展开匹配的片段、选择下一补全项、执行默认 Tab；
@@ -184,7 +184,7 @@ if __name__ == "__main__":
 在 Insert 模式用 `<C-n>` / `<C-p>` 选择补全项，在 Select 模式用这两个键切换 choice node。
 `<C-J>` 也可返回上一个字段；`<C-L>` 用于跳到行尾，`<C-E>` 用于关闭补全菜单。
 
-### OJ snippets（18 个）
+### OJ snippets
 
 | Trigger | 默认展开结果 |
 | --- | --- |
@@ -200,12 +200,18 @@ if __name__ == "__main__":
 | `f n` | `for i in range(n):`，循环 n 次（0..n-1） |
 | `f l r` | `for i in range(l, r + 1):`（保留闭区间，能算出数值就直接算） |
 | `rf` | `for i in range(n, 0, -1):`（仍 1-based 含端点） |
-| `enum` | `for index, value in enumerate(items):` |
+| `enum` / `enum a` | `for idx, val in enumerate(a):` |
+| `enum2 a` | `for idx, val in enumerate(a, 2):`；数字后缀指定起始索引，如 `enum10 a` |
 | `tests` | 读取测试组数并重复调用 `solve()` |
 | `heap` | 导入 `heapq` 并创建 `heap = []` |
 | `bisect` | 导入 `bisect_left`、`bisect_right` |
 | `deque` | 导入 `deque` 并创建 `queue = deque()` |
 | `dbg` | `print(value, file=sys.stderr)` |
+
+`enum a` / `enum2 a` 的遍历对象可以替换为 `values`、`a[1:]` 等不含空格的表达式。
+数字后缀支持非负整数，包括 `enum0 a`、`enum10 a`；前导零会去掉，
+例如 `enum002 a` 展开为 `enumerate(a, 2)`。
+遍历对象作为固定文本插入；按 `<Tab>` 依次跳过 `idx`、`val`、起始索引（如有），最后进入循环体。
 
 `f` / `lf` / `f n` / `fabc` 现在是 0-based 半开（`range(n)`），不再从 1 开始；
 需要指定上下界时用 `f l r`，它仍保留闭区间 `range(l, r + 1)`。原来的 `fr` /
@@ -292,7 +298,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 :lua print(#require("luasnip").get_snippets("python"))
 ```
 
-应输出 `69`：42 个 OJ snippets 加 27 个通用 snippets。
+应输出 `71`：44 个 OJ snippets 加 27 个通用 snippets。
 
 ## 调试
 
@@ -362,7 +368,7 @@ basedpyright --version
 ### Snippet 不展开
 
 1. 用 `:set filetype?` 确认是 `python`。
-2. 用前面的 Lua 命令确认数量是 42。
+2. 用前面的 Lua 命令确认数量是 71。
 3. 在 Insert 模式输入完整 trigger，再按 `<C-K>`。
 4. 执行 `:Lazy`，确认 LuaSnip 已加载。
 

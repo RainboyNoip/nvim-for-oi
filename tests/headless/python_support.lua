@@ -62,7 +62,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 69, "python snippet count")
+  assert_equal(#python_snippets, 71, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -192,6 +192,7 @@ local function run()
     local padded = line_before_cursor .. " "
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { padded })
     vim.api.nvim_win_set_cursor(0, { 1, #padded - 1 })
+    assert(luasnip.expandable(), line_before_cursor .. " must match a snippet")
     luasnip.expand()
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     lines[#lines] = lines[#lines]:gsub(" $", "")
@@ -229,6 +230,56 @@ local function run()
     for_bounds:find("for i in range(l, r + 1):", 1, true),
     "f l r must stay inclusive range(l, r + 1)"
   )
+
+  -- 走真实触发词匹配，检查数字捕获、多位数、前导零和遍历对象的保留。
+  local tab = require("cmp").get_config().mapping["<Tab>"].i
+  for _, case in ipairs({
+    { "enum", "enumerate(a)" },
+    { "enum a", "enumerate(a)" },
+    { "enum values", "enumerate(values)" },
+    { "enum a[1:]", "enumerate(a[1:])" },
+    { "enum0 a", "enumerate(a, 0)", "0" },
+    { "enum1 a", "enumerate(a, 1)", "1" },
+    { "enum2 a", "enumerate(a, 2)", "2" },
+    { "enum10 values", "enumerate(values, 10)", "10" },
+    { "enum002 a", "enumerate(a, 2)", "2" },
+  }) do
+    assert_equal(
+      expand_regex_snippet(case[1]),
+      "for idx, val in " .. case[2] .. ":\n    pass",
+      case[1] .. " expansion"
+    )
+    local fields = { "idx", "val" }
+    if case[3] then
+      table.insert(fields, case[3])
+    end
+    table.insert(fields, "pass")
+    for position, text in ipairs(fields) do
+      local node = luasnip.session.current_nodes[bufnr]
+      assert_equal(node.pos, position, case[1] .. " contiguous jump index")
+      assert_equal(node:get_text(), { text }, case[1] .. " editable field")
+      tab(function() error(case[1] .. " Tab must jump through fields and exit") end)
+    end
+    local exit_node = luasnip.session.current_nodes[bufnr]
+    assert(not exit_node or exit_node.pos == 0, case[1] .. " must exit the dynamic snippet")
+  end
+
+  -- 起始索引可改，遍历对象固定；idx 改成触发词 f 后，Tab 仍跳到 val。
+  expand_regex_snippet("enum002 a")
+  local enum_node = luasnip.session.current_nodes[bufnr]
+  assert_equal(enum_node.pos, 1, "enumerate first field must be idx")
+  local first, last = enum_node.mark:pos_begin_end()
+  vim.api.nvim_buf_set_text(bufnr, first[1], first[2], last[1], last[2], { "f" })
+  vim.api.nvim_win_set_cursor(0, { first[1] + 1, first[2] + 1 })
+  luasnip.active_update_dependents()
+  assert(luasnip.expandable(), "f must match a snippet to reproduce the Tab conflict")
+  tab(function() error("Tab must jump within enumerate") end)
+  assert_equal(luasnip.session.current_nodes[bufnr].pos, 2, "Tab must jump to val")
+  assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "val" }, "val placeholder")
+  luasnip.jump(1)
+  assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "2" }, "start index placeholder")
+  luasnip.jump(1)
+  assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "pass" }, "loop body placeholder")
 
   -- next a b c：名字从正则捕获取，data 是唯一的可改字段（三处 mirror）
   local next_three = expand_regex_snippet("next a b c")
