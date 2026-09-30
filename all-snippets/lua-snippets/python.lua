@@ -330,6 +330,17 @@ return {
   ),
 
   s(
+    { trig = "testsdata", desc = "Multiple test cases from integer iterator" },
+    fmt(
+      [[
+      for _ in range(next(data)):
+          {}(data)
+      ]],
+      { i(1, "solve") }
+    )
+  ),
+
+  s(
     { trig = "heap", desc = "Min-heap setup" },
     fmt(
       [[

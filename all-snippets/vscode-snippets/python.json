@@ -1,22 +1,36 @@
 {
-    "OJ主程序模板": {
+    "OJ主程序模板（逐行输入）": {
         "prefix": "main",
         "body": [
             "import sys",
             "",
+            "input = sys.stdin.buffer.readline",
             "",
             "def solve():",
-            "    # sys.stdin.buffer.readline",
-            "    data =iter(map(int,sys.stdin.buffer.read().split())) ",
-            "    n=next(data)",
-            "    # n,m=next(data),next(data)",
             "    ${0}",
             "",
             "",
             "if __name__ == \"__main__\":",
             "    solve()"
         ],
-        "description": "Python OJ main skeleton"
+        "description": "逐行读取的 Python OJ 主程序；可配合 ii/ints/listi/tests"
+    },
+    "OJ主程序模板（一次性读取）": {
+        "prefix": "mainread",
+        "body": [
+            "import sys",
+            "",
+            "",
+            "def solve(data):",
+            "    ${1:n} = next(data)",
+            "    ${0}",
+            "",
+            "",
+            "if __name__ == \"__main__\":",
+            "    data = iter(map(int, sys.stdin.buffer.read().split()))",
+            "    solve(data)"
+        ],
+        "description": "一次性读取整数的 Python OJ 主程序；可配合 next/testsdata"
     },
     "定义函数": {
         "prefix": "df",
@@ -252,7 +266,14 @@
             "",
             "${1:Alias}: TypeAlias = ${0:ExistingType}"
         ],
-        "description": "使用 TypeAlias 定义 Python 3.10 类型别名"
+        "description": "使用 TypeAlias 定义 Python 3.10 类型别名（旧式写法，Python 3.12+ 建议用 type）"
+    },
+    "定义 PEP 695 类型别名": {
+        "prefix": "type",
+        "body": [
+            "type ${1:Name} = ${0:Type}"
+        ],
+        "description": "使用 PEP 695 type 语句定义类型别名（Python 3.12+；需要泛型时把 Name 写成 Name[T]）"
     },
     "定义可选变量": {
         "prefix": "opt",

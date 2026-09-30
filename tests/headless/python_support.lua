@@ -62,7 +62,7 @@ local function run()
 
   local luasnip = require("luasnip")
   local python_snippets = luasnip.get_snippets("python")
-  assert_equal(#python_snippets, 71, "python snippet count")
+  assert_equal(#python_snippets, 74, "python snippet count")
 
   local trigger_counts = {}
   for _, snippet in ipairs(python_snippets) do
@@ -82,6 +82,7 @@ local function run()
     "rf",
     "enum",
     "tests",
+    "testsdata",
     "heap",
     "bisect",
     "deque",
@@ -89,6 +90,7 @@ local function run()
   }
 
   local general_triggers = {
+    "mainread",
     "df",
     "dft",
     "adf",
@@ -113,6 +115,7 @@ local function run()
     "dictc",
     "gen",
     "ta",
+    "type",
     "opt",
   }
 
@@ -201,8 +204,30 @@ local function run()
 
   local main_expansion = expand_snippet("main")
   assert(main_expansion:find("def solve():", 1, true), "main snippet must define solve()")
+  assert(
+    main_expansion:find("input = sys.stdin.buffer.readline", 1, true),
+    "main snippet must use line input"
+  )
   assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
   assert(main_expansion:find("    solve()", 1, true), "main snippet must call solve()")
+
+  local mainread_expansion = expand_snippet("mainread")
+  assert(mainread_expansion:find("def solve(data):", 1, true), "mainread must pass the iterator")
+  assert(
+    mainread_expansion:find("data = iter(map(int, sys.stdin.buffer.read().split()))", 1, true),
+    "mainread must read stdin once"
+  )
+  assert(mainread_expansion:find("    solve(data)", 1, true), "mainread must call solve(data)")
+
+  local testsdata_expansion = expand_snippet("testsdata")
+  assert(
+    testsdata_expansion:find("for _ in range(next(data)):", 1, true),
+    "testsdata must read the case count from data"
+  )
+  assert(
+    testsdata_expansion:find("    solve(data)", 1, true),
+    "testsdata must pass data to solve"
+  )
 
   -- for 家族：
   --   不带显式下界的默认形态是 0-based 半开 range(n)（Python 习惯，不再是 1-based）；
@@ -249,11 +274,8 @@ local function run()
       "for idx, val in " .. case[2] .. ":\n    pass",
       case[1] .. " expansion"
     )
-    local fields = { "idx", "val" }
-    if case[3] then
-      table.insert(fields, case[3])
-    end
-    table.insert(fields, "pass")
+    -- 起始索引来自 trigger，是静态文本；可编辑字段始终只有 idx/val/pass。
+    local fields = { "idx", "val", "pass" }
     for position, text in ipairs(fields) do
       local node = luasnip.session.current_nodes[bufnr]
       assert_equal(node.pos, position, case[1] .. " contiguous jump index")
@@ -264,7 +286,7 @@ local function run()
     assert(not exit_node or exit_node.pos == 0, case[1] .. " must exit the dynamic snippet")
   end
 
-  -- 起始索引可改，遍历对象固定；idx 改成触发词 f 后，Tab 仍跳到 val。
+  -- 起始索引和遍历对象固定；idx 改成触发词 f 后，Tab 仍跳到 val。
   expand_regex_snippet("enum002 a")
   local enum_node = luasnip.session.current_nodes[bufnr]
   assert_equal(enum_node.pos, 1, "enumerate first field must be idx")
@@ -276,8 +298,6 @@ local function run()
   tab(function() error("Tab must jump within enumerate") end)
   assert_equal(luasnip.session.current_nodes[bufnr].pos, 2, "Tab must jump to val")
   assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "val" }, "val placeholder")
-  luasnip.jump(1)
-  assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "2" }, "start index placeholder")
   luasnip.jump(1)
   assert_equal(luasnip.session.current_nodes[bufnr]:get_text(), { "pass" }, "loop body placeholder")
 
