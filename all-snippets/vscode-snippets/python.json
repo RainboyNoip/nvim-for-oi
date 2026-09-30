@@ -4,15 +4,17 @@
         "body": [
             "import sys",
             "",
-            "input = sys.stdin.buffer.readline",
             "",
-            "",
-            "def ${1:solve}():",
-            "    ${0:pass}",
+            "def solve():",
+            "    # sys.stdin.buffer.readline",
+            "    data =iter(map(int,sys.stdin.buffer.read().split())) ",
+            "    n=next(data)",
+            "    # n,m=next(data),next(data)",
+            "    ${0}",
             "",
             "",
             "if __name__ == \"__main__\":",
-            "    ${1:solve}()"
+            "    solve()"
         ],
         "description": "Python OJ main skeleton"
     },
