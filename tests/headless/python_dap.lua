@@ -88,6 +88,55 @@ local function run()
   watches.add("value")
   assert(watches.get()[1].expression == "value", "disp must retain the watched variable")
 
+  -- cgdb 风格 REPL 命令（见 lua/plugins/dap/repl_commands.lua）
+  local repl_commands = require("plugins.dap.repl_commands")
+  local custom = require("dap.repl").commands.custom_commands
+  for _, name in ipairs({
+    "n", "next", "s", "step", "fin", "finish", "c", "continue",
+    "until", "b", "break", "p", "print", "bt", "where", "locals", "info",
+    "display", "undisplay",
+  }) do
+    assert(type(custom[name]) == "function", "REPL command missing: " .. name)
+  end
+
+  local scratch = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(scratch, 0, -1, false, {
+    "@decorator",
+    "def solve():",
+    "    x = 1",
+    "async def gen():",
+    "    yield 1",
+  })
+  assert(
+    repl_commands.find_function_line(scratch, "solve") == 3,
+    "b 函数名必须落在函数体首行（装饰器不计入）"
+  )
+  assert(repl_commands.find_function_line(scratch, "gen") == 5, "b 函数名必须支持 async def")
+  assert(repl_commands.find_function_line(scratch, "missing") == nil, "b 函数名找不到时返回 nil")
+
+  -- b if / b 文件:行号 if：条件必须落到 breakpoints 上
+  local fixture_win = vim.fn.bufwinid(vim.fn.bufnr(source))
+  if fixture_win ~= -1 then
+    vim.api.nvim_set_current_win(fixture_win)
+  end
+  local breakpoints = require("dap.breakpoints")
+  custom.b("if value > 1")
+  local bps = breakpoints.get()[vim.fn.bufnr(source)] or {}
+  assert(#bps == 1 and bps[1].condition == "value > 1", "b if 必须在当前行设条件断点")
+  custom.b(source .. ":1 if value == 21")
+  local line1
+  for _, bp in ipairs(breakpoints.get()[vim.fn.bufnr(source)] or {}) do
+    if bp.line == 1 then line1 = bp end
+  end
+  assert(line1 and line1.condition == "value == 21", "b 文件:行号 if 必须支持")
+  breakpoints.clear()  -- 清掉条件断点，避免 continue 后再次停下
+
+  -- display / undisplay → disp
+  custom.display("value * 2")
+  assert(watches.get()[2].expression == "value * 2", "display 必须加入 disp")
+  custom.undisplay("value * 2")
+  assert(#watches.get() == 1, "undisplay 必须从 disp 移除")
+
   dap.continue()
   assert(vim.wait(5000, function()
     return dap.session() == nil

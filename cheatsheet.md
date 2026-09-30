@@ -300,6 +300,23 @@ Python DAP 已启用，C/C++ DAP 保持关闭。调试前先保存当前文件�
 F5 启动时弹窗选择 `in` / `*.in` / `*.txt` 等输入文件，Esc 取消。
 界面只有右侧 DAP（REPL）和底部 disp；程序输出也显示在 REPL，无需手动发送 EOF。
 
+REPL 里可以敲 cgdb/gdb 风格命令：
+
+| 命令 | 作用 |
+| --- | --- |
+| `n` / `s` / `fin` / `c` | Step Over / Step Into / Step Out / Continue |
+| `until [N]` | 跑到光标行；`until 36` 先跳到 36 行再跑过去 |
+| `b` / `b if 条件` | 当前行断点 / 条件断点 |
+| `b 文件:行号 [if 条件]` | 指定位置断点，如 `b 3.py:36 if x > 3` |
+| `b 函数名` | 断在函数体首行（同 gdb/pdb 落点） |
+| `p 表达式` | 求值，如 `p n`、`p a[0]` |
+| `bt` / `where` | 调用栈 |
+| `locals` / `info locals` | 局部变量 |
+| `display 表达式` / `undisplay 表达式` | 加入 / 移出 disp |
+
+注意：`n`/`s`/`b`/`c` 被命令占用，看这些变量请用 `p n`（或看行内 virtual-text / disp）。
+`d`/`kill`/`q`/`run` 不做命令，保留给变量求值；结束用 `<F4>`，重启用 `<Leader>dn`。
+
 ## STL / OJ Snippets
 
 | 触发 | 展开结果 |

@@ -8,6 +8,7 @@ return {
   config = function()
     local dap = require("dap")
     require("plugins.dap.python").setup(dap)
+    require("plugins.dap.repl_commands").setup(dap)
     require("nvim-dap-virtual-text").setup({})
 
     -- DAP（REPL）窗口固定在右侧：会话启动自动打开，<leader>dr 随时开关。

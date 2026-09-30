@@ -349,6 +349,32 @@ stdout/stderr 显示在 REPL 中。暂停后可在 REPL 输入 Python 表达式�
 disp 中的表达式会在暂停、单步时刷新；在 Watches 窗口按 `i` 可新增表达式，
 `d` 删除当前监视项，`e` 编辑，回车展开字典、列表等对象。
 
+### REPL 的 gdb 风格命令
+
+右侧 DAP（REPL）窗口同时是命令行，支持 cgdb/gdb 命令（实现见
+`lua/plugins/dap/repl_commands.lua`）：
+
+| 命令 | 作用 |
+| --- | --- |
+| `n` / `next` | Step Over（同 `<F8>`） |
+| `s` / `step` | Step Into（同 `<F7>`） |
+| `fin` / `finish` | Step Out（同 `<Leader>do`） |
+| `c` / `continue` | 继续（同 `<F5>`） |
+| `until [N]` | 跑到光标行；`until 36` 先跳到 36 行再跑过去（≈ `<F9>`） |
+| `b` | 当前行设断点 |
+| `b if 条件` | 当前行条件断点 |
+| `b 文件:行号 [if 条件]` | 指定位置断点，如 `b 3.py:36 if x > 3` |
+| `b 函数名` | 断在函数体首行（装饰器不计入；单行函数不准） |
+| `p 表达式` | 求值，如 `p n`、`p len(prev)` |
+| `bt` / `where` | 打印调用栈 |
+| `locals` / `info locals` | 打印局部变量 |
+| `display 表达式` / `undisplay 表达式` | 加入 / 移出 disp（Watches） |
+
+注意：命令分发优先于表达式求值，所以 `n`/`s`/`b`/`c` 不再是变量名；
+看这些变量请用 `p n`，或直接看行内 virtual-text、disp。
+`d`/`kill`/`q`/`run` 故意不注册为命令（避免误清断点/误杀会话），
+这些词仍可作为变量求值；结束会话用 `<F4>`，重启用 `<Leader>dn`。
+
 ## 故障排查
 
 ### 没有 LSP 补全或诊断
