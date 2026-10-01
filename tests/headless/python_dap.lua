@@ -62,25 +62,32 @@ local function run()
     visible[ft] = true
   end
   assert(visible["dap-repl"] and visible.dapui_watches, "REPL and watches must be visible")
-  local repl_win, watches_win
+  local repl_win, watches_win, edit_win
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
     if ft == "dap-repl" then repl_win = win end
     if ft == "dapui_watches" then watches_win = win end
+    if vim.api.nvim_win_get_buf(win) == vim.fn.bufnr(source) then edit_win = win end
   end
   assert(repl_win and watches_win, "REPL and watches windows must exist")
   local repl_pos = vim.api.nvim_win_get_position(repl_win)
   local watches_pos = vim.api.nvim_win_get_position(watches_win)
-  assert(repl_pos[2] > watches_pos[2], "DAP 窗口必须在右侧")
-  assert(watches_pos[1] > repl_pos[1], "watch 窗口必须在下方")
-  dap.repl.toggle({ width = 48 }, "botright vsplit")
-  assert(not vim.api.nvim_win_is_valid(repl_win), "<leader>dr 必须能关闭 DAP 窗口")
-  dap.repl.toggle({ width = 48 }, "botright vsplit")
+  assert(edit_win, "source window must exist")
+  local edit_pos = vim.api.nvim_win_get_position(edit_win)
+  assert(repl_pos[2] > edit_pos[2], "DAP 窗口必须在编辑器右侧")
+  assert(watches_pos[2] > edit_pos[2], "watch 窗口必须在编辑器右侧")
+  assert(watches_pos[1] > repl_pos[1], "watch 窗口必须在 DAP 窗口下方")
+  require("dapui").toggle()  -- <leader>dr：整栏开关
+  assert(
+    not vim.api.nvim_win_is_valid(repl_win) and not vim.api.nvim_win_is_valid(watches_win),
+    "<leader>dr 必须能关闭整栏"
+  )
+  require("dapui").toggle()
   local reopened
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "dap-repl" then reopened = win end
   end
-  assert(reopened, "<leader>dr 必须能重新打开 DAP 窗口")
+  assert(reopened, "<leader>dr 必须能重新打开整栏")
   for _, ft in ipairs({ "dapui_scopes", "dapui_stacks", "dapui_breakpoints", "dapui_console" }) do
     assert(not visible[ft], "unexpected DAP window: " .. ft)
   end

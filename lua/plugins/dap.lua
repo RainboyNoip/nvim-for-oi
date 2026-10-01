@@ -10,13 +10,6 @@ return {
     require("plugins.dap.python").setup(dap)
     require("plugins.dap.repl_commands").setup(dap)
     require("nvim-dap-virtual-text").setup({})
-
-    -- DAP（REPL）窗口固定在右侧：会话启动自动打开，<leader>dr 随时开关。
-    -- 程序结束后不关，方便查看 stdout/stderr。
-    local repl_winopts = { width = 48 }
-    dap.listeners.after.event_initialized["rainboy_dap_repl"] = function()
-      dap.repl.open(repl_winopts, "botright vsplit")
-    end
   end,
   keys = require("plugins.dap.keys"),
 }

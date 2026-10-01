@@ -295,10 +295,10 @@ Python DAP 已启用，C/C++ DAP 保持关闭。调试前先保存当前文件�
 | `<F9>` | 运行到光标 |
 | `<Leader>dw` | 将光标处变量加入 disp（Watches） |
 | `<Leader>de` | 添加持续监视的表达式 |
-| `<Leader>dr` | 切换右侧 DAP（REPL）窗口 |
+| `<Leader>dr` | 切换右栏（REPL+disp） |
 
 F5 启动时弹窗选择 `in` / `*.in` / `*.txt` 等输入文件，Esc 取消。
-界面只有右侧 DAP（REPL）和底部 disp；程序输出也显示在 REPL，无需手动发送 EOF。
+界面是右栏上下两格：上= DAP（REPL）、下= disp；程序输出显示在 REPL，无需手动发送 EOF。
 
 REPL 里可以敲 cgdb/gdb 风格命令：
 

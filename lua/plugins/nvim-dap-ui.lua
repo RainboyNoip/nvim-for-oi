@@ -9,12 +9,11 @@ return {
     local dap = require("dap")
     local dapui = require("dapui")
 
-    -- 布局：右侧是 DAP（REPL）窗口，由 nvim-dap 自己打开（见 dap.lua，<leader>dr 切换）；
-    -- dapui 只负责底部的 disp（Watches）窗口。
+    -- 布局：右侧一栏分上下两格——上= DAP（REPL），下= disp（Watches）。
+    -- <leader>dr 整栏开关（dapui.toggle）。程序结束后保留右栏，方便查看 stdout。
     dapui.setup({
       controls = {
-        -- 控制条挂在 watches 窗口顶部（原来挂 repl 元素，现 repl 已不归 dapui 管）
-        element = "watches",
+        element = "repl",
         enabled = true,
       },
       floating = {
@@ -25,22 +24,17 @@ return {
       layouts = {
         {
           elements = {
-            { id = "watches", size = 1 },
+            { id = "repl", size = 0.65 },
+            { id = "watches", size = 0.35 },
           },
-          position = "bottom",
-          size = 10,
+          position = "right",
+          size = 48,
         },
       },
     })
 
     dap.listeners.after.event_initialized["rainboy_dapui"] = function()
       dapui.open()
-    end
-    dap.listeners.before.event_terminated["rainboy_dapui"] = function()
-      dapui.close()
-    end
-    dap.listeners.before.event_exited["rainboy_dapui"] = function()
-      dapui.close()
     end
   end,
 }

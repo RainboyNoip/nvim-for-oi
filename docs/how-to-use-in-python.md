@@ -325,7 +325,7 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 | `<Leader>do` | Step Out |
 | `<Leader>dw` | 将光标处变量加入 disp（Watches）窗口 |
 | `<Leader>de` | 输入要持续监视的表达式 |
-| `<Leader>dr` | 切换右侧 DAP（REPL）窗口 |
+| `<Leader>dr` | 切换右栏（REPL+disp） |
 | `<Leader>dt` | 结束调试 |
 
 典型流程：
@@ -333,8 +333,8 @@ Python snippet 冲突的 `f` / `rf` / `sc` / `main` / `dbg` 保留既有版本�
 1. 把光标放在目标行，按 `<F6>` 设置断点。
 2. 按 `<F5>`，在弹出的窗口中选择输入文件，回车启动；Esc 取消。
 3. 程序停下后使用 `<F7>`、`<F8>`、`<F9>`。
-4. 右侧是 DAP（REPL）窗口，底部是 disp（Watches）窗口；`<Leader>dr` 切换
-   右侧 DAP 窗口。光标放在变量上按 `<Leader>dw`
+4. 右侧一栏分上下两格：上= DAP（REPL），下= disp（Watches）；`<Leader>dr`
+   切换整栏。光标放在变量上按 `<Leader>dw`
    添加持续监视；用 `<Leader>de` 添加 `len(prev)`、`people[0]` 等表达式。
 5. 按 `<F4>` 结束。
 
