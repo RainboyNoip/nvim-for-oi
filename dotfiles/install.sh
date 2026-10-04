@@ -86,6 +86,12 @@ if [ -e "$HOME_DIR/.clang-format" ] || [ -L "$HOME_DIR/.clang-format" ]; then
     echo -e "${YELLOW}或自行加一句: ln -sfn ~/.clang-format /tmp/.clang-format${NC}"
 fi
 
+# 4. 安装 ruff 用户级配置（Python 格式化行宽等）
+echo ""
+echo "Installing ruff config..."
+mkdir -p "$HOME_DIR/.config/ruff"
+create_symlink "$SCRIPT_DIR/../config/ruff.toml" "$HOME_DIR/.config/ruff/ruff.toml"
+
 echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo -e "Please make sure ${YELLOW}'$BIN_DIR'${NC} is in your shell's \$PATH."

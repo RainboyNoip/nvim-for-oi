@@ -422,6 +422,22 @@ ln -s "$(pwd)/config/clangd.yaml" "$HOME/.config/clangd/config.yaml"
 
 重启 Neovim 后生效。项目目录中的 `.clangd` 可以覆盖这项用户级设置。
 
+#### 安装 Python 格式化配置（ruff）
+
+Python 用 [ruff.toml](config/ruff.toml) 做格式化（BasedPyright 不提供格式化能力，
+实测其 capabilities 里没有 `textDocument/formatting`），按 `<Leader>cf` 手动触发，
+**不在保存前自动跑**：ruff format 是 Black 语义，会把 `if x: f()` 这类一行复合语句
+拆成多行，自动跑会反复改掉一行流写法。在仓库根目录执行一次：
+
+```bash
+mkdir -p "$HOME/.config/ruff"
+ln -s "$(pwd)/config/ruff.toml" "$HOME/.config/ruff/ruff.toml"
+```
+
+配置里把行宽定为 120（ruff 默认 88 会把长表达式拆成 `inv[\n len\n]` 这种样子）。
+ruff 的用户级配置对 `/tmp` 下的临时文件同样生效，无需额外软链。
+未安装 ruff 时按键会提示安装（`sudo pacman -S ruff` 或 `pip install ruff`）。
+
 `<Leader>sf` 依赖 clangd 返回的 document symbols。如果当前 C++ 文件存在严重语法错误，符号列表可能为空；先修正语法错误后再使用。
 
 Python LSP 由 BasedPyright 提供，使用适合 OJ 的宽松诊断。Python 的模板、

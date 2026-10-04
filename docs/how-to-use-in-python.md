@@ -13,13 +13,16 @@ Neovim 负责：
 - BasedPyright 补全、诊断、定义跳转、引用、重命名和文件符号。
 - Pythonic LuaSnip 和完整 OJ 模板。
 - debugpy 断点、单步、变量、调用栈和 REPL。
+- `<Leader>cf` 手动调 ruff format 格式化当前 Python 文件。
 
 Neovim 不负责：
 
 - 普通运行的一键入口（调试支持选择输入文件）。
 - Codeforces、洛谷样例下载。
 - 样例评测、输出 diff 和对拍。
-- 虚拟环境、第三方依赖、自动格式化和 import 排序。
+- 虚拟环境、第三方依赖、保存前自动格式化和 import 排序。
+  （格式化只做手动触发：ruff format 会拆开 `if x: f()` 这类一行复合语句，
+  自动跑会反复改掉一行流写法。）
 
 这些工作继续在终端完成。
 
@@ -30,7 +33,7 @@ Neovim 不负责：
 | `lua/lsp.lua` | 注册并启用 clangd 与 BasedPyright；LSP 缺失时提示安装 |
 | `lua/lsp/basedpyright.lua` | Python 3.15 目标版本、LSP root、宽松诊断和分析范围 |
 | `lua/plugins/lang-python.lua` | 只在 Python buffer 加载本地设置 |
-| `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释和 fold marker |
+| `lua/local/python-settings/lua/python-settings.lua` | 4 空格、Python 注释、fold marker 和 `<Leader>cf` ruff 格式化 |
 | `lua/plugins/treesitter.lua` | 为 Python filetype 安全启动 Treesitter |
 | `lua/plugins/LuaSnip.lua` | 显式注册 `all-snippets/lua-snippets/` 的 cpp / python 入口 |
 | `all-snippets/lua-snippets/python.lua` | 45 个 Python OJ snippets（含从 C++ 迁移的对应版） |
