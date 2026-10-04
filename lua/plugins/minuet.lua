@@ -79,14 +79,40 @@ return {
     })
 
     vim.keymap.set("n", "<leader>at", "<cmd>Minuet virtualtext toggle<cr>", {
-      desc = "Toggle Minuet completion",
+      desc = "切换 AI 补全 开/关",
+    })
+    vim.keymap.set("n", "<leader>ad", "<cmd>Minuet virtualtext disable<cr>", {
+      desc = "关闭 AI 自动补全",
+    })
+    vim.keymap.set("n", "<leader>ae", "<cmd>Minuet virtualtext enable<cr>", {
+      desc = "开启 AI 自动补全",
     })
     vim.keymap.set("n", "<leader>af", "<cmd>Minuet change_preset fast<cr>", {
-      desc = "Minuet fast preset",
+      desc = "AI 补全切到 fast 预设 (快)",
     })
     vim.keymap.set("n", "<leader>ac", "<cmd>Minuet change_preset choice<cr>", {
-      desc = "Minuet choice preset",
+      desc = "AI 补全切到 choice 预设 (多候选)",
     })
+
+    -- DeepSeek 余额不足 / API 报错时，Minuet 会把服务端原始响应原样 notify
+    -- 出来（一大坨英文 JSON）。这里包装 vim.notify，拦截并翻译成友好提示。
+    -- 做法：匹配 DeepSeek 常见错误码（402 Insufficient Balance、401 无效 key 等）。
+    local notify = vim.notify
+    vim.notify = function(msg, level, opts)
+      if type(msg) == "string" and msg:find("DeepSeek returns error", 1, true) then
+        if msg:find("Insufficient Balance", 1, true) or msg:find("402", 1, true) then
+          notify("AI 补全失败：DeepSeek 账户余额不足，请充值后重试", vim.log.levels.ERROR, { title = "Minuet / AI 补全" })
+          return
+        elseif msg:find("Authentication Fails", 1, true) or msg:find("401", 1, true) then
+          notify("AI 补全失败：DEEPSEEK_API_KEY 无效或已过期", vim.log.levels.ERROR, { title = "Minuet / AI 补全" })
+          return
+        elseif msg:find("Not Found", 1, true) or msg:find("404", 1, true) then
+          notify("AI 补全失败：模型或接口不存在（404）", vim.log.levels.ERROR, { title = "Minuet / AI 补全" })
+          return
+        end
+      end
+      notify(msg, level, opts)
+    end
 
     if not has_deepseek_key then
       vim.schedule(function()
