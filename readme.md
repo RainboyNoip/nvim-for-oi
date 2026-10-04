@@ -388,8 +388,11 @@ clangd 尚未附着时会跳过本次格式化，不影响保存。
 #### 安装全局 C++ 格式规则
 
 仓库提供 [clang-format](config/clang-format)，用于 OI 单文件：
-短 `if`（无 `else`）、`for` 和 `while` 会在一行内保留，例如
-`if (l == r) return tree[p].sum;`。在仓库根目录执行一次：
+短 `if`（无 `else`）、`for`、`while` 和单语句块会在一行内保留，例如
+`if (l == r) return tree[p].sum;`、`if (l == r) { tree[p].sum = a[l]; }`；
+`case 1: return 2;` 同样保留一行。规则不限制列宽（`ColumnLimit: 0`），
+只统一缩进为 4 空格，不会把手工排的长表达式或长字符串折断；`#include` 顺序保持原样。
+在仓库根目录执行一次：
 
 ```bash
 ln -s "$(pwd)/config/clang-format" "$HOME/.clang-format"
@@ -397,6 +400,17 @@ ln -s "$(pwd)/config/clang-format" "$HOME/.clang-format"
 
 `~/.clang-format` 是 clang-format 的用户级配置；它会应用到主目录下所有未被项目
 `.clang-format` 覆盖的 C++ 文件。规则更新后无需重新链接，重启 Neovim 后保存文件即可。
+
+注意：clang-format 是从**文件所在目录逐级向上**找 `.clang-format` 的，所以在 `/tmp` 下
+写的临时题单文件找不到 `~/.clang-format`，会退回纯 LLVM 风格（2 空格、全部展开）。
+补一条软链即可覆盖 `/tmp`：
+
+```bash
+ln -sfn "$HOME/.clang-format" /tmp/.clang-format
+```
+
+`/tmp` 通常是 tmpfs，重启即清空；`dotfiles/install.sh` 会自动补建这条软链，
+也可自行把上面这句加到 shell 启动文件里。
 
 仓库也提供 [clangd.yaml](config/clangd.yaml)，关闭 OI 常见的“未使用头文件”诊断。
 安装为 clangd 用户配置：

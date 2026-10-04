@@ -71,6 +71,21 @@ for script in "$SCRIPT_DIR/scripts"/*; do
     create_symlink "$script" "$BIN_DIR/${filename%.sh}"
 done
 
+# 3. 安装 C++ 格式规则（clang-format）
+echo ""
+echo "Installing clang-format style..."
+create_symlink "$SCRIPT_DIR/../config/clang-format" "$HOME_DIR/.clang-format"
+
+# clang-format 从文件所在目录逐级向上找 .clang-format，/tmp 的父目录是 /，
+# 找不到 ~/.clang-format，临时题单文件会退回纯 LLVM 风格（2 空格、全部展开）。
+# 补一条软链覆盖 /tmp；但 /tmp 一般是 tmpfs，重启即清空。
+if [ -e "$HOME_DIR/.clang-format" ] || [ -L "$HOME_DIR/.clang-format" ]; then
+    ln -sfn "$HOME_DIR/.clang-format" /tmp/.clang-format
+    echo -e "${GREEN}Symlink /tmp/.clang-format -> $HOME_DIR/.clang-format${NC}"
+    echo -e "${YELLOW}注意: /tmp 重启即清空，需要时重跑本脚本，${NC}"
+    echo -e "${YELLOW}或自行加一句: ln -sfn ~/.clang-format /tmp/.clang-format${NC}"
+fi
+
 echo ""
 echo -e "${GREEN}Installation complete!${NC}"
 echo -e "Please make sure ${YELLOW}'$BIN_DIR'${NC} is in your shell's \$PATH."

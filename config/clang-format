@@ -2,8 +2,22 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
 
+# 不限制列宽：只统一缩进，不碰手工排的折行。
+# LLVM 默认 80 列会把长表达式从中间断开、把长字符串拆成相邻字面量。
+ColumnLimit: 0
+
 # if 没有 else 时，将短语句压缩为一行。
 AllowShortIfStatementsOnASingleLine: WithoutElse
 
 # 将短 for / while 循环压缩为一行。
 AllowShortLoopsOnASingleLine: true
+
+# 单语句块保留一行，如 if (l == r) { tree[p].sum = a[l]; }。
+# 含两条语句的块必被拆行（clang-format 限制），想留一行就别写花括号。
+AllowShortBlocksOnASingleLine: Always
+
+# case 1: return 2; 保留一行。
+AllowShortCaseLabelsOnASingleLine: true
+
+# 不重排 #include：OI 里宏（如 #define int long long）与 include 的顺序常有讲究。
+SortIncludes: Never
