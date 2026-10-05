@@ -4,7 +4,8 @@
 `lua/plugins/*`、`lua/local/cpp-settings`、`lua/local/python-settings`、`lua/fileSnip.lua`。
 
 前提：只用 C++ 和 Python 打 OI / OJ，单文件 `main.cpp` 为主，无 `compile_commands.json`，
-不做跨文件重构，不要求自动格式化。
+不做跨文件重构。（原文此处写着“不要求自动格式化”——2026-10 已作废：现在 C++ 保存前
+自动格式化、两门语言都有 `<leader>cf` 手动格式化，见 §7。）
 
 结论：**启动链路是健康的，不需要为了"快"去砍插件。真正该做的是修 3 个功能 bug +
 清掉 clangd / cmp 里对本场景无用的开销。**
@@ -214,7 +215,7 @@ cmd = { "clangd",
 | `--header-insertion=iwyu` | **改 `never`** | 会在接受补全时往文件头插 `#include <vector>` 之类，你写 OI 还得手删 |
 | `--completion-style=detailed` | 保留 | cmp 里签名可读性好 |
 | `--function-arg-placeholders` | 保留 | 配合 snippet/Tab 填参 |
-| `--fallback-style=llvm` | 保留 | 只影响格式化，而你没开 format-on-save |
+| `--fallback-style=llvm` | 保留 | 只在找不到 `.clang-format` 时生效（现在主要是 `/tmp` 临时文件）。⚠ 2026-10 实测：clangd 的 fallback **只接受风格名**，`file:...` 和内联 YAML 都会被判 `Invalid fallback style` 后静默落回 LLVM，config 的 `Style:` 键也无效；已用 `/tmp/.clang-format` 软链补救（见 §7） |
 
 **实际改动（✅ 已完成）**：cmd 变成
 
@@ -429,7 +430,7 @@ module = "luasnip",
 cpp/python buffer 的 FileType 事件**。`--startuptime` 里能直接看到 `require('luasnip')`
 (2.5 ms) / `from_vscode` (2.2 ms) / `util.parser` (1.8 ms) 这些现在挂在
 `FileType Autocommands for "cpp"` 下面。所以“打开第一个 cpp 文件”的总耗时几乎没变
-（64.0 → 63.1 ms），真正变快的是**不开 cpp/python 的场景**（dashbaord、临时 buffer、
+（64.0 → 63.1 ms），真正变快的是**不开 cpp/python 的场景**（dashboard、临时 buffer、
 .md/.txt、git commit）：那才是 20 ms 的真收益。
 
 **顺带查清的一件事**：`<Tab>` 的 `desc` 是 `vim.snippet.jump if active, otherwise <Tab>`，
@@ -455,7 +456,7 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 | --- | --- | --- |
 | marks.nvim | `lua/plugins/marks.lua` | 位置书签，OI 单文件用不上；`opts` 里只有从默认模板拄贝的 `bookmark_0`（`virt_text = "hello world"`），实际上从未被重新配置过 |
 | render-markdown.nvim | `lua/plugins/render-markdown.lua` | ~~`enabled = false` —— 可直接删依赖~~ **2026-09 更新：已改为启用**（`enabled = true` + `ft = { "markdown" }` 懒加载 + `<Leader>mm/me/md` 开关），本行结论作废，不再是待删项 |
-| DAP 全套 | `lua/plugins/dap.lua`、`nvim-dap-ui.lua`、`lua/plugins/dap/` | 已在 `c65b475` 整块注释禁用，readme 改推终端 gdb。既然不启用就删文件，别让 `docs/how-to-use-in-python.md` 和 `tests/headless/python_dap.lua` 长期描述一个不存在的功能 |
+| DAP 全套 | `lua/plugins/dap.lua`、`nvim-dap-ui.lua`、`lua/plugins/dap/` | ~~已在 `c65b475` 整块注释禁用，既然不启用就删文件~~ **2026-10 更新：已重新启用，本行结论作废**。`7fa004a` 启用 Python DAP（nvim-dap + debugpy + 输入文件选择），随后 `3e22c6e` / `45e03e5` / `900fd07` 调整为右侧 DAP 布局、REPL 支持 cgdb 风格命令（n/s/b/until/p）。C/C++ DAP 仍关闭。不再是待删项；`docs/how-to-use-in-python.md` 与 `tests/headless/python_dap.lua` 描述的也确实是存在的功能 |
 | 两套模板入口并存 | `lua/plugins/rbook.lua` + `lua/fileSnip.lua` | rbook.nvim 是带索引的本地插件，`<leader>of`/`<leader>oe` 与 `<leader>rf`/`<leader>rc` 功能重叠。留一套。<br>**2026-09 更新**：已修好并可用。① 旧的硬编码路径（`~/mycode/rbook_nunjucks/...`）在仓库移进 `教程与书籍/` 后已失效，现改为“环境变量 `RBOOK_CODE_YAML` → 本仓库 mini 库”两级回退，且环境变量指向的文件不存在时会**自动退回 mini 库**而不是把插件搞坏；② 已装 `luarocks` + 针对 LuaJIT 5.1 ABI 编译的 `lyaml`；③ 仓库内新增 mini 模板库 `all-snippets/oi-snippets/rbook/{code.yaml,code/cpp/main.cpp,code/python/main.py}`。实测：无变量时扫出 2 个模板，设变量指向书库时扫出 157 个。<br>所以本行现在不再是一个“要删的东西”，而是一个**已解决**的重复：若仍想要单一入口，删 fileSnip 或删 rbook 都行，但两者现在都能用。<br>④ 2026-09 新增：`RbookCodeFiles` / `RbookCode` 按当前 buffer 的 filetype 过滤（`cpp`/`c`/`h`/`hpp` → `.cpp/.cc/.cxx`，`python` → `.py`；未登记的 filetype 不过滤），`:RbookCodeFiles!` / `:RbookCode!` 可强制看全部。实测书库：cpp buffer 148（共 158）/ py buffer 5 / markdown 不过滤 158 |
 | 多余配色 | `lua/plugins/colortheme.lua:15-23` | tokyonight / kanagawa / kanagawa-paper / moonfly / everviolet **都没安装**（`lazy-lock.json` 里只有 `vim-nightfly-colors` 和 `themify.nvim`），因为它们在 `config` 表里而不是 `dependencies` —— 属失效配置。而 `loader` 的兜底 `vim.cmd.colorscheme("moonfly")`（`:30`）在 moonfly 未安装时会直接报错 —— 潜在 bug |
 | 空目录 | `after/ftplugin/`、`plugin/`、`tmp/` | 直接 `git rm -r --cached` + 删 |
@@ -468,7 +469,8 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 ## 4. 做得对、明确不要动的地方
 
 - `lua/lsp.lua` 用 `vim.lsp.config` + `vim.lsp.enable`，不依赖 `nvim-lspconfig` 插件
-  （readme 里还写着 `nvim-lspconfig`，属文档漂移）。少一个必装插件 = 少一层启动开销。
+  （readme 曾经写着 `nvim-lspconfig`，现已在插件列表里注明“并不需要”，漂移已修）。
+  少一个必装插件 = 少一层启动开销。
 - `lua/plugins/treesitter.lua`：只 `setup({ install_dir = ... })`，不用 main-module 的
   `highlight`/`indent` 表，而是 FileType autocmd + `pcall(vim.treesitter.start, ...)`
   （`:13-21`，pattern 正好是 c/cpp/markdown/python）。0.12 main 分支上这是更省、更可预测
@@ -479,8 +481,9 @@ cmp 加载后会用自己 i/s 的 `<Tab>` 覆盖它（见 2.6）。
 - `lua/keymaps.lua:46-47` 用 select 模式的 `<C-n>`/`<C-p>` 处理 snippet choice，避开与 cmp
   的 insert 模式 `<C-n>`/`<C-p>`（`nvim-cmp.lua:49-50`）抢键 —— 这是上一次 commit
   （"stop hijacking `<C-n>`/`<C-p>`"）的正确做法，保留。
-- 没有 format-on-save、没有 gitsigns、没有 telescope+plenary（用 snacks picker）。
-  这是暖启动能压在 45 ms 的直接原因。
+- 没有 gitsigns、没有 telescope+plenary（用 snacks picker）。这是暖启动能压在 45 ms 的
+  直接原因。（原文此处写“没有 format-on-save”，2026-10 已作废：现在 C++ 保存前会自动
+  格式化，但它走 clangd 自带能力 + 一个 autocmd，**零插件依赖**，不占启动预算。）
 - 语言设置隔离成 `lua/local/cpp-settings` + `lua/local/python-settings` 两个本地插件，靠
   `ft` 触发，不互相污染 buffer。结构是对的（只需按 1.1 改法 B 修绑定方式）。
 - `lua/config/lazy.lua:28` `checker = { enabled = false }` + lockfile：比赛机器上不会被
@@ -547,3 +550,47 @@ clangd 会直接报启动失败而不是给出安装提示。把 clangd 也包�
   **不足以作为依据**。`ps` 的 `pcpu` 是进程启动以来的平均值，200 个微型文件的索引可能在
   第一次采样（6 s）前就跑完了；同时全盘找不到 `.idx` 分片，两种解释（没索引 / 索引早已完成
   并清理）都与该测量兼容。所以 2.1 的结论只按配置语义推导，不依赖那次测量。
+
+---
+
+## 7. 补记：格式化（2026-10 新增，本文前提“不要求自动格式化”已作废）
+
+| 语言 | 保存前自动 | 手动 | 规则文件 |
+| --- | --- | --- | --- |
+| C++ | ✅ `BufWritePre` → `vim.lsp.buf.format()`（clangd 提供能力）| `<leader>cf` | `config/clang-format` → `~/.clang-format` |
+| Python | ❌ 刻意不做（理由见下）| `<leader>cf` → `ruff format` 管道写回 | `config/ruff.toml` → `~/.config/ruff/ruff.toml` |
+
+实现位置：`lua/local/cpp-settings/lua/cpp-settings.lua`（`RainboyCppFormat`）、
+`lua/local/python-settings/lua/python-settings.lua`（`format_python_buffer`）。
+
+**为什么 Python 不走 LSP**：BasedPyright 不提供 `textDocument/formatting`（实测
+`initialize` 返回的 capabilities 里没有此项，只有 onTypeFormatting 的 `{` 触发），所以
+照搬 C++ 那套 `vim.lsp.buf.format()` 会静默什么都不做。只能调外部工具；本机只有
+`ruff`（black / yapf / autopep8 未装）。
+
+**为什么 Python 刻意不做保存前自动**：ruff format 是 Black 语义，会拆开 `if x: f()`
+这类一行复合语句（实测 `if n == 0: print(0)` → 2 行），自动跑会反复改掉一行流写法。
+C++ 侧之所以能自动，是因为 clang-format 被调成“只管缩进不动折行”：
+
+| 规则 | 作用 |
+| --- | --- |
+| `ColumnLimit: 0` | LLVM 默认 80 列会把长表达式从中间断开、把长字符串拆成相邻字面量；置 0 后一律不动 |
+| `AllowShortBlocksOnASingleLine: Always` | 单语句块保留一行（**两语句块必被拆**，这是硬限制，想留一行只能不写花括号）|
+| `AllowShortCaseLabelsOnASingleLine: true` | `case 1: return 2;` 保留一行 |
+| `SortIncludes: Never` | 不重排 `#include`（OI 里宏与 include 的顺序常有讲究）|
+
+ruff 侧只定了 `line-length = 120`（默认 88 会把长表达式拆成 `inv[\n len\n]`）。
+
+**`/tmp` 临时文件的坑（实测，与 §2.1 的 root 讨论同源）**：clang-format 从**文件所在目录
+逐级向上**找 `.clang-format`，`/tmp` 的父目录是 `/`，所以 /tmp 下的文件永远找不到
+`~/.clang-format`，落回纯 LLVM（2 空格、全展开）。试过的修法全部无效：
+
+| 修法 | 实测结果 |
+| --- | --- |
+| `--fallback-style=file:~/.clang-format` | ❌ `Invalid fallback style`（fallback 只收风格名）|
+| `--fallback-style={内联 YAML}` | ❌ 同上（仅 clang-format CLI 支持，clangd 不支持）|
+| clangd config 的 `Style:` 键 | ❌ 被解析（报错形式证明键存在）但对格式化无作用 |
+| `ln -sfn ~/.clang-format /tmp/.clang-format` | ✅ CLI 与 clangd 都实测生效 |
+
+所以 `dotfiles/install.sh` 会补建这条软链；但 `/tmp` 是 tmpfs，重启即清空。
+ruff 没有这个问题：其用户级配置（`~/.config/ruff/ruff.toml`）对 `/tmp` 文件同样生效。
