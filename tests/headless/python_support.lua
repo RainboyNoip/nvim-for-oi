@@ -69,7 +69,7 @@ local function run()
   end
 
   local oj_triggers = {
-    "main",
+    "mainread-line",
     "solve",
     "fastin",
     "ii",
@@ -201,14 +201,20 @@ local function run()
     return table.concat(lines, "\n")
   end
 
-  local main_expansion = expand_snippet("main")
-  assert(main_expansion:find("def solve():", 1, true), "main snippet must define solve()")
+  local mainread_line_expansion = expand_snippet("mainread-line")
   assert(
-    main_expansion:find("input = sys.stdin.buffer.readline", 1, true),
-    "main snippet must use line input"
+    mainread_line_expansion:find("def solve():", 1, true),
+    "mainread-line snippet must define solve()"
   )
-  assert(main_expansion:find('if __name__ == "__main__":', 1, true), "main guard is missing")
-  assert(main_expansion:find("    solve()", 1, true), "main snippet must call solve()")
+  assert(
+    mainread_line_expansion:find("    input = sys.stdin.buffer.readline", 1, true),
+    "mainread-line must set line input inside solve()"
+  )
+  assert(
+    mainread_line_expansion:find('if __name__ == "__main__":', 1, true),
+    "mainread-line guard is missing"
+  )
+  assert(mainread_line_expansion:find("    solve()", 1, true), "mainread-line must call solve()")
 
   local mainread_expansion = expand_snippet("mainread")
   assert(mainread_expansion:find("def solve(data):", 1, true), "mainread must pass the iterator")

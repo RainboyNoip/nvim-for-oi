@@ -1,12 +1,12 @@
 {
     "OJ主程序模板（逐行输入）": {
-        "prefix": "main",
+        "prefix": "mainread-line",
         "body": [
             "import sys",
             "",
-            "input = sys.stdin.buffer.readline",
             "",
             "def solve():",
+            "    input = sys.stdin.buffer.readline",
             "    ${0}",
             "",
             "",
