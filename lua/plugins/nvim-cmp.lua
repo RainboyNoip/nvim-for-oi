@@ -233,7 +233,26 @@ return {
           hl_group = "CmpGhostText",
         } or false,
       },
-      sorting = defaults.sorting,
+      -- Snippet 永远排在非 Snippet 之前。
+      -- cmp 自带的 kind 比较器本就有这条规则（“snippets be the highest”），但它排在
+      -- exact/score 之后：输入 `main` 时 LSP 的 `main`（词与输入完全相等）在
+      -- source.lua 里被标成 exact=true，于是在第 2 位的 compare.exact 就把片段压死了
+      -- （实测片段 score 更高也翻不了身）。这里只在最前面插一条“Snippet vs 非 Snippet”
+      -- 的比较器，其余链路（offset/exact/score/locality/kind/...）原样保留。
+      sorting = (function()
+        local comparators = {
+          function(entry1, entry2)
+            local s1 = entry1:get_kind() == cmp.lsp.CompletionItemKind.Snippet
+            local s2 = entry2:get_kind() == cmp.lsp.CompletionItemKind.Snippet
+            if s1 ~= s2 then
+              return s1
+            end
+            return nil
+          end,
+        }
+        vim.list_extend(comparators, defaults.sorting.comparators)
+        return { comparators = comparators }
+      end)(),
     }
   end,
   -- main = "lazyvim.util.cmp",
